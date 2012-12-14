@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="500.0" prefWidth="330.0" style="-fx-background: #eee;" xmlns:fx="http://javafx.com/fxml" fx:controller="com.philipp_mandler.hexapod.infoscreen.MainWindowController">
+  <children>
+    <VBox id="vBox1" prefHeight="500.0" prefWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <children>
+        <AnchorPane id="anchorPane1" style="-fx-background-color: #333;" VBox.vgrow="NEVER">
+          <children>
+            <Label id="label1" text="Hexapod Infoscreen" textFill="WHITE" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
+              <font>
+                <Font size="24.0" />
+              </font>
+            </Label>
+          </children>
+        </AnchorPane>
+        <AnchorPane id="anchorPane2" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+          <children>
+            <ScrollPane id="scrollPane1" fitToWidth="true" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <content>
+                <VBox id="vBox2" fx:id="vbox_infoholder" fillWidth="false">
+                  <padding>
+                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  </padding>
+                </VBox>
+              </content>
+            </ScrollPane>
+          </children>
+        </AnchorPane>
+        <ToolBar id="toolBar1" VBox.vgrow="NEVER">
+          <items>
+            <TextField id="textField1" fx:id="textfield_connectAddress" prefWidth="200.0" promptText="Hexapod Address..." />
+            <Button id="button1" fx:id="button_connect" onAction="#button_connect_click" text="Connect" />
+          </items>
+        </ToolBar>
+      </children>
+    </VBox>
+  </children>
+</AnchorPane>

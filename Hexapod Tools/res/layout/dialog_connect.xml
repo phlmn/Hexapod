@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <EditText
+        android:id="@+id/text_address"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginTop="12dp"
+        android:ems="10"
+        android:hint="@string/dialog_connect_address_hint"
+        android:inputType="textUri" >
+
+        <requestFocus />
+
+    </EditText>
+    <Button
+        android:id="@+id/button_connect"
+        style="@android:style/Widget.Holo.Light.Button.Borderless.Small"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_connect_connect" />
+
+</LinearLayout>

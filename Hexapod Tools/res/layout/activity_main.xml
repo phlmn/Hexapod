@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:showDividers="middle"
+    tools:context=".MainActivity"
+    android:baselineAligned="false"
+    android:background="#fff" >
+
+	 <FrameLayout
+	     android:layout_width="0dp"
+	     android:layout_height="match_parent"
+	     android:layout_weight="1"
+	     android:layout_marginLeft="12dp"
+	     android:layout_marginTop="12dp"
+	     android:layout_marginBottom="12dp" >
+
+	     <fragment
+	         android:name="com.philipp_mandler.hexapod.android.PagesFragment"
+	         android:layout_width="fill_parent"
+	         android:layout_height="fill_parent"
+	         android:tag="pages_fragment" />
+
+	 </FrameLayout>
+
+     <FrameLayout
+	     android:layout_width="0dp"
+	     android:layout_height="fill_parent"
+	     android:layout_weight="4"
+	     android:layout_margin="12dp"
+	     android:background="#555"
+	     android:padding="1dp" >
+	     
+	    <FrameLayout
+		    android:layout_width="fill_parent"
+	    	android:layout_height="fill_parent"
+	    	android:background="#fff" >
+	    	
+	        <FrameLayout
+		        android:id="@+id/content_fragment"
+	    	    android:layout_width="fill_parent"
+	        	android:layout_height="fill_parent" >
+	        </FrameLayout>
+	        
+	    </FrameLayout>
+	    
+	 </FrameLayout>
+</LinearLayout>

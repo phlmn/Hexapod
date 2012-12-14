@@ -1,0 +1,66 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+    <com.philipp_mandler.hexapod.android.LegView
+        android:id="@+id/legView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+	<RadioGroup
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="right|center"
+	    android:layout_margin="20dp"
+	    android:background="#ffffff"
+	    android:clickable="true"
+	    android:paddingBottom="20dp"
+	    android:paddingLeft="20dp"
+	    android:paddingRight="34dp"
+	    android:paddingTop="20dp" >
+
+        <RadioButton
+            android:id="@+id/radio_leg1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/fragment_leg_leg1"
+            android:onClick="onRadioButtonClicked" />
+
+        <RadioButton
+            android:id="@+id/radio_leg2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fragment_leg_leg2"
+            android:onClick="onRadioButtonClicked" />
+
+        <RadioButton
+            android:id="@+id/radio_leg3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fragment_leg_leg3"
+            android:onClick="onRadioButtonClicked" />
+        <RadioButton
+            android:id="@+id/radio_leg4"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fragment_leg_leg4"
+            android:onClick="onRadioButtonClicked" />
+
+        <RadioButton
+            android:id="@+id/radio_leg5"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fragment_leg_leg5"
+            android:onClick="onRadioButtonClicked" />
+
+        <RadioButton
+            android:id="@+id/radio_leg6"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fragment_leg_leg6"
+            android:onClick="onRadioButtonClicked" />
+
+    </RadioGroup>
+
+</FrameLayout>
