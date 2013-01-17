@@ -1,0 +1,67 @@
+/* Common */
+
+.button {
+	-fx-background-color: #333;
+	-fx-background-radius: 0;
+}
+
+.text-field {
+	-fx-background-color: #e5e5e5;
+	-fx-background-radius: 0;
+}
+
+/* Console Scrollbar */
+
+#console .scroll-bar:vertical {
+	-fx-background-color: #111;
+}
+
+#console .scroll-bar:vertical .increment-button,
+#console .scroll-bar:vertical .decrement-button {
+	-fx-background-color: #111;
+}
+
+#console .scroll-bar:vertical .increment-arrow,
+#console .scroll-bar:vertical .decrement-arrow {
+	-fx-shape: " ";
+	-fx-padding: 0;
+}
+
+#console .scroll-bar:vertical .track {
+	-fx-background-radius: 0;
+	-fx-background-color: #111;
+	-fx-border-color: transparent;
+}
+
+#console .scroll-bar:vertical .thumb {
+	-fx-background-radius: 10px;
+	-fx-background-color: #aaa;
+}
+
+/* Debug Info Scrollbar */
+
+#scrollpane-debug .scroll-bar:vertical {
+	-fx-background-color: #fff;
+}
+
+#scrollpane-debug .scroll-bar:vertical .increment-button,
+#scrollpane-debug .scroll-bar:vertical .decrement-button {
+	-fx-background-color: #fff;
+}
+
+#scrollpane-debug .scroll-bar:vertical .increment-arrow,
+#scrollpane-debug .scroll-bar:vertical .decrement-arrow {
+	-fx-shape: " ";
+	-fx-padding: 0;
+}
+
+#scrollpane-debug .scroll-bar:vertical .track {
+	-fx-background-radius: 0;
+	-fx-background-color: #fff;
+	-fx-border-color: transparent;
+}
+
+#scrollpane-debug .scroll-bar:vertical .thumb {
+	-fx-background-radius: 10px;
+	-fx-background-color: #555;
+}

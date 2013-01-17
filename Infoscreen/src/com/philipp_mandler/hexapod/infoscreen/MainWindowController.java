@@ -10,8 +10,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -26,35 +30,40 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	@FXML Button button_connect;
 	@FXML TextField textfield_connectAddress;	
 	@FXML VBox vbox_infoholder;
+	@FXML Pane pane_canvasHolder;
+	@FXML TextArea textarea_console;
+	@FXML TextField textfield_consoleInput;
 	
-	TextInfo servo1;
-	TextInfo servo2;
-	TextInfo servo3;
-	TextInfo[] goalPosition;
+	TextInfo m_servo1;
+	TextInfo m_servo2;
+	TextInfo m_servo3;
+	TextInfo[] m_goalPosition;
 	
-	Canvas legGoalCanvas;
+	Canvas m_legGoalCanvas;
 	
 	Vec3[] m_legGoalPoints;
 	
-	Paint canvasBg;
+	Paint m_canvasBg;
+	Paint m_legEndColor;
 	
-	Image hexapodFrame;
+	Image m_hexapodFrame;
 	
 	public MainWindowController() {
 		Main.getNetworking().addEventListener(this);
 		m_legGoalPoints = new Vec3[6];
-		goalPosition = new TextInfo[6];
-		hexapodFrame = new Image("images/hexapod-frame.png");
+		m_goalPosition = new TextInfo[6];
+		m_hexapodFrame = new Image("images/hexapod-frame.png");
 	}
 	
 	public void initialize(URL location, ResourceBundle resources) {
 		
-		canvasBg = Color.web("#eee");
+		m_canvasBg = Color.web("#fff");
+		m_legEndColor = Color.web("#369ed3");
 		
-		legGoalCanvas = new Canvas();
-		legGoalCanvas.setWidth(300);
-		legGoalCanvas.setHeight(300);
-		vbox_infoholder.getChildren().add(legGoalCanvas);
+		m_legGoalCanvas = new Canvas();
+		m_legGoalCanvas.setWidth(300);
+		m_legGoalCanvas.setHeight(300);
+		pane_canvasHolder.getChildren().add(m_legGoalCanvas);
 		
 		drawLegGoals();
 	}
@@ -74,17 +83,17 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 		if(pack instanceof LegServoPackage) {
 			LegServoPackage legServoPack = (LegServoPackage)pack;
 			if(legServoPack.getLegID() == 0) {
-				servo1.setContent(String.valueOf(legServoPack.getServoPos1()));
-				servo2.setContent(String.valueOf(legServoPack.getServoPos2()));
-				servo3.setContent(String.valueOf(legServoPack.getServoPos3()));
+				m_servo1.setContent(String.valueOf(legServoPack.getServoPos1()));
+				m_servo2.setContent(String.valueOf(legServoPack.getServoPos2()));
+				m_servo3.setContent(String.valueOf(legServoPack.getServoPos3()));
 			}
 		}
 		else if(pack instanceof LegPositionPackage) {
 			LegPositionPackage posPack = (LegPositionPackage)pack;
-			if(goalPosition[posPack.getLegIndex()] == null)
-				goalPosition[posPack.getLegIndex()] = new TextInfo(vbox_infoholder, "Leg " + posPack.getLegIndex() + " Goal");
+			if(m_goalPosition[posPack.getLegIndex()] == null)
+				m_goalPosition[posPack.getLegIndex()] = new TextInfo(vbox_infoholder, "Leg " + posPack.getLegIndex() + " Goal");
 			
-			goalPosition[posPack.getLegIndex()].setContent(posPack.getGoalPosition().getX() + " | " + posPack.getGoalPosition().getY() + " | " + posPack.getGoalPosition().getZ());
+			m_goalPosition[posPack.getLegIndex()].setContent(posPack.getGoalPosition().getX() + " | " + posPack.getGoalPosition().getY() + " | " + posPack.getGoalPosition().getZ());
 			m_legGoalPoints[posPack.getLegIndex()] = new Vec3(posPack.getGoalPosition());
 			Platform.runLater(new Runnable() {
 				@Override
@@ -96,19 +105,25 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	}
 	
 	private void drawLegGoals() {
-		GraphicsContext gc = legGoalCanvas.getGraphicsContext2D();
-		gc.setFill(canvasBg);
-		gc.fillRect(0, 0, legGoalCanvas.getWidth(), legGoalCanvas.getHeight());
+		GraphicsContext gc = m_legGoalCanvas.getGraphicsContext2D();
+		gc.setFill(m_canvasBg);
+		gc.fillRect(0, 0, m_legGoalCanvas.getWidth(), m_legGoalCanvas.getHeight());
 		
-		gc.drawImage(hexapodFrame, (legGoalCanvas.getWidth() / 2) - (hexapodFrame.getWidth() / 2), (legGoalCanvas.getHeight() / 2)  - (hexapodFrame.getHeight() / 2));
+		gc.drawImage(m_hexapodFrame, (m_legGoalCanvas.getWidth() / 2) - (m_hexapodFrame.getWidth() / 2), (m_legGoalCanvas.getHeight() / 2)  - (m_hexapodFrame.getHeight() / 2));
 		
-		gc.setFill(Color.BLUE);
+		gc.setFill(m_legEndColor);
 		for(Vec3 point : m_legGoalPoints) {
 			if(point == null) continue;
-			gc.fillOval((point.getX() / 5) + (legGoalCanvas.getWidth() / 2) - 5, (legGoalCanvas.getHeight() / 2) - (point.getY() / 5) - 5, 10, 10);
+			gc.fillOval((point.getX() / 5) + (m_legGoalCanvas.getWidth() / 2) - 5, (m_legGoalCanvas.getHeight() / 2) - (point.getY() / 5) - 5, 10, 10);
 		}
-		gc.setStroke(Color.GREY);
-		gc.strokeRect(0, 0, legGoalCanvas.getWidth(), legGoalCanvas.getHeight());
+	}
+	
+	@FXML
+	public void onConsoleKeyPressed(KeyEvent event) {
+		if(Main.getNetworking().isConnected() && (event).getCode() == KeyCode.ENTER) {
+			textarea_console.appendText("\n> " + textfield_consoleInput.getText());
+			textfield_consoleInput.setText("");
+		}
 	}
 
 	public void onConnected() {
@@ -123,19 +138,19 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 				}
 			});	
 		}
-		if(servo1 != null) servo1.remove();
-		if(servo2 != null) servo2.remove();
-		if(servo3 != null) servo3.remove();
-		for(int i = 0; i < goalPosition.length; i++) {
-			if(goalPosition[i] != null) {
-				goalPosition[i].remove();
-				goalPosition[i] = null;
+		if(m_servo1 != null) m_servo1.remove();
+		if(m_servo2 != null) m_servo2.remove();
+		if(m_servo3 != null) m_servo3.remove();
+		for(int i = 0; i < m_goalPosition.length; i++) {
+			if(m_goalPosition[i] != null) {
+				m_goalPosition[i].remove();
+				m_goalPosition[i] = null;
 			}
 		}
 		
-		servo1 = new TextInfo(vbox_infoholder, "Servo 1");
-		servo2 = new TextInfo(vbox_infoholder, "Servo 2");
-		servo3 = new TextInfo(vbox_infoholder, "Servo 3");
+		m_servo1 = new TextInfo(vbox_infoholder, "Servo 1");
+		m_servo2 = new TextInfo(vbox_infoholder, "Servo 2");
+		m_servo3 = new TextInfo(vbox_infoholder, "Servo 3");
 	}
 
 	public void onDisconnected() {
@@ -155,5 +170,4 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	public void onConnectionError() {
 		
 	}
-
 }
