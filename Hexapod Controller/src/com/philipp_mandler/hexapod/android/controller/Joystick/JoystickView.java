@@ -17,8 +17,8 @@ public class JoystickView extends View {
 	private Bitmap m_knob;
 	private Bitmap m_bg;
 	
-	private float m_touch_x = 130;
-	private float m_touch_y = 130;
+	private float m_touch_x = 0;
+	private float m_touch_y = 0;
 	
 	private ArrayList<JoystickListener> m_listeners;
 
@@ -49,7 +49,7 @@ public class JoystickView extends View {
 		canvas.save();
 		
 		canvas.drawBitmap(m_bg, canvas.getHeight() / 2 - m_bg.getHeight() / 2, canvas.getWidth() / 2 - m_bg.getWidth() / 2, null);
-		canvas.drawBitmap(m_knob, m_touch_x - 90, m_touch_y - 90, null);
+		canvas.drawBitmap(m_knob, m_touch_x + 40, m_touch_y + 40, null);
 		
 		canvas.restore();
 	}
@@ -59,23 +59,33 @@ public class JoystickView extends View {
 		
 		boolean accepted = false;
 		
+		float eventX = event.getX() - 130;
+		float eventY = event.getY() - 130;
+		
 		if(event.getAction() == MotionEvent.ACTION_MOVE) {
-			m_touch_x = event.getX();
-			m_touch_y = event.getY();
+			if(Math.sqrt(Math.pow(eventX, 2) + Math.pow(eventY, 2)) <= 80) {
+				m_touch_x = event.getX() - 130;
+				m_touch_y = event.getY() - 130;
+			}
+			else {
+				double alpha = Math.asin(eventY / Math.sqrt(Math.pow(eventX, 2) + Math.pow(eventY, 2)));
+				m_touch_x = (float) (Math.cos(alpha) * 80 * Math.signum(eventX));
+				m_touch_y = (float) (Math.sin(alpha) * 80);
+			}
 			onPositionChanged();
 			accepted = true;
 		}
 		else if(event.getAction() == MotionEvent.ACTION_DOWN) {
-			if(Math.sqrt(Math.pow(event.getX() - 130, 2) + Math.pow(event.getY() - 130, 2)) <= 80) {
-				m_touch_x = event.getX();
-				m_touch_y = event.getY();
+			if(Math.sqrt(Math.pow(eventX, 2) + Math.pow(eventY, 2)) <= 80) {
+				m_touch_x = eventX;
+				m_touch_y = eventY;
 				onPositionChanged();
 				accepted = true;
 			}
 		}
 		else if(event.getAction() == MotionEvent.ACTION_UP) {
-			m_touch_x = 130;
-			m_touch_y = 130;
+			m_touch_x = 0;
+			m_touch_y = 0;
 			onPositionChanged();
 			accepted = true;
 		}
@@ -87,7 +97,7 @@ public class JoystickView extends View {
 	
 	private void onPositionChanged() {
 		for(JoystickListener listener : m_listeners) {
-			listener.joystickPositionChanged(this, (m_touch_x - 130) / 80f, -(m_touch_y - 130) / 80f);
+			listener.joystickPositionChanged(this, m_touch_x / 80f, -m_touch_y / 80f);
 		}
 	}
 	
