@@ -1,10 +1,11 @@
 Hexapod
 =======
+My software for a hexapod robot.
 
-Software for a hexapod robot.
+It contains a server application, an Infoscreen application to view infos and use console access and a Controller App for Android Tablets.
 
-2012 &copy; Philipp Mandler
+2013 &copy; Philipp Mandler
 
-All rights reserved
+All rights reserved.
 
 If you want to use something of this &rarr; ask me.
