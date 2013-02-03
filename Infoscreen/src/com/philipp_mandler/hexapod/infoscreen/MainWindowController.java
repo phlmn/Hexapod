@@ -20,6 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+import com.philipp_mandler.hexapod.hexapod.ConsolePackage;
 import com.philipp_mandler.hexapod.hexapod.LegPositionPackage;
 import com.philipp_mandler.hexapod.hexapod.LegServoPackage;
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
@@ -55,6 +56,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 		m_hexapodFrame = new Image("images/hexapod-frame.png");
 	}
 	
+	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		
 		m_canvasBg = Color.web("#fff");
@@ -78,7 +80,8 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 			Main.getNetworking().connect(textfield_connectAddress.getText(), 8888);
 		}
 	}
-
+	
+	@Override
 	public void onDataReceived(NetPackage pack) {
 		if(pack instanceof LegServoPackage) {
 			LegServoPackage legServoPack = (LegServoPackage)pack;
@@ -102,6 +105,20 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 				}
 			});
 		}
+		else if(pack instanceof ConsolePackage) {
+			final ConsolePackage consolePack = (ConsolePackage)pack;
+			if(Platform.isFxApplicationThread()) {
+				textarea_console.appendText("\n" + consolePack.getText());
+			}
+			else {
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						textarea_console.appendText("\n" + consolePack.getText());			
+					}
+				});	
+			}
+		}
 	}
 	
 	private void drawLegGoals() {
@@ -122,10 +139,12 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	public void onConsoleKeyPressed(KeyEvent event) {
 		if(Main.getNetworking().isConnected() && (event).getCode() == KeyCode.ENTER) {
 			textarea_console.appendText("\n> " + textfield_consoleInput.getText());
+			Main.getNetworking().send(new ConsolePackage(textfield_consoleInput.getText()));
 			textfield_consoleInput.setText("");
 		}
 	}
 
+	@Override
 	public void onConnected() {
 		if(Platform.isFxApplicationThread()) {
 			button_connect.setText("Disconnect");
@@ -152,7 +171,8 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 		m_servo2 = new TextInfo(vbox_infoholder, "Servo 2");
 		m_servo3 = new TextInfo(vbox_infoholder, "Servo 3");
 	}
-
+	
+	@Override
 	public void onDisconnected() {
 		if(Platform.isFxApplicationThread()) {
 			button_connect.setText("Connect");
@@ -167,6 +187,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 		}
 	}
 
+	@Override
 	public void onConnectionError() {
 		
 	}

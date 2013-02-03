@@ -6,75 +6,75 @@ public class Vec2 implements Serializable {
 	
 	private static final long serialVersionUID = 5292692273784938654L;
 	
-	private double x;
-	private double y;
+	private double m_x;
+	private double m_y;
 	
 	public Vec2() {
-		x = 0;
-		y = 0;
+		m_x = 0;
+		m_y = 0;
 	}
 	
 	public Vec2(double x, double y) {
-		this.x = x;
-		this.y = y;
+		this.m_x = x;
+		this.m_y = y;
 	}
 	
 	public Vec2(Vec2 obj) {
-		x = obj.getX();
-		y = obj.getY();
+		m_x = obj.getX();
+		m_y = obj.getY();
 	}
 	
 	public double getLength() {
-		return Math.sqrt(x*x + y*y);
+		return Math.sqrt(m_x*m_x + m_y*m_y);
 	}
 	
 	public void set(double x, double y) {
-		this.x = x;
-		this.y = y;
+		this.m_x = x;
+		this.m_y = y;
 	}
 	
 	public void set(Vec2 source) {
-		x = source.x;
-		y = source.y;
+		m_x = source.m_x;
+		m_y = source.m_y;
 	}
 	
 	public void setX(double x) {
-		this.x = x;
+		this.m_x = x;
 	}
 	
 	public double getX() {
-		return x;
+		return m_x;
 	}
 	
 	public void setY(double y) {
-		this.y = y;
+		this.m_y = y;
 	}
 	
 	public double getY() {
-		return y;
+		return m_y;
 	}
 	
 	public void multiply(double factor) {
-		x *= factor;
-		y *= factor;
+		m_x *= factor;
+		m_y *= factor;
 	}
 	
 	public void rotate(Vec2 center, double angle) {
 		double sinValue = Math.sin(angle);
 		double cosValue = Math.cos(angle);
 		
-		double ox = x - center.getX();
-		double oy = y - center.getY();
+		double ox = m_x - center.getX();
+		double oy = m_y - center.getY();
 		
-		x = center.getX() + ox * cosValue + oy * sinValue;
-		y = center.getY() - ox * sinValue + oy * cosValue;
+		m_x = center.getX() + ox * cosValue + oy * sinValue;
+		m_y = center.getY() - ox * sinValue + oy * cosValue;
 	}
 	
 	public void rotate(double angle) {
 		double sinValue = Math.sin(angle);
 		double cosValue = Math.cos(angle);
 		
-		x = x * cosValue - y * sinValue;
-		y = x * sinValue - y * cosValue;
+		m_x = m_x * cosValue - m_y * sinValue;
+		m_y = m_x * sinValue - m_y * cosValue;
 	}
 }

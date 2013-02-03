@@ -4,17 +4,17 @@ public class WelcomePackage implements NetPackage {
 
 	private static final long serialVersionUID = 3480135183540296655L;
 	
-	private DeviceType deviceType;
+	private DeviceType m_deviceType;
 	
 	public WelcomePackage(DeviceType deviceType) {
-		this.deviceType = deviceType;
+		this.m_deviceType = deviceType;
 	}
 	
 	public void setDeviceType(DeviceType deviceType) {
-		this.deviceType = deviceType;
+		this.m_deviceType = deviceType;
 	}
 	
 	public DeviceType getDeviceType() {
-		return deviceType;
+		return m_deviceType;
 	}
 }

@@ -6,76 +6,80 @@ public class Vec3 implements Serializable {
 	
 	private static final long serialVersionUID = 862152504035620391L;
 	
-	private double x;
-	private double y;
-	private double z;
+	private double m_x;
+	private double m_y;
+	private double m_z;
 	
 	public Vec3() {
-		x = 0;
-		y = 0;
-		z = 0;
+		m_x = 0;
+		m_y = 0;
+		m_z = 0;
 	}
 	
 	public Vec3(double x, double y, double z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.m_x = x;
+		this.m_y = y;
+		this.m_z = z;
 	}
 	
 	public Vec3(Vec2 source, double z) {
-		this.x = source.getX();
-		this.y = source.getY();
-		this.z = z;
+		this.m_x = source.getX();
+		this.m_y = source.getY();
+		this.m_z = z;
 	}
 	
 	public Vec3(Vec3 source) {
-		this.x = source.getX();
-		this.y = source.getY();
-		this.z = source.getZ();
+		this.m_x = source.getX();
+		this.m_y = source.getY();
+		this.m_z = source.getZ();
 	}
 	
 	public void set(double x, double y, double z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.m_x = x;
+		this.m_y = y;
+		this.m_z = z;
 	}
 	
 	public void set(Vec3 source) {
-		x = source.x;
-		y = source.y;
-		z = source.z;
+		m_x = source.m_x;
+		m_y = source.m_y;
+		m_z = source.m_z;
 	}
 	
 	public void setX(double x) {
-		this.x = x;
+		this.m_x = x;
 	}
 	
 	public double getX() {
-		return x;
+		return m_x;
 	}
 	
 	public void setY(double y) {
-		this.y = y;
+		this.m_y = y;
 	}
 	
 	public double getY() {
-		return y;
+		return m_y;
 	}
 	
 	public void setZ(double z) {
-		this.z = z;
+		this.m_z = z;
 	}
 	
 	public double getZ() {
-		return z;
+		return m_z;
+	}
+	
+	public double getLength() {
+		return Math.sqrt(m_x*m_x + m_y*m_y + m_z*m_z);
 	}
 	
 	public Vec3 sum(Vec3 obj) {
-		return new Vec3(x + obj.x, y + obj.y, z + obj.z);
+		return new Vec3(m_x + obj.m_x, m_y + obj.m_y, m_z + obj.m_z);
 	}
 	
 	public Vec3 divide(double number) {
 		if(number == 0) return null;
-		return new Vec3(x / number, y / number, z / number);
+		return new Vec3(m_x / number, m_y / number, m_z / number);
 	}
 }

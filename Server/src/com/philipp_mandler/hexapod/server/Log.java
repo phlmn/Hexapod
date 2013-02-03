@@ -2,8 +2,8 @@ package com.philipp_mandler.hexapod.server;
 
 public class Log {	
 	static final int INFO = 0;
-	static final int ERROR = 1;
-	static final int CRITICAL = 2;
+	static final int WARNING = 1;
+	static final int ERROR = 2;
 	
 	private String text;
 	private int level;

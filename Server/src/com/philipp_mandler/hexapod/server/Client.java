@@ -15,16 +15,16 @@ import com.philipp_mandler.hexapod.hexapod.WelcomePackage;
 
 public class Client extends Thread {
 	
-	ServerSocket m_serverSocket;
-	Socket m_clientSocket;
-	ObjectOutputStream m_objOutputStream;
-	ObjectInputStream m_objInputStream;
-	Networking m_parent;
-	List<NetPackage> m_outQueue;
-	DeviceType deviceType;
-	boolean m_run;
+	private ServerSocket m_serverSocket;
+	private Socket m_clientSocket;
+	private ObjectOutputStream m_objOutputStream;
+	private ObjectInputStream m_objInputStream;
+	private ServerNetworking m_parent;
+	private List<NetPackage> m_outQueue;
+	private DeviceType deviceType;
+	private boolean m_run;
 	
-	public Client(Networking parent, ServerSocket serverSocket) {
+	public Client(ServerNetworking parent, ServerSocket serverSocket) {
 		m_parent = parent;
 		m_serverSocket = serverSocket;
 		m_outQueue = new ArrayList<NetPackage>();
@@ -52,7 +52,6 @@ public class Client extends Thread {
 		
 		m_parent.registerClient(this);
 		new Client(m_parent, m_serverSocket).start();
-		DebugHelper.log("Client Connected");
 		
 		while(m_clientSocket.isConnected() && m_run) {
 			try {
@@ -64,13 +63,16 @@ public class Client extends Thread {
 					Object input = m_objInputStream.readObject();
 					if(input instanceof NetPackage) {
 						if(input instanceof WelcomePackage) {
-							deviceType = ((WelcomePackage)input).getDeviceType();
+							if(deviceType == null) {
+								deviceType = ((WelcomePackage)input).getDeviceType();
+								m_parent.clientConnected(this);
+							}							
 						}
 						else if(input instanceof ExitPackage) {
 							m_run = false;
 						}
 						else {
-							m_parent.dataReceived((NetPackage)input);
+							m_parent.dataReceived(this, (NetPackage)input);
 						}
 					}
 				}
@@ -86,7 +88,7 @@ public class Client extends Thread {
 				e.printStackTrace();
 			}
 		}
-		DebugHelper.log("Client Disconnected");
+		m_parent.clientDisconnected(this);
 		m_parent.unregisterClient(this);
 		try {
 			m_objInputStream.close();
@@ -117,5 +119,9 @@ public class Client extends Thread {
 	
 	public DeviceType getDeviceType() {
 		return deviceType;
+	}
+	
+	public Socket getSocket() {
+		return m_clientSocket;
 	}
 }

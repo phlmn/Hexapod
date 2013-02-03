@@ -51,18 +51,22 @@ public class MainActivity extends Activity implements NetworkingEventListener {
         return true;
     }
 
+    @Override
 	public void onDataReceived(NetPackage pack) {
 		
 	}
-
+	
+	@Override
 	public void onConnected() {
 		
 	}
 
+	@Override
 	public void onDisconnected() {
 		
 	}
 
+	@Override
 	public void onConnectionError() {
 		
 	}
