@@ -1,6 +1,7 @@
 package com.philipp_mandler.hexapod.infoscreen;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -43,6 +44,9 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	Canvas m_legGoalCanvas;
 	
 	Vec3[] m_legGoalPoints;
+	
+	ArrayList<String> m_lastCmds = new ArrayList<String>();
+	int m_cmdSelection = 0;
 	
 	Paint m_canvasBg;
 	Paint m_legEndColor;
@@ -96,7 +100,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 			if(m_goalPosition[posPack.getLegIndex()] == null)
 				m_goalPosition[posPack.getLegIndex()] = new TextInfo(vbox_infoholder, "Leg " + posPack.getLegIndex() + " Goal");
 			
-			m_goalPosition[posPack.getLegIndex()].setContent(posPack.getGoalPosition().getX() + " | " + posPack.getGoalPosition().getY() + " | " + posPack.getGoalPosition().getZ());
+			m_goalPosition[posPack.getLegIndex()].setContent(Math.round(posPack.getGoalPosition().getX() * 100) / 100.0 + " | " + Math.round(posPack.getGoalPosition().getY() * 100) / 100.0 + " | " + Math.round(posPack.getGoalPosition().getZ() * 100) / 100.0);
 			m_legGoalPoints[posPack.getLegIndex()] = new Vec3(posPack.getGoalPosition());
 			Platform.runLater(new Runnable() {
 				@Override
@@ -131,16 +135,46 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 		gc.setFill(m_legEndColor);
 		for(Vec3 point : m_legGoalPoints) {
 			if(point == null) continue;
-			gc.fillOval((point.getX() / 5) + (m_legGoalCanvas.getWidth() / 2) - 5, (m_legGoalCanvas.getHeight() / 2) - (point.getY() / 5) - 5, 10, 10);
+			gc.fillOval((point.getX() / 5) + (m_legGoalCanvas.getWidth() / 2) - (point.getZ() / 50.0), (m_legGoalCanvas.getHeight() / 2) - (point.getY() / 5) - (point.getZ() / 50.0), 10 + point.getZ() / 25.0, 10 + point.getZ() / 25.0);
 		}
 	}
 	
 	@FXML
 	public void onConsoleKeyPressed(KeyEvent event) {
-		if(Main.getNetworking().isConnected() && (event).getCode() == KeyCode.ENTER) {
+		if(event.getCode() == KeyCode.UP) {
+			if(m_lastCmds.size() > 0) {
+				if(m_cmdSelection < m_lastCmds.size()) {
+					m_cmdSelection++;
+				}
+				if(m_lastCmds.get(m_lastCmds.size() - m_cmdSelection) != null) {
+					textfield_consoleInput.setText(m_lastCmds.get(m_lastCmds.size() - m_cmdSelection));
+					textfield_consoleInput.selectEnd();
+				}
+			}
+		}
+		else if(event.getCode() == KeyCode.DOWN) {
+			if(m_lastCmds.size() > 0) {
+				if(m_cmdSelection > 0)
+					m_cmdSelection--;
+				if(m_cmdSelection == 0) {
+					textfield_consoleInput.setText("");
+				}
+				else {
+					if(m_lastCmds.get(m_lastCmds.size() - m_cmdSelection) != null) {
+						textfield_consoleInput.setText(m_lastCmds.get(m_lastCmds.size() - m_cmdSelection));
+						textfield_consoleInput.selectEnd();
+					}
+				}
+			}
+		}
+		else if(event.getCode() == KeyCode.ENTER && Main.getNetworking().isConnected()) {
 			textarea_console.appendText("\n> " + textfield_consoleInput.getText());
+			if(!textfield_consoleInput.getText().isEmpty())
+				m_lastCmds.add(textfield_consoleInput.getText());
+			
 			Main.getNetworking().send(new ConsolePackage(textfield_consoleInput.getText()));
 			textfield_consoleInput.setText("");
+			m_cmdSelection = 0;
 		}
 	}
 

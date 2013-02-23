@@ -8,12 +8,14 @@ public class SingleServo {
 	private int m_servoID;
 	private int m_servoResolution;
 	private double m_offset;
+	private boolean m_connected;
 	
 	public SingleServo(Servo controller, int id) {
 		m_controller = controller;
 		m_servoID = id;
 		m_servoResolution = 4096;
 		m_offset = 0;
+		m_connected = ping();
 	}
 	
 	public SingleServo(Servo controller, int id, int servoResolution) {
@@ -21,6 +23,7 @@ public class SingleServo {
 		m_servoID = id;
 		m_servoResolution = servoResolution;
 		m_offset = 0;
+		m_connected = ping();
 	}
 	
 	public SingleServo(Servo controller, int id, int servoResolution, double offset) {
@@ -28,62 +31,92 @@ public class SingleServo {
 		m_servoID = id;
 		m_servoResolution = servoResolution;
 		m_offset = offset;
+		m_connected = ping();
 	}
 	
-	public void setGoalPosition(double rad) {
-		m_controller.setGoalPosition(m_servoID, (int)Math.round((rad + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0)));
+	public boolean setGoalPosition(double rad) {
+		if(m_connected)
+			return m_connected = m_controller.setGoalPosition(m_servoID, (int)Math.round((rad + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0)));
+		else
+			return false;
 	}
 	
-	public void getGoalPosition() {
-		m_controller.goalPosition(m_servoID);
+	public double getGoalPosition() {
+		if(m_connected)
+			return m_controller.goalPosition(m_servoID) * (2.0 * Math.PI) / (m_servoResolution - 1.0);
+		return -1;
 	}
 	
-	public void setMaxTorque(int torque) {
-		m_controller.setMaxTorque(m_servoID, torque);
+	public boolean setMaxTorque(int torque) {
+		if(m_connected)
+			return m_connected = m_controller.setMaxTorque(m_servoID, torque);
+		return false;
 	}
 	
 	public int getMaxTorque() {
-		return m_controller.maxTorque(m_servoID);
+		if(m_connected)
+			return m_controller.maxTorque(m_servoID);
+		return -1;
 	}
 	
 	public int getCurrentTemp() {
-		return m_controller.presentTemp(m_servoID);
+		if(m_connected)
+			return m_controller.presentTemp(m_servoID);
+		return -1;
 	}
 	
 	public int getCurrentLoad() {
-		return m_controller.presentLoad(m_servoID);
+		if(m_connected)
+			return m_controller.presentLoad(m_servoID);
+		return -1;
 	}
 	
 	public int getCurrentVoltage() {
-		return m_controller.presentVolt(m_servoID);
+		if(m_connected)
+			return m_controller.presentVolt(m_servoID);
+		return -1;
 	}
 	
 	public int getCurrentSpeed() {
-		return m_controller.presentSpeed(m_servoID);
+		if(m_connected)
+			return m_controller.presentSpeed(m_servoID);
+		return -1;
 	}
 	
 	public double getCurrentPosition() {
-		return (m_controller.presentPosition(m_servoID) / (m_servoResolution - 1)) * (2 * Math.PI);
+		if(m_connected)
+			return (m_controller.presentPosition(m_servoID) / (m_servoResolution - 1)) * (2 * Math.PI);
+		return -1;
 	}
 	
-	public void setMoovingSpeed(int speed) {
-		m_controller.setMovingSpeed(m_servoID, speed);
+	public boolean setMoovingSpeed(int speed) {
+		if(m_connected)
+			return m_connected = m_controller.setMovingSpeed(m_servoID, speed);
+		return false;
 	}
 	
 	public int getMovingSpeed() {
-		return m_controller.movingSpeed(m_servoID);
+		if(m_connected)
+			return m_controller.movingSpeed(m_servoID);
+		return -1;
 	}
 	
 	public boolean isMoving() {
-		return m_controller.moving(m_servoID);
+		if(m_connected)
+			return m_controller.moving(m_servoID);
+		return false;
 	}
 	
-	public void setTorqueEnabled(boolean enable) {
-		m_controller.setTorqueEnable(m_servoID, enable);
+	public boolean setTorqueEnabled(boolean enable) {
+		if(m_connected)
+			return m_connected = m_controller.setTorqueEnable(m_servoID, enable);
+		return false;
 	}
 	
 	public boolean getTorqueEnabled() {
-		return m_controller.torqueEnable(m_servoID);
+		if(m_connected)
+			return m_controller.torqueEnable(m_servoID);
+		return false;
 	}
 	
 	public void setServoResolution(int res) {
@@ -95,52 +128,81 @@ public class SingleServo {
 	}
 
 	public int getBaudrate() {
-		return m_controller.baudrate(m_servoID);
+		if(m_connected)
+			return m_controller.baudrate(m_servoID);
+		return -1;
 	}
 	
-	public void setTempLimit(int temp) {
-		m_controller.setHighLimitTemp(m_servoID, temp);
+	public boolean setTempLimit(int temp) {
+		if(m_connected)
+			return m_connected = m_controller.setHighLimitTemp(m_servoID, temp);
+		return false;
 	}
 	
 	public int getTempLimit() {
-		return m_controller.highLimitTemp(m_servoID);
+		if(m_connected)
+			return m_controller.highLimitTemp(m_servoID);
+		return -1;
 	}
 	
 	public int getVoltageLimitLow() {
-		return m_controller.lowLimitVolt(m_servoID);
+		if(m_connected)
+			return m_controller.lowLimitVolt(m_servoID);
+		return -1;
 	}
 	
 	public int getVoltageLimitHigh() {
-		return m_controller.highLimitVolt(m_servoID);
+		if(m_connected)
+			return m_controller.highLimitVolt(m_servoID);
+		return -1;
 	}
 	
-	public void setVoltageLimitLow(int voltage) {
-		m_controller.setLowLimitVolt(m_servoID, voltage);
+	public boolean setVoltageLimitLow(int voltage) {
+		if(m_connected)
+			return m_connected = m_controller.setLowLimitVolt(m_servoID, voltage);
+		return false;
 	}
 	
-	public void setVoltageLimitHigh(int voltage) {
-		m_controller.setHightLimitVolt(m_servoID, voltage);
+	public boolean setVoltageLimitHigh(int voltage) {
+		if(m_connected)
+			return m_connected = m_controller.setHightLimitVolt(m_servoID, voltage);
+		return false;
 	}
 
 	public boolean setLed(boolean enable) {
-		return m_controller.setLed(m_servoID, enable);
+		if(m_connected)
+			return m_connected = m_controller.setLed(m_servoID, enable);
+		return false;
 	}
 	
 	public boolean getLed() {
-		return m_controller.led(m_servoID);
+		if(m_connected)
+			return m_controller.led(m_servoID);
+		return false;
 	}
 	
 	public void setID(int servoID) {
 		m_servoID = servoID;
+		m_connected = ping();
 	}
 		
 	public int getID() {
 		return m_servoID;
 	}
 
-	public void setHardwareID(int hardwareID) {
-		if(m_controller.setId(m_servoID, hardwareID))
+	public boolean setHardwareID(int hardwareID) {
+		if(m_controller.setId(m_servoID, hardwareID)) {
 			m_servoID = hardwareID;
-		
+			return m_connected = true;
+		}
+		return m_connected = false;		
+	}
+	
+	public boolean ping() {
+		return m_connected = m_controller.ping(m_servoID);		
+	}
+	
+	public boolean isConnected() {
+		return m_connected;
 	}
 }

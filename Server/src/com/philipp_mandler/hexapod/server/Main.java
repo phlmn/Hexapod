@@ -86,18 +86,7 @@ public class Main implements NetworkingEventListener {
 				m_gamePad = controller;
 				DebugHelper.log("Gamepad connected.");
 			}
-		}
-		
-		DebugHelper.log("Searching servos...");
-		int[] servos = servo.pingRange(0, 32);
-		
-		DebugHelper.log(servos.length + " servos found.");
-		
-		if(!testmode && servos.length == 0) {
-			DebugHelper.log("No Servos found, aborting now.", Log.WARNING);
-			System.exit(0);
-		}
-		
+		}		
 	}
 	
 	public void run() {
@@ -145,7 +134,7 @@ public class Main implements NetworkingEventListener {
 					if(cmd.length > 2) {
 						if(cmd[2].toLowerCase().equals("start")) {
 							switch(cmd[1]) {
-							case "walking": startModule(new WalkingModule(servo)); break;
+							case "walking": WalkingModule mod = new WalkingModule(servo); startModule(mod); if(mod != null) mod.setGamepad(m_gamePad); break;
 							default: DebugHelper.log("No such module found.");
 							}
 						}

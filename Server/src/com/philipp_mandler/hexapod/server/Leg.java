@@ -28,6 +28,11 @@ public class Leg {
 		m_servos[1] = servo2;
 		m_servos[2] = servo3;
 		
+		for(SingleServo servo : m_servos) {
+			if(!servo.ping())
+				DebugHelper.log("Servo (ID: " + servo.getID() + ") from Leg (ID: " + legID + ") couldn't be found.", Log.WARNING);
+		}
+		
 		m_goalPosition = new Vec3();
 		
 		m_position = position;

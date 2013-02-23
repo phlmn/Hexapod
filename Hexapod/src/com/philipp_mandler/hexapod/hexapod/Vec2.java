@@ -59,6 +59,11 @@ public class Vec2 implements Serializable {
 		m_y *= factor;
 	}
 	
+	public void divide(double divisor) {
+		m_x /= divisor;
+		m_y /= divisor;
+	}
+	
 	public void rotate(Vec2 center, double angle) {
 		double sinValue = Math.sin(angle);
 		double cosValue = Math.cos(angle);
@@ -76,5 +81,9 @@ public class Vec2 implements Serializable {
 		
 		m_x = m_x * cosValue - m_y * sinValue;
 		m_y = m_x * sinValue - m_y * cosValue;
+	}
+	
+	public void normalize() {
+		divide(getLength());
 	}
 }
