@@ -135,7 +135,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 		gc.setFill(m_legEndColor);
 		for(Vec3 point : m_legGoalPoints) {
 			if(point == null) continue;
-			gc.fillOval((point.getX() / 5) + (m_legGoalCanvas.getWidth() / 2) - (point.getZ() / 50.0), (m_legGoalCanvas.getHeight() / 2) - (point.getY() / 5) - (point.getZ() / 50.0), 10 + point.getZ() / 25.0, 10 + point.getZ() / 25.0);
+			gc.fillOval((point.getX() / 5) + (m_legGoalCanvas.getWidth() / 2) - (point.getZ() / 30.0), (m_legGoalCanvas.getHeight() / 2) - (point.getY() / 5) - (point.getZ() / 30.0), 10 + point.getZ() / 15.0, 10 + point.getZ() / 15.0);
 		}
 	}
 	

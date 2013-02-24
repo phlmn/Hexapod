@@ -72,7 +72,7 @@ public class WalkingModule implements Module {
 		boolean direction2 = false;
 		boolean stepping = false;
 		
-		Vec2 triangle1Pos = new Vec2(0, 40);
+		Vec2 triangle1Pos = new Vec2(0, 0);
 		Vec2 triangle2Pos = new Vec2(0, 0);
 		
 		double z1 = 0, z2 = 0;
@@ -142,24 +142,43 @@ public class WalkingModule implements Module {
 				directionSign2 = 1;
 			}
 			
-			if(triangle1Pos.getLength() > m_range/2 - 20) {
-				if(direction1)
-					z1 = (m_range/2 - triangle1Pos.getLength()) * 2;
+			if(direction1) {
+				if(triangle1Pos.getLength() - (m_range/2 - 20) > 0) {
+					z1 = triangle1Pos.getLength() - (m_range/2 - 20);
+				}
+				else {
+					z1 = 0;
+				}
 			}
 			else {
-				z1 = 0;
+				z1 = 20;
 			}
 			
-			if(triangle2Pos.getLength() > m_range/2 - 20) {
-				if(direction2)
-					z2 = (m_range/2 - triangle2Pos.getLength()) * 2;
+			if(direction2) {
+				if(triangle2Pos.getLength() - (m_range/2 - 20) > 0) {
+					z2 = triangle2Pos.getLength() - (m_range/2 - 20);
+				}
+				else {
+					z2 = 0;
+				}
 			}
 			else {
-				z2 = 0;
+				z2 = 20;
 			}
 			
-			triangle1Pos.setY(triangle1Pos.getY() + directionSign1 *  m_speed.getY() * (elapsedTime / 100000000));
-			triangle2Pos.setY(triangle2Pos.getY() + directionSign2 *  m_speed.getY() * (elapsedTime / 100000000));
+			if(direction1) {
+				triangle1Pos.setY(triangle1Pos.getY() + (directionSign1 * m_speed.getY() * (elapsedTime / 100000000)));
+			}
+			else {
+				triangle1Pos.setY(triangle1Pos.getY() + (directionSign1 * m_speed.getY() * 2.0 * (elapsedTime / 100000000)));
+			}
+			
+			if(direction2) {
+				triangle2Pos.setY(triangle2Pos.getY() + (directionSign2 * m_speed.getY() * (elapsedTime / 100000000)));
+			}
+			else {
+				triangle2Pos.setY(triangle2Pos.getY() + (directionSign2 * m_speed.getY() * 2.0 * (elapsedTime / 100000000)));
+			}
 			
 			triangle1.getTranslation().set(new Vec3(triangle1Pos, z1));
 			triangle2.getTranslation().set(new Vec3(triangle2Pos, z2));
