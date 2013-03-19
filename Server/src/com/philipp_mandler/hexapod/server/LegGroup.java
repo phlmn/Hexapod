@@ -40,6 +40,10 @@ public class LegGroup {
 		m_translation = translation;
 	}
 	
+	public void translate(Vec3 relativePos) {
+		m_translation.add(relativePos);
+	}
+	
 	public Vec3 getRotation() {
 		return m_rotation;
 	}

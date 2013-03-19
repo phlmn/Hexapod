@@ -82,4 +82,10 @@ public class Vec3 implements Serializable {
 		if(number == 0) return null;
 		return new Vec3(m_x / number, m_y / number, m_z / number);
 	}
+	
+	public void add(Vec3 obj) {
+		m_x += obj.m_x;
+		m_y += obj.m_y;
+		m_z += obj.m_z;
+	}
 }

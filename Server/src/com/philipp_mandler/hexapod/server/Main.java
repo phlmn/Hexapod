@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import motej.Mote;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
@@ -39,9 +38,6 @@ import com.philipp_mandler.hexapod.hexapod.NetPackage;
 
 public class Main implements NetworkingEventListener {
 
-	/**
-	 * @param args
-	 */
 	static boolean m_testmode = false;
 	
 	int m_sensitivity = 8;
@@ -50,8 +46,6 @@ public class Main implements NetworkingEventListener {
 	Leg legs[];
 	
 	Controller m_gamePad = null;
-	
-	Mote m_wiimote;
 	
 	ArrayList<Module> m_modules;
 	

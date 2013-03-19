@@ -9,14 +9,14 @@ import com.philipp_mandler.hexapod.hexapod.Vec3;
 public class Leg {
 	
 	private SingleServo[] m_servos;
-	private LegThread m_processingThread;
 	private volatile Vec3 m_goalPosition;
 	private Vec2 m_position;
 	private double m_upperLeg;
 	private double m_lowerLeg;
-	private int m_legID = 0;
+	private int m_legID;
+	private double m_angle;
 	
-	public Leg(int legID, double upperLegLength, double lowerLegLength, Vec2 position, SingleServo servo1, SingleServo servo2, SingleServo servo3) {
+	public Leg(int legID, double upperLegLength, double lowerLegLength, Vec2 position, double angle, SingleServo servo1, SingleServo servo2, SingleServo servo3) {
 		m_legID = legID;
 		
 		m_servos = new SingleServo[3];
@@ -33,12 +33,10 @@ public class Leg {
 				DebugHelper.log("Servo (ID: " + servo.getID() + ") from Leg (ID: " + legID + ") couldn't be found.", Log.WARNING);
 		}
 		
-		m_goalPosition = new Vec3();
+		m_goalPosition = null;
 		
 		m_position = position;
-		
-		m_processingThread = new LegThread();
-		m_processingThread.start();
+		m_angle = angle;
 	}
 	
 	public void setGoalPosition(Vec3 pos) {
@@ -84,7 +82,7 @@ public class Leg {
 		double rotDistance = calculateStartGoalDistance(tempRotatedGoal);
 		double s1 = calculateS1Value(tempRotatedGoal, rotDistance);
 		double s2 = calculateS2Value(tempRotatedGoal, rotDistance);
-		double s0 = Math.PI - Math.asin(tmpGoal.getY() / rotDistance);
+		double s0 = Math.PI - Math.asin(tmpGoal.getY() / rotDistance) - m_angle;
 		if(!(Double.isNaN(s0) || Double.isNaN(s1) || Double.isNaN(s2) || Double.isInfinite(s0) || Double.isInfinite(s1) || Double.isInfinite(s2))) {
 			if(!Main.isTestmode()) {
 				m_servos[0].setGoalPosition(s0);				
@@ -101,7 +99,7 @@ public class Leg {
 		double rotDistance = calculateStartGoalDistance(tempRotatedGoal);
 		double s1 = calculateS1Value(tempRotatedGoal, rotDistance);
 		double s2 = calculateS2Value(tempRotatedGoal, rotDistance);
-		double s0 = Math.PI - Math.asin(goal.getY() / rotDistance);
+		double s0 = Math.PI - Math.asin(goal.getY() / rotDistance) - m_angle;
 		if(!(Double.isNaN(s0) || Double.isNaN(s1) || Double.isNaN(s2) || Double.isInfinite(s0) || Double.isInfinite(s1) || Double.isInfinite(s2))) {
 			if(!Main.isTestmode()) {
 				m_servos[0].setGoalPosition(s0);				
@@ -121,40 +119,8 @@ public class Leg {
 		return m_legID;
 	}
 	
-	public class LegThread extends Thread {
-		
-		private boolean m_running;
-		
-		public LegThread() {
-			
-		}
-		
-		@Override
-		public void run() {
-			m_running = true;
-			
-			while(m_running) {
-				if(m_goalPosition != null)
-					moveLegToPosition(m_goalPosition);		
-				
-				try {
-					sleep(10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			super.run();
-		}
-		
-		public void end() {
-			m_running = false;
-		}
-	}
-	
-	public void dispose() {
-		if(m_processingThread != null && m_processingThread.isAlive()) {
-			m_processingThread.end();
-		}
+	public void updateServos() {
+		if(m_goalPosition != null)
+			moveLegToPosition(m_goalPosition);	
 	}
 }

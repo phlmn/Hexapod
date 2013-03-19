@@ -36,7 +36,7 @@ public class SingleServo {
 	
 	public boolean setGoalPosition(double rad) {
 		if(m_connected)
-			return m_connected = m_controller.setGoalPosition(m_servoID, (int)Math.round((rad + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0)));
+			return m_connected = m_controller.setGoalPosition(m_servoID, ((int)Math.round((rad + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0))) % m_servoResolution);
 		else
 			return false;
 	}
@@ -49,7 +49,7 @@ public class SingleServo {
 	
 	public boolean setMaxTorque(int torque) {
 		if(m_connected)
-			return m_connected = m_controller.setMaxTorque(m_servoID, torque);
+			return m_controller.setMaxTorque(m_servoID, torque);
 		return false;
 	}
 	
@@ -91,7 +91,7 @@ public class SingleServo {
 	
 	public boolean setMoovingSpeed(int speed) {
 		if(m_connected)
-			return m_connected = m_controller.setMovingSpeed(m_servoID, speed);
+			return m_controller.setMovingSpeed(m_servoID, speed);
 		return false;
 	}
 	
@@ -109,7 +109,7 @@ public class SingleServo {
 	
 	public boolean setTorqueEnabled(boolean enable) {
 		if(m_connected)
-			return m_connected = m_controller.setTorqueEnable(m_servoID, enable);
+			return m_controller.setTorqueEnable(m_servoID, enable);
 		return false;
 	}
 	
@@ -135,7 +135,7 @@ public class SingleServo {
 	
 	public boolean setTempLimit(int temp) {
 		if(m_connected)
-			return m_connected = m_controller.setHighLimitTemp(m_servoID, temp);
+			return m_controller.setHighLimitTemp(m_servoID, temp);
 		return false;
 	}
 	
@@ -159,19 +159,19 @@ public class SingleServo {
 	
 	public boolean setVoltageLimitLow(int voltage) {
 		if(m_connected)
-			return m_connected = m_controller.setLowLimitVolt(m_servoID, voltage);
+			return m_controller.setLowLimitVolt(m_servoID, voltage);
 		return false;
 	}
 	
 	public boolean setVoltageLimitHigh(int voltage) {
 		if(m_connected)
-			return m_connected = m_controller.setHightLimitVolt(m_servoID, voltage);
+			return m_controller.setHightLimitVolt(m_servoID, voltage);
 		return false;
 	}
 
 	public boolean setLed(boolean enable) {
 		if(m_connected)
-			return m_connected = m_controller.setLed(m_servoID, enable);
+			return m_controller.setLed(m_servoID, enable);
 		return false;
 	}
 	
@@ -193,9 +193,9 @@ public class SingleServo {
 	public boolean setHardwareID(int hardwareID) {
 		if(m_controller.setId(m_servoID, hardwareID)) {
 			m_servoID = hardwareID;
-			return m_connected = true;
+			return true;
 		}
-		return m_connected = false;		
+		return false;		
 	}
 	
 	public boolean ping() {

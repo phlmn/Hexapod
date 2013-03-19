@@ -10,7 +10,7 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane minHeight="550.0" minWidth="400.0" prefHeight="550.0" prefWidth="820.0" style="-fx-background-color: #ddd;" xmlns:fx="http://javafx.com/fxml" fx:controller="com.philipp_mandler.hexapod.infoscreen.MainWindowController">
+<AnchorPane minHeight="550.0" minWidth="400.0" prefHeight="613.0" prefWidth="804.0" style="-fx-background-color: #ddd;" xmlns:fx="http://javafx.com/fxml" fx:controller="com.philipp_mandler.hexapod.infoscreen.MainWindowController">
   <children>
     <VBox id="vBox1" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <children>
@@ -18,31 +18,59 @@
           <children>
             <HBox prefHeight="-1.0" prefWidth="-1.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <children>
-                <AnchorPane minHeight="-Infinity" prefHeight="300.0" prefWidth="-1.0" style="-fx-background-color: #111;" HBox.hgrow="ALWAYS">
+                <VBox id="VBox" alignment="CENTER" fillWidth="true" spacing="5.0" HBox.hgrow="ALWAYS">
                   <children>
-                    <TextArea id="console" fx:id="textarea_console" editable="false" prefHeight="-1.0" prefWidth="-1.0" style="-fx-background-radius: 0;&#10;-fx-background-color: transparent;&#10;-fx-text-fill: #fff;&#10;-fx-font-family: &quot;Courier New&quot;;&#10;-fx-font-weight: bold;" text="" wrapText="true" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                    <AnchorPane prefHeight="20.0" prefWidth="-1.0" style="-fx-background-color: #222;" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+                    <AnchorPane minHeight="-Infinity" prefHeight="-1.0" prefWidth="-1.0" style="-fx-background-color: #111;" VBox.vgrow="ALWAYS">
                       <children>
-                        <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="20.0" prefWidth="-1.0" style="&#10;" text="&gt;" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="0.0">
-                          <font>
-                            <Font name="Courier New" size="12.0" />
-                          </font>
-                        </Label>
-                        <TextField fx:id="textfield_consoleInput" onKeyPressed="#onConsoleKeyPressed" opacity="1.0" prefColumnCount="12" prefHeight="-1.0" prefWidth="-1.0" promptText="" style="-fx-background-radius: 0;&#10;-fx-background-color: transparent;&#10;-fx-text-fill: #fff;&#10;-fx-font-family: &quot;Courier New&quot;;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <TextArea id="console" fx:id="textarea_console" editable="false" prefHeight="-1.0" prefWidth="-1.0" style="-fx-background-radius: 0;&#10;-fx-background-color: transparent;&#10;-fx-text-fill: #fff;&#10;-fx-font-family: &quot;Courier New&quot;;&#10;-fx-font-weight: bold;" text="" wrapText="true" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                        <AnchorPane prefHeight="20.0" prefWidth="-1.0" style="-fx-background-color: #222;" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+                          <children>
+                            <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="20.0" prefWidth="-1.0" style="&#10;" text="&gt;" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="0.0">
+                              <font>
+                                <Font name="Courier New" size="12.0" />
+                              </font>
+                            </Label>
+                            <TextField fx:id="textfield_consoleInput" onKeyPressed="#onConsoleKeyPressed" opacity="1.0" prefColumnCount="12" prefHeight="-1.0" prefWidth="-1.0" promptText="" style="-fx-background-radius: 0;&#10;-fx-background-color: transparent;&#10;-fx-text-fill: #fff;&#10;-fx-font-family: &quot;Courier New&quot;;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                          </children>
+                        </AnchorPane>
                       </children>
+                      <effect>
+                        <DropShadow height="11.0" radius="5.0" width="11.0">
+                          <color>
+                            <Color blue="0.000" green="0.000" opacity="0.247" red="0.000" fx:id="x1" />
+                          </color>
+                        </DropShadow>
+                      </effect>
+                      <padding>
+                        <Insets />
+                      </padding>
+                    </AnchorPane>
+                    <AnchorPane prefHeight="-1.0" prefWidth="-1.0" style="-fx-background-color: #fff;" VBox.vgrow="ALWAYS">
+                      <children>
+                        <TextArea id="javascript" fx:id="textarea_walkingScript" prefWidth="-1.0" style="-fx-background-radius: 0;&#10;-fx-background-color: transparent;&#10;-fx-font-family: &quot;Courier New&quot;;" wrapText="false" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                        <AnchorPane minHeight="-Infinity" prefHeight="40.0" prefWidth="-1.0" style="-fx-background-color: #eee;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                          <children>
+                            <FlowPane alignment="CENTER_RIGHT" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                              <children>
+                                <Button mnemonicParsing="false" onAction="#button_saveWalkingScript_click" text="Save" textFill="WHITE" />
+                              </children>
+                            </FlowPane>
+                          </children>
+                        </AnchorPane>
+                      </children>
+                      <effect>
+                        <DropShadow height="11.0" radius="5.0" width="11.0">
+                          <color>
+                            <Color blue="0.000" green="0.000" opacity="0.247" red="0.000" fx:id="x2" />
+                          </color>
+                        </DropShadow>
+                      </effect>
+                      <VBox.margin>
+                        <Insets top="5.0" />
+                      </VBox.margin>
                     </AnchorPane>
                   </children>
-                  <effect>
-                    <DropShadow height="11.0" radius="5.0" width="11.0">
-                      <color>
-                        <Color blue="0.000" green="0.000" opacity="0.247" red="0.000" fx:id="x1" />
-                      </color>
-                    </DropShadow>
-                  </effect>
-                  <padding>
-                    <Insets />
-                  </padding>
-                </AnchorPane>
+                </VBox>
                 <VBox prefHeight="-1.0" prefWidth="-1.0" spacing="10.0" HBox.hgrow="NEVER">
                   <children>
                     <Pane id="pane_canvas" fx:id="pane_canvasHolder" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: #fff;" VBox.vgrow="NEVER">
@@ -83,7 +111,7 @@
             <Button id="button1" fx:id="button_connect" onAction="#button_connect_click" style="" text="Connect" textFill="WHITE" />
           </children>
           <effect>
-            <DropShadow color="#0000003f" height="11.0" radius="5.0" width="11.0" />
+            <DropShadow color="$x2" height="11.0" radius="5.0" width="11.0" />
           </effect>
         </FlowPane>
       </children>

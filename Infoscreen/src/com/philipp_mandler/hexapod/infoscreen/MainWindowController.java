@@ -26,6 +26,7 @@ import com.philipp_mandler.hexapod.hexapod.LegPositionPackage;
 import com.philipp_mandler.hexapod.hexapod.LegServoPackage;
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
 import com.philipp_mandler.hexapod.hexapod.Vec3;
+import com.philipp_mandler.hexapod.hexapod.WalkingScriptPackage;
 
 public class MainWindowController implements Initializable, NetworkingEventListener {
 
@@ -35,6 +36,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	@FXML Pane pane_canvasHolder;
 	@FXML TextArea textarea_console;
 	@FXML TextField textfield_consoleInput;
+	@FXML TextArea textarea_walkingScript;
 	
 	TextInfo m_servo1;
 	TextInfo m_servo2;
@@ -82,6 +84,13 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 		else {
 			if(textfield_connectAddress.getText().isEmpty()) return;
 			Main.getNetworking().connect(textfield_connectAddress.getText(), 8888);
+		}
+	}
+	
+	@FXML
+	protected void button_saveWalkingScript_click(ActionEvent event) {
+		if(Main.getNetworking().isConnected()) {
+			Main.getNetworking().send(new WalkingScriptPackage(textarea_walkingScript.getText()));
 		}
 	}
 	
@@ -135,7 +144,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 		gc.setFill(m_legEndColor);
 		for(Vec3 point : m_legGoalPoints) {
 			if(point == null) continue;
-			gc.fillOval((point.getX() / 5) + (m_legGoalCanvas.getWidth() / 2) - (point.getZ() / 30.0), (m_legGoalCanvas.getHeight() / 2) - (point.getY() / 5) - (point.getZ() / 30.0), 10 + point.getZ() / 15.0, 10 + point.getZ() / 15.0);
+			gc.fillOval((point.getX() / 5) + (m_legGoalCanvas.getWidth() / 2) - (point.getZ() / 10.0) - 10, (m_legGoalCanvas.getHeight() / 2) - (point.getY() / 5)  - (point.getZ() / 10.0) - 10, 20 + point.getZ() / 5.0, 20 + point.getZ() / 5.0);
 		}
 	}
 	

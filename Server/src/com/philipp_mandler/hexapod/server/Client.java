@@ -29,6 +29,7 @@ public class Client extends Thread {
 		m_serverSocket = serverSocket;
 		m_outQueue = new ArrayList<NetPackage>();
 		m_run = true;
+		super.setName("Network client worker");
 	}
 	
 	@Override
