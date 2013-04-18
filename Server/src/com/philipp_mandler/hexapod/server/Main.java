@@ -37,8 +37,6 @@ import com.philipp_mandler.hexapod.hexapod.NetPackage;
  */             
 
 public class Main implements NetworkingEventListener {
-
-	static boolean m_testmode = false;
 	
 	int m_sensitivity = 8;
 
@@ -52,26 +50,15 @@ public class Main implements NetworkingEventListener {
 	static ServerNetworking m_networking;
 	
 	public static void main(String[] args) {
-		boolean testmode = false;
-		
-		String argLog = "Started with args:\n";
-		for(String arg : args) {
-			argLog += arg + "\n";
-			if(arg.equals("testmode")) testmode = true;
-		}
-		DebugHelper.log(argLog);
-		Main main = new Main(testmode);
+		Main main = new Main();
 		main.run();
 	}
 	
-	public Main(boolean testmode) {		
-	
-		m_testmode = testmode;
-		
+	public Main() {		
 		m_modules = new ArrayList<Module>();
 		
 		servo = new Servo();
-		servo.init("COM5", 57142);
+		servo.init("COM5", 100000);
 		
 		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
 		
@@ -80,7 +67,7 @@ public class Main implements NetworkingEventListener {
 				m_gamePad = controller;
 				DebugHelper.log("Gamepad connected.");
 			}
-		}		
+		}
 	}
 	
 	public void run() {
@@ -211,9 +198,4 @@ public class Main implements NetworkingEventListener {
 	public static ServerNetworking getNetworking() {
 		return m_networking;
 	}
-	
-	public static boolean isTestmode() {
-		return m_testmode;
-	}
-
 }

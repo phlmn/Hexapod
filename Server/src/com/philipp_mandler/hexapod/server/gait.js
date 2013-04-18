@@ -8,15 +8,15 @@ var triangle2 = new LegGroup(new Array(legs[1], legs[2], legs[5]), new Array(new
 
 var legPosition = new Vec2();
 
-var z1 = 0;
-var z2 = 0;
+var z1 = 0.0;
+var z2 = 0.0;
 
-var bodyHeight = -30;
-var defaultHeight = 100;
+var bodyHeight = -30.0;
+var defaultHeight = 100.0;
 
-var stepHeight = 30;
+var stepHeight = 30.0;
 
-var range = 60;
+var range = 60.0;
 
 var direction = true;
 
@@ -68,10 +68,10 @@ Module.prototype.walk = function(time, speed) {
 					switchHeight = false;
 			}
 			else {
-				if(z1 > 0)
-					z1 -= time / 10;
-				else if(z2 < 30)
+				if(z2 < 30)
 					z2 += time / 10;
+				else if(z1 > 0)
+					z1 -= time / 10;				
 				else
 					switchHeight = false;
 			}

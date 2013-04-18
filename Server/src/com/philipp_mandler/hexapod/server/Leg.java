@@ -1,5 +1,7 @@
 package com.philipp_mandler.hexapod.server;
 
+import SimpleDynamixel.Servo;
+
 import com.philipp_mandler.hexapod.hexapod.DeviceType;
 import com.philipp_mandler.hexapod.hexapod.LegPositionPackage;
 import com.philipp_mandler.hexapod.hexapod.LegServoPackage;
@@ -16,7 +18,7 @@ public class Leg {
 	private int m_legID;
 	private double m_angle;
 	
-	public Leg(int legID, double upperLegLength, double lowerLegLength, Vec2 position, double angle, SingleServo servo1, SingleServo servo2, SingleServo servo3) {
+	public Leg(int legID, double upperLegLength, double lowerLegLength, Vec2 position, double angle, SingleServo servo1, SingleServo servo2, SingleServo servo3, Servo servoController) {
 		m_legID = legID;
 		
 		m_servos = new SingleServo[3];
@@ -84,11 +86,10 @@ public class Leg {
 		double s2 = calculateS2Value(tempRotatedGoal, rotDistance);
 		double s0 = Math.PI - Math.asin(tmpGoal.getY() / rotDistance) - m_angle;
 		if(!(Double.isNaN(s0) || Double.isNaN(s1) || Double.isNaN(s2) || Double.isInfinite(s0) || Double.isInfinite(s1) || Double.isInfinite(s2))) {
-			if(!Main.isTestmode()) {
-				m_servos[0].setGoalPosition(s0);				
-				m_servos[1].setGoalPosition(s1);
-				m_servos[2].setGoalPosition(s2);
-			}
+			m_servos[0].setGoalPosition(s0);				
+			m_servos[1].setGoalPosition(s1);
+			m_servos[2].setGoalPosition(s2);
+			
 			Main.getNetworking().broadcast(new LegServoPackage(m_legID, s0, s1, s2), DeviceType.InfoScreen);
 		}
 		Main.getNetworking().broadcast(new LegPositionPackage(m_legID, new Vec3(goal)), DeviceType.InfoScreen);
@@ -101,11 +102,10 @@ public class Leg {
 		double s2 = calculateS2Value(tempRotatedGoal, rotDistance);
 		double s0 = Math.PI - Math.asin(goal.getY() / rotDistance) - m_angle;
 		if(!(Double.isNaN(s0) || Double.isNaN(s1) || Double.isNaN(s2) || Double.isInfinite(s0) || Double.isInfinite(s1) || Double.isInfinite(s2))) {
-			if(!Main.isTestmode()) {
-				m_servos[0].setGoalPosition(s0);				
-				m_servos[1].setGoalPosition(s1);
-				m_servos[2].setGoalPosition(s2);
-			}
+			m_servos[0].setGoalPosition(s0);				
+			m_servos[1].setGoalPosition(s1);
+			m_servos[2].setGoalPosition(s2);
+			
 			Main.getNetworking().broadcast(new LegServoPackage(m_legID, s0, s1, s2), DeviceType.InfoScreen);
 		}
 		Main.getNetworking().broadcast(new LegPositionPackage(m_legID, new Vec3(goal.getX() + m_position.getX(), goal.getY() + m_position.getY(), goal.getZ())), DeviceType.InfoScreen);
@@ -122,5 +122,9 @@ public class Leg {
 	public void updateServos() {
 		if(m_goalPosition != null)
 			moveLegToPosition(m_goalPosition);	
+	}
+	
+	public SingleServo[] getServos() {
+		return m_servos;
 	}
 }

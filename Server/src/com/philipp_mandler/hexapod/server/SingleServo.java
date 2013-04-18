@@ -9,6 +9,7 @@ public class SingleServo {
 	private int m_servoResolution;
 	private double m_offset;
 	private boolean m_connected;
+	private int m_goalPosition;
 	
 	public SingleServo(Servo controller, int id) {
 		m_controller = controller;
@@ -34,11 +35,12 @@ public class SingleServo {
 		m_connected = ping();
 	}
 	
-	public boolean setGoalPosition(double rad) {
-		if(m_connected)
-			return m_connected = m_controller.setGoalPosition(m_servoID, ((int)Math.round((rad + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0))) % m_servoResolution);
-		else
-			return false;
+	public void setGoalPosition(double rad) {
+		m_goalPosition = (int)((Math.round((rad + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0))) % m_servoResolution);
+	}
+	
+	public int getPosValue()  {
+		return m_goalPosition;
 	}
 	
 	public double getGoalPosition() {
