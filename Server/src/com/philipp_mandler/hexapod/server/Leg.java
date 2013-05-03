@@ -56,18 +56,19 @@ public class Leg {
 	}
 	
 	public double calculateS1Value(Vec2 goal, double distance) {
-		if(goal.getX() < 0) {
+//		if(goal.getX() < 0) {
+		//TODO: Test
 			if(goal.getY() < 0)
 				return 2 * Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) + Math.asin( Math.abs(goal.getY()) / distance ) );
 			
 			return 2 * Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) - Math.asin( Math.abs(goal.getY()) / distance ) );
-		}
-		else {
-			if(goal.getY() < 0)
-				return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) - Math.asin( Math.abs(goal.getY()) / distance ) );
-			
-			return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) + Math.asin( Math.abs(goal.getY()) / distance ) );
-		}
+//		}
+//		else {
+//			if(goal.getY() < 0)
+//				return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) - Math.asin( Math.abs(goal.getY()) / distance ) );
+//			
+//			return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) + Math.asin( Math.abs(goal.getY()) / distance ) );
+//		}
 	}
 	
 	public double calculateS2Value(Vec2 goal, double distance) {

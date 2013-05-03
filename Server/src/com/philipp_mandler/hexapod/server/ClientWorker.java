@@ -13,7 +13,7 @@ import com.philipp_mandler.hexapod.hexapod.ExitPackage;
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
 import com.philipp_mandler.hexapod.hexapod.WelcomePackage;
 
-public class Client extends Thread {
+public class ClientWorker extends Thread {
 	
 	private ServerSocket m_serverSocket;
 	private Socket m_clientSocket;
@@ -24,7 +24,7 @@ public class Client extends Thread {
 	private DeviceType deviceType;
 	private boolean m_run;
 	
-	public Client(ServerNetworking parent, ServerSocket serverSocket) {
+	public ClientWorker(ServerNetworking parent, ServerSocket serverSocket) {
 		m_parent = parent;
 		m_serverSocket = serverSocket;
 		m_outQueue = new ArrayList<NetPackage>();
@@ -52,7 +52,7 @@ public class Client extends Thread {
 		}
 		
 		m_parent.registerClient(this);
-		new Client(m_parent, m_serverSocket).start();
+		new ClientWorker(m_parent, m_serverSocket).start();
 		
 		while(m_clientSocket.isConnected() && m_run) {
 			try {
@@ -78,15 +78,16 @@ public class Client extends Thread {
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				m_run = false;
 			} catch (ClassNotFoundException e) {
+				DebugHelper.log(e.toString(), Log.ERROR);
 				e.printStackTrace();
 			}
 			
 			try {
 				sleep(1);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				DebugHelper.log(e.toString(), Log.ERROR);
 			}
 		}
 		m_parent.clientDisconnected(this);

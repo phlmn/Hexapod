@@ -11,25 +11,25 @@ import com.philipp_mandler.hexapod.hexapod.NetPackage;
 public class ServerNetworking {
 	
 	private ServerSocket m_serverSocket;
-	private ArrayList<Client> m_clients;
+	private ArrayList<ClientWorker> m_clients;
 	private ArrayList<NetworkingEventListener> m_listeners;
 
 	public ServerNetworking(int port) throws IOException {
 		m_serverSocket = new ServerSocket(port);
-		m_clients = new ArrayList<Client>();
+		m_clients = new ArrayList<ClientWorker>();
 		m_listeners = new ArrayList<NetworkingEventListener>();
 		
-		new Client(this, m_serverSocket).start();
+		new ClientWorker(this, m_serverSocket).start();
 	}
 	
 	public void broadcast(NetPackage pack) {
-		for(Client client : m_clients) {
+		for(ClientWorker client : m_clients) {
 			client.send(pack);
 		}
 	}
 	
 	public void broadcast(NetPackage pack, DeviceType devices) {
-		for(Client client : m_clients) {
+		for(ClientWorker client : m_clients) {
 			if(client.getDeviceType() == devices)
 				client.send(pack);
 		}
@@ -39,7 +39,7 @@ public class ServerNetworking {
 		return m_serverSocket;
 	}
 	
-	public void dataReceived(Client client, NetPackage pack) {
+	public void dataReceived(ClientWorker client, NetPackage pack) {
 		if(pack instanceof ConsolePackage) {
 			ConsolePackage consolePackage = (ConsolePackage)pack;
 			String[] cmd = consolePackage.getText().split(" ");
@@ -54,13 +54,13 @@ public class ServerNetworking {
 		}
 	}
 	
-	public void clientConnected(Client client) {
+	public void clientConnected(ClientWorker client) {
 		for(NetworkingEventListener listener : m_listeners) {
 			listener.onClientConnected(client);
 		}
 	}
 	
-	public void clientDisconnected(Client client) {
+	public void clientDisconnected(ClientWorker client) {
 		for(NetworkingEventListener listener : m_listeners) {
 			listener.onClientDisconnected(client);
 		}
@@ -74,12 +74,19 @@ public class ServerNetworking {
 		m_listeners.remove(listener);
 	}
 	
-	public void registerClient(Client client) {
+	public void registerClient(ClientWorker client) {
 		m_clients.add(client);
 	}
 	
-	public void unregisterClient(Client client) {
+	public void unregisterClient(ClientWorker client) {
 		m_clients.remove(client);
+	}
+	
+	public void internalCmd(String cmd) {
+		String[] splitedCmd = cmd.split(" ");
+		for(NetworkingEventListener listener : new ArrayList<NetworkingEventListener>(m_listeners)) {
+			listener.onCmdReceived(null, splitedCmd);
+		}
 	}
 	
 }

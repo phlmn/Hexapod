@@ -23,10 +23,10 @@ import com.philipp_mandler.hexapod.hexapod.NetPackage;
  *               \     |     /                                     z               
  *                \    |    /                                      ^                  
  *                 o   |   o                                       |                   
- *                  \__|__/                                    o   |    o             
- *                  |  |  |                                   / \  |   / \             
- *  --  [2] ----o---|--|--|---o---- [3]   ---> x       ------/----____/---\----> x       
- *                  |__|__|                                 /      |       \           
+ *                  \__|__/                                    o   |   o             
+ *                  |  |  |                                   / \  |  / \             
+ *  --  [2] ----o---|--|--|---o---- [3]   ---> x      -------/---\___/---\----> x       
+ *                  |__|__|                                 /      |      \           
  *                  /  |   \                                       |                  
  *                 o   |    o                                      |                  
  *                /    |     \                                                        
@@ -50,15 +50,19 @@ public class Main implements NetworkingEventListener {
 	static ServerNetworking m_networking;
 	
 	public static void main(String[] args) {
-		Main main = new Main();
+		String serialPort = "COM5";
+		if(args.length > 0)
+			serialPort = args[0];
+		
+		Main main = new Main(serialPort);
 		main.run();
 	}
 	
-	public Main() {		
+	public Main(String serialPort) {		
 		m_modules = new ArrayList<Module>();
 		
 		servo = new Servo();
-		servo.init("COM5", 100000);
+		servo.init(serialPort, 100000);
 		
 		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
 		
@@ -86,8 +90,7 @@ public class Main implements NetworkingEventListener {
 		while(true) {
 			try {
 				String input = reader.readLine();
-				String[] cmd = input.split(" ");
-				onCmdReceived(null, cmd);
+				m_networking.internalCmd(input);				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -95,7 +98,7 @@ public class Main implements NetworkingEventListener {
 	}
 
 	@Override
-	public void onDataReceived(Client client, NetPackage pack) {
+	public void onDataReceived(ClientWorker client, NetPackage pack) {
 		if(pack instanceof LegPositionPackage) {
 			LegPositionPackage posPack = (LegPositionPackage)pack;
 			DebugHelper.log("Position received\nLeg: " + posPack.getLegIndex() + "\nPosition: ( " + posPack.getGoalPosition().getX() + " | " + posPack.getGoalPosition().getY() + " | " + posPack.getGoalPosition().getZ() + " )");
@@ -107,7 +110,7 @@ public class Main implements NetworkingEventListener {
 	}
 	
 	@Override
-	public void onCmdReceived(Client client, String[] cmd) {
+	public void onCmdReceived(ClientWorker client, String[] cmd) {
 		if(cmd.length > 0) {
 			String mainCmd = cmd[0].toLowerCase();
 			switch(mainCmd) {
@@ -186,12 +189,12 @@ public class Main implements NetworkingEventListener {
 	}
 	
 	@Override
-	public void onClientDisconnected(Client client) {
+	public void onClientDisconnected(ClientWorker client) {
 		DebugHelper.log("Client Disconnected (" + client.getDeviceType() + ") | IP: " + client.getSocket().getInetAddress() + ":" + client.getSocket().getPort());
 	}
 
 	@Override
-	public void onClientConnected(Client client) {
+	public void onClientConnected(ClientWorker client) {
 		DebugHelper.log("Client Connected (" + client.getDeviceType() + ") | IP : " + client.getSocket().getInetAddress() + ":" + client.getSocket().getPort());
 	}
 	

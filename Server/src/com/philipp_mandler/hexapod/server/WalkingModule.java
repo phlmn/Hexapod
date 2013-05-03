@@ -73,13 +73,13 @@ public class WalkingModule implements Module {
 		
 		m_legs = new Leg[6];
 		
-		m_legs[1] = new Leg(1, Data.upperLeg, Data.lowerLeg, new Vec2(90, 210), -1, new SingleServo(m_servoController, 10, 4096, 0), new SingleServo(m_servoController, 11, 4096, 0.35), new SingleServo(m_servoController, 13, 4096, 0.6), m_servoController);
+		m_legs[1] = new Leg(1, Data.upperLeg, Data.lowerLeg, new Vec2(90, 210), -1.0122f, new SingleServo(m_servoController, 10, 4096, 0), new SingleServo(m_servoController, 11, 4096, 0.35), new SingleServo(m_servoController, 13, 4096, 0.6), m_servoController);
 		m_legs[3] = new Leg(3, Data.upperLeg, Data.lowerLeg, new Vec2(130, 0), Math.PI, new SingleServo(m_servoController, 13, 4096, 0), new SingleServo(m_servoController, 14, 4096, 0), new SingleServo(m_servoController, 15, 4096, 0), m_servoController);
-		m_legs[5] = new Leg(5, Data.upperLeg, Data.lowerLeg, new Vec2(90, -210), -1, new SingleServo(m_servoController, 16, 4096, 0), new SingleServo(m_servoController, 17, 4096, 0.35), new SingleServo(m_servoController, 18, 4096, 0.6), m_servoController);
+		m_legs[5] = new Leg(5, Data.upperLeg, Data.lowerLeg, new Vec2(90, -210), 1.0122f, new SingleServo(m_servoController, 16, 4096, 0), new SingleServo(m_servoController, 17, 4096, 0.35), new SingleServo(m_servoController, 18, 4096, 0.6), m_servoController);
 		
-		m_legs[0] = new Leg(0, Data.upperLeg, Data.lowerLeg, new Vec2(-90, 210), -1f, new SingleServo(m_servoController, 7, 4096, 0), new SingleServo(m_servoController, 8, 4096, 0.35), new SingleServo(m_servoController, 9, 4096, 0.6), m_servoController);
-		m_legs[2] = new Leg(2, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, new SingleServo(m_servoController, 4, 4096, 0), new SingleServo(m_servoController, 5, 4096, 0), new SingleServo(m_servoController, 6, 4096, 0), m_servoController);
-		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1f, new SingleServo(m_servoController, 1, 4096, 0), new SingleServo(m_servoController, 2, 4096, 0.35), new SingleServo(m_servoController, 3, 4096, 0.6), m_servoController);
+		m_legs[0] = new Leg(0, Data.upperLeg, Data.lowerLeg, new Vec2(-90, 210), -1.0122f, new SingleServo(m_servoController, 7, 4096, 0), new SingleServo(m_servoController, 8, 4096, 0.35), new SingleServo(m_servoController, 9, 4096, 0.6), m_servoController);
+		m_legs[2] = new Leg(2, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, new SingleServo(m_servoController, 4, 4096, 0), new SingleServo(m_servoController, 5, 4096, 0.35), new SingleServo(m_servoController, 6, 4096, 0.6), m_servoController);
+		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1.0122f, new SingleServo(m_servoController, 1, 4096, 0), new SingleServo(m_servoController, 2, 4096, 0.35), new SingleServo(m_servoController, 3, 4096, 0.6), m_servoController);
 		
 		for(Leg leg : m_legs) {		
 			m_legUpdater.addLeg(leg);
@@ -186,7 +186,7 @@ public class WalkingModule implements Module {
 	}
 
 	@Override
-	public void onDataReceived(Client client, NetPackage pack) {
+	public void onDataReceived(ClientWorker client, NetPackage pack) {
 		if(pack instanceof WalkingScriptPackage) {
 			try {
 				m_scriptEngine.eval(((WalkingScriptPackage) pack).getScript());
@@ -201,7 +201,7 @@ public class WalkingModule implements Module {
 	}
 	
 	@Override
-	public void onCmdReceived(Client client, String[] cmd) {
+	public void onCmdReceived(ClientWorker client, String[] cmd) {
 		if(cmd.length > 1) {
 			if(cmd[0].toLowerCase().equals("walking")) {
 				if(cmd[1].toLowerCase().equals("speed")) {
@@ -231,12 +231,12 @@ public class WalkingModule implements Module {
 	}
 
 	@Override
-	public void onClientDisconnected(Client client) {
+	public void onClientDisconnected(ClientWorker client) {
 		
 	}
 
 	@Override
-	public void onClientConnected(Client client) {
+	public void onClientConnected(ClientWorker client) {
 		
 	}
 

@@ -36,7 +36,7 @@ public class SingleServo {
 	}
 	
 	public void setGoalPosition(double rad) {
-		m_goalPosition = (int)((Math.round((rad + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0))) % m_servoResolution);
+		m_goalPosition = (int)Math.round((rad + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0)) % m_servoResolution;
 	}
 	
 	public int getPosValue()  {
@@ -45,6 +45,7 @@ public class SingleServo {
 	
 	public double getGoalPosition() {
 		if(m_connected)
+			// TODO: Fix it (offset)!!
 			return m_controller.goalPosition(m_servoID) * (2.0 * Math.PI) / (m_servoResolution - 1.0);
 		return -1;
 	}
