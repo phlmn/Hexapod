@@ -56,22 +56,14 @@ public class Leg {
 	}
 	
 	public double calculateS1Value(Vec2 goal, double distance) {
-//		if(goal.getX() < 0) {
-		//TODO: Test
-			if(goal.getY() < 0)
-				return 2 * Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) + Math.asin( Math.abs(goal.getY()) / distance ) );
-			
-			return 2 * Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) - Math.asin( Math.abs(goal.getY()) / distance ) );
-//		}
-//		else {
-//			if(goal.getY() < 0)
-//				return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) - Math.asin( Math.abs(goal.getY()) / distance ) );
-//			
-//			return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) + Math.asin( Math.abs(goal.getY()) / distance ) );
-//		}
+		
+		if(goal.getY() < 0)
+			return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) - Math.asin( Math.abs(goal.getY()) / distance ) );
+		
+		return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) + Math.asin( Math.abs(goal.getY()) / distance ) );
 	}
 	
-	public double calculateS2Value(Vec2 goal, double distance) {
+	public double calculateS2Value(Vec2 goal, double distance) {	
 		return Math.acos( (Math.pow(m_upperLeg, 2) + Math.pow(m_lowerLeg, 2) - Math.pow(distance, 2)) / (2 * m_upperLeg * m_lowerLeg) );
 	}
 	
@@ -80,20 +72,7 @@ public class Leg {
 	}
 	
 	public void moveLegToPosition(Vec3 goal) {
-		Vec3 tmpGoal = new Vec3(goal.getX() - m_position.getX(), goal.getY() - m_position.getY(), goal.getZ());
-		Vec2 tempRotatedGoal = new Vec2(Math.sqrt(Math.pow(tmpGoal.getX(), 2) + Math.pow(tmpGoal.getY(), 2)) - 55, tmpGoal.getZ());
-		double rotDistance = calculateStartGoalDistance(tempRotatedGoal);
-		double s1 = calculateS1Value(tempRotatedGoal, rotDistance);
-		double s2 = calculateS2Value(tempRotatedGoal, rotDistance);
-		double s0 = Math.PI - Math.asin(tmpGoal.getY() / rotDistance) - m_angle;
-		if(!(Double.isNaN(s0) || Double.isNaN(s1) || Double.isNaN(s2) || Double.isInfinite(s0) || Double.isInfinite(s1) || Double.isInfinite(s2))) {
-			m_servos[0].setGoalPosition(s0);				
-			m_servos[1].setGoalPosition(s1);
-			m_servos[2].setGoalPosition(s2);
-			
-			Main.getNetworking().broadcast(new LegServoPackage(m_legID, s0, s1, s2), DeviceType.InfoScreen);
-		}
-		Main.getNetworking().broadcast(new LegPositionPackage(m_legID, new Vec3(goal)), DeviceType.InfoScreen);
+		moveLegToRelativePosition(new Vec3(goal.getX() - m_position.getX(), goal.getY() - m_position.getY(), goal.getZ()));
 	}
 	
 	public void moveLegToRelativePosition(Vec3 goal) {
@@ -101,9 +80,14 @@ public class Leg {
 		double rotDistance = calculateStartGoalDistance(tempRotatedGoal);
 		double s1 = calculateS1Value(tempRotatedGoal, rotDistance);
 		double s2 = calculateS2Value(tempRotatedGoal, rotDistance);
-		double s0 = Math.PI - Math.asin(goal.getY() / rotDistance) - m_angle;
+		double s0;
+		if(goal.getX() < 0)
+			s0 = Math.PI - Math.asin(goal.getY() / rotDistance) - m_angle;
+		else
+			s0 = Math.PI + Math.asin(goal.getY() / rotDistance) + m_angle;
+		
 		if(!(Double.isNaN(s0) || Double.isNaN(s1) || Double.isNaN(s2) || Double.isInfinite(s0) || Double.isInfinite(s1) || Double.isInfinite(s2))) {
-			m_servos[0].setGoalPosition(s0);				
+			m_servos[0].setGoalPosition(s0);
 			m_servos[1].setGoalPosition(s1);
 			m_servos[2].setGoalPosition(s2);
 			

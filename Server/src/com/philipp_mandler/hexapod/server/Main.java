@@ -118,7 +118,12 @@ public class Main implements NetworkingEventListener {
 					if(cmd.length > 2) {
 						if(cmd[2].toLowerCase().equals("start")) {
 							switch(cmd[1]) {
-							case "walking": WalkingModule mod = new WalkingModule(servo); startModule(mod); if(mod != null) mod.setGamepad(m_gamePad); break;
+							case "walking": 
+								WalkingModule mod = new WalkingModule(servo);
+								startModule(mod);
+								if(mod != null)
+									mod.setGamepad(m_gamePad);
+								break;
 							default: DebugHelper.log("No such module found.");
 							}
 						}

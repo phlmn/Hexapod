@@ -98,7 +98,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	public void onDataReceived(NetPackage pack) {
 		if(pack instanceof LegServoPackage) {
 			LegServoPackage legServoPack = (LegServoPackage)pack;
-			if(legServoPack.getLegID() == 0) {
+			if(legServoPack.getLegID() == 3) {
 				m_servo1.setContent(String.valueOf(legServoPack.getServoPos1()));
 				m_servo2.setContent(String.valueOf(legServoPack.getServoPos2()));
 				m_servo3.setContent(String.valueOf(legServoPack.getServoPos3()));
