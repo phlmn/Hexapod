@@ -17,8 +17,9 @@ public class Leg {
 	private double m_lowerLeg;
 	private int m_legID;
 	private double m_angle;
+	private boolean m_rightSide;
 	
-	public Leg(int legID, double upperLegLength, double lowerLegLength, Vec2 position, double angle, SingleServo servo1, SingleServo servo2, SingleServo servo3, Servo servoController) {
+	public Leg(int legID, double upperLegLength, double lowerLegLength, Vec2 position, double angle, SingleServo servo1, SingleServo servo2, SingleServo servo3, Servo servoController, boolean rightSide) {
 		m_legID = legID;
 		
 		m_servos = new SingleServo[3];
@@ -39,6 +40,7 @@ public class Leg {
 		
 		m_position = position;
 		m_angle = angle;
+		m_rightSide = rightSide;
 	}
 	
 	public void setGoalPosition(Vec3 pos) {
@@ -55,36 +57,50 @@ public class Leg {
 		m_servos[2].setTorqueEnabled(enable);
 	}
 	
-	public double calculateS1Value(Vec2 goal, double distance) {
-		
-		if(goal.getY() < 0)
-			return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) - Math.asin( Math.abs(goal.getY()) / distance ) );
-		
-		return Math.PI  - ( Math.acos( (Math.pow(distance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * distance * m_upperLeg) ) + Math.asin( Math.abs(goal.getY()) / distance ) );
-	}
-	
-	public double calculateS2Value(Vec2 goal, double distance) {	
-		return Math.acos( (Math.pow(m_upperLeg, 2) + Math.pow(m_lowerLeg, 2) - Math.pow(distance, 2)) / (2 * m_upperLeg * m_lowerLeg) );
-	}
-	
-	public double calculateStartGoalDistance(Vec2 goal) {
-		return Math.sqrt( Math.pow(goal.getX(), 2) + Math.pow(goal.getY(), 2) );
-	}
-	
 	public void moveLegToPosition(Vec3 goal) {
 		moveLegToRelativePosition(new Vec3(goal.getX() - m_position.getX(), goal.getY() - m_position.getY(), goal.getZ()));
 	}
 	
 	public void moveLegToRelativePosition(Vec3 goal) {
-		Vec2 tempRotatedGoal = new Vec2(Math.sqrt(Math.pow(goal.getX(), 2) + Math.pow(goal.getY(), 2)) - 55, goal.getZ());
-		double rotDistance = calculateStartGoalDistance(tempRotatedGoal);
-		double s1 = calculateS1Value(tempRotatedGoal, rotDistance);
-		double s2 = calculateS2Value(tempRotatedGoal, rotDistance);
+		Vec2 tempRotatedGoal = new Vec2(Math.sqrt(Math.pow(goal.getX(), 2) + Math.pow(goal.getY(), 2)), goal.getZ());
+		double rotDistance = tempRotatedGoal.getLength();
+		
+		
+		// calculate s0
+		
 		double s0;
-		if(goal.getX() < 0)
-			s0 = Math.PI - Math.asin(goal.getY() / rotDistance) - m_angle;
+		
+		if(m_rightSide)
+			s0 = Math.asin(goal.getY() / rotDistance) + m_angle;
 		else
-			s0 = Math.PI + Math.asin(goal.getY() / rotDistance) + m_angle;
+			s0 = Math.PI - Math.asin(goal.getY() / rotDistance) - m_angle;
+		
+				
+		// calculate S1
+		
+		double s1;
+		if(m_rightSide) {
+			/*if(goal.getY() < 0)
+				s1 = 2 * Math.PI - (Math.PI  - ( Math.acos( (Math.pow(rotDistance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * rotDistance * m_upperLeg) ) - Math.asin( Math.abs(goal.getY()) / rotDistance )) );
+			else */
+			s1 = 2 * Math.PI - (Math.PI  - ( Math.acos( (Math.pow(rotDistance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * rotDistance * m_upperLeg) ) + Math.asin( tempRotatedGoal.getY() / rotDistance ) ));
+		}
+		else {
+			 /*if(goal.getY() < 0)
+				s1 = Math.PI  - ( Math.acos( (Math.pow(rotDistance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * rotDistance * m_upperLeg) ) - Math.asin( Math.abs(goal.getY()) / rotDistance ) );
+			else */
+				s1 = Math.PI  - ( Math.acos( (Math.pow(rotDistance, 2) + Math.pow(m_upperLeg, 2) - Math.pow(m_lowerLeg, 2)) / (2 * rotDistance * m_upperLeg) ) + Math.asin( tempRotatedGoal.getY() / rotDistance ) );
+		}
+		
+		
+		// calculate S2
+		
+		double s2;
+		if(m_rightSide)
+			s2 = Math.PI * 2 - Math.acos( (Math.pow(m_upperLeg, 2) + Math.pow(m_lowerLeg, 2) - Math.pow(rotDistance, 2)) / (2 * m_upperLeg * m_lowerLeg) );
+		else
+			s2 = Math.acos( (Math.pow(m_upperLeg, 2) + Math.pow(m_lowerLeg, 2) - Math.pow(rotDistance, 2)) / (2 * m_upperLeg * m_lowerLeg) );
+		
 		
 		if(!(Double.isNaN(s0) || Double.isNaN(s1) || Double.isNaN(s2) || Double.isInfinite(s0) || Double.isInfinite(s1) || Double.isInfinite(s2))) {
 			m_servos[0].setGoalPosition(s0);

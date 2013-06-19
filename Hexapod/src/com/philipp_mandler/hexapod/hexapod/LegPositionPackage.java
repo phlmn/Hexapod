@@ -1,8 +1,7 @@
 package com.philipp_mandler.hexapod.hexapod;
 
-import java.io.Serializable;
 
-public class LegPositionPackage implements NetPackage, Serializable {
+public class LegPositionPackage implements NetPackage {
 
 	private static final long serialVersionUID = 4667006753603340204L;
 	

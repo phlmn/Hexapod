@@ -3,18 +3,18 @@ importPackage(com.philipp_mandler.hexapod.hexapod);
 
 var legs = robot.getLegs();
 
-var triangle1 = new LegGroup(new Array(legs[0], legs[3], legs[4]), new Array(new Vec2(-230, 310), new Vec2(320, 0), new Vec2(-230, -310)));
-var triangle2 = new LegGroup(new Array(legs[1], legs[2], legs[5]), new Array(new Vec2(230, 310), new Vec2(-320, 0), new Vec2(230, -310)));
+var triangle1 = new LegGroup(new Array(legs[0], legs[3], legs[4]), new Array(new Vec2(-200, 310), new Vec2(300, 0), new Vec2(-200, -310)));
+var triangle2 = new LegGroup(new Array(legs[1], legs[2], legs[5]), new Array(new Vec2(200, 310), new Vec2(-300, 0), new Vec2(200, -310)));
 
 var legPosition = new Vec2();
 
 var z1 = 0.0;
 var z2 = 0.0;
 
-var bodyHeight = -30.0;
-var defaultHeight = 100.0;
+var bodyHeight = 0.0;
+var defaultHeight = 80.0;
 
-var stepHeight = 30.0;
+var stepHeight = 60.0;
 
 var range = 60.0;
 
@@ -60,7 +60,7 @@ Module.prototype.walk = function(time, speed) {
 
 		if(switchHeight) {
 			if(direction) {
-				if(z1 < 30)
+				if(z1 < stepHeight)
 					z1 += time / 10;
 				else if(z2 > 0)
 					z2 -= time / 10;
@@ -68,7 +68,7 @@ Module.prototype.walk = function(time, speed) {
 					switchHeight = false;
 			}
 			else {
-				if(z2 < 30)
+				if(z2 < stepHeight)
 					z2 += time / 10;
 				else if(z1 > 0)
 					z1 -= time / 10;				

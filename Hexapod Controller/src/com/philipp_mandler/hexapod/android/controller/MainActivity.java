@@ -8,7 +8,10 @@ import android.view.View;
 
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickListener;
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickView;
+import com.philipp_mandler.hexapod.hexapod.JoystickPackage;
+import com.philipp_mandler.hexapod.hexapod.JoystickType;
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.Vec2;
 
 public class MainActivity extends Activity implements NetworkingEventListener {
 	
@@ -30,14 +33,16 @@ public class MainActivity extends Activity implements NetworkingEventListener {
         joystick1.addListener(new JoystickListener() {
 			
 			public void joystickPositionChanged(View view, float x, float y) {
-				
+				if(m_networking.isConnected())
+					m_networking.send(new JoystickPackage(new Vec2(x, y), JoystickType.Rotation));
 			}
 		});
         
         joystick2.addListener(new JoystickListener() {
 			
 			public void joystickPositionChanged(View view, float x, float y) {
-				
+				if(m_networking.isConnected())
+					m_networking.send(new JoystickPackage(new Vec2(x, y), JoystickType.Direction));
 			}
 		});
         

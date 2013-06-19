@@ -20,6 +20,9 @@ public class JoystickView extends View {
 	private float m_touch_x = 0;
 	private float m_touch_y = 0;
 	
+	private float m_dragStart_x = 0;
+	private float m_dragStart_y = 0;
+	
 	private ArrayList<JoystickListener> m_listeners;
 
 	public JoystickView(Context context, AttributeSet attrs, int defStyle) {
@@ -63,22 +66,23 @@ public class JoystickView extends View {
 		float eventY = event.getY() - 130;
 		
 		if(event.getAction() == MotionEvent.ACTION_MOVE) {
-			if(Math.sqrt(Math.pow(eventX, 2) + Math.pow(eventY, 2)) <= 80) {
-				m_touch_x = event.getX() - 130;
-				m_touch_y = event.getY() - 130;
-			}
-			else {
-				double alpha = Math.asin(eventY / Math.sqrt(Math.pow(eventX, 2) + Math.pow(eventY, 2)));
-				m_touch_x = (float) (Math.cos(alpha) * 80 * Math.signum(eventX));
+			m_touch_x = eventX - m_dragStart_x;
+			m_touch_y = eventY - m_dragStart_y;
+			
+			if(Math.sqrt(Math.pow(m_touch_x, 2) + Math.pow(m_touch_y, 2)) > 80) {
+				double alpha = Math.asin(m_touch_y / Math.sqrt(Math.pow(m_touch_x, 2) + Math.pow(m_touch_y, 2)));
+				m_touch_x = (float) (Math.cos(alpha) * 80 * Math.signum(m_touch_x));
 				m_touch_y = (float) (Math.sin(alpha) * 80);
 			}
 			onPositionChanged();
 			accepted = true;
 		}
 		else if(event.getAction() == MotionEvent.ACTION_DOWN) {
-			if(Math.sqrt(Math.pow(eventX, 2) + Math.pow(eventY, 2)) <= 80) {
-				m_touch_x = eventX;
-				m_touch_y = eventY;
+			if(Math.sqrt(Math.pow(eventX, 2) + Math.pow(eventY, 2)) <= 70) {
+				m_dragStart_x = eventX;
+				m_dragStart_y = eventY;
+				m_touch_x = 0;
+				m_touch_y = 0;
 				onPositionChanged();
 				accepted = true;
 			}

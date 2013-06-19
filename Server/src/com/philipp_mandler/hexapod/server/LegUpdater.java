@@ -53,7 +53,7 @@ public class LegUpdater extends Thread {
 			m_servoController.syncWriteGoalPosition(idArray, valueArray);
 			
 			try {
-				sleep(10);
+				sleep(20);
 			} catch (InterruptedException e) {
 				DebugHelper.log(e.toString(), Log.ERROR);
 			}
