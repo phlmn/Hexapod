@@ -7,4 +7,5 @@ public class ExitPackage implements NetPackage {
 	public ExitPackage() {
 		
 	}
+
 }

@@ -1,6 +1,7 @@
 package com.philipp_mandler.hexapod.hexapod;
 
 public class ConsolePackage implements NetPackage {
+
 	private static final long serialVersionUID = 1754181619084998648L;
 	
 	private String m_text;
@@ -16,4 +17,5 @@ public class ConsolePackage implements NetPackage {
 	public String getText() {
 		return m_text;
 	}
+
 }

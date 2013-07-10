@@ -88,4 +88,5 @@ public class Vec3 implements Serializable {
 		m_y += obj.m_y;
 		m_z += obj.m_z;
 	}
+
 }

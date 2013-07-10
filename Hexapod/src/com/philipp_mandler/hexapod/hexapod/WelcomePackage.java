@@ -17,4 +17,5 @@ public class WelcomePackage implements NetPackage {
 	public DeviceType getDeviceType() {
 		return m_deviceType;
 	}
+
 }

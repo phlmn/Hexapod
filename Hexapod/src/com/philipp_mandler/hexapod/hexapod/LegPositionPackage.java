@@ -28,4 +28,5 @@ public class LegPositionPackage implements NetPackage {
 	public void setGoalPosition(Vec3 goal) {
 		this.m_goal = goal;
 	}
+
 }

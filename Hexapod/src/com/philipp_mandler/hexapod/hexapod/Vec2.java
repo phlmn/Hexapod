@@ -86,4 +86,5 @@ public class Vec2 implements Serializable {
 	public void normalize() {
 		divide(getLength());
 	}
+
 }

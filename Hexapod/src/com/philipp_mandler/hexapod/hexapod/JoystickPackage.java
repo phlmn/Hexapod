@@ -26,5 +26,6 @@ public class JoystickPackage implements NetPackage {
 	
 	public void setType(JoystickType type) {
 		m_type = type;
-	}	
+	}
+
 }
