@@ -25,13 +25,15 @@ public class Main extends Application implements NetworkingEventListener {
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		fxmlLoader.setLocation(location);
 		Parent root;
+
 		try {
 			root = (Parent)fxmlLoader.load(location.openStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
-		controller = (MainWindowController)fxmlLoader.getController();
+
+		controller = fxmlLoader.getController();
 		
 		primaryStage.setScene(new Scene(root));
 		primaryStage.sizeToScene();

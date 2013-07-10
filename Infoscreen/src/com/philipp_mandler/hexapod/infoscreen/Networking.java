@@ -11,7 +11,7 @@ public class Networking {
 	boolean m_connected = false;
 
 	public Networking() {		
-		m_listeners = new ArrayList<NetworkingEventListener>();		
+		m_listeners = new ArrayList<>();
 	}
 	
 	public void connect(String address, int port) {
@@ -52,7 +52,7 @@ public class Networking {
 	
 	public void disconnect() {
 		if(m_connected)
-			m_client.diconnect();
+			m_client.disconnect();
 	}
 	
 	public void addEventListener(NetworkingEventListener listener) {

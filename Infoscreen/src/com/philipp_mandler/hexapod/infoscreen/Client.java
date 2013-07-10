@@ -40,7 +40,7 @@ public class Client extends Thread {
 			m_objOutputStream = new ObjectOutputStream(m_socket.getOutputStream());
 			m_objOutputStream.writeObject(new WelcomePackage(DeviceType.InfoScreen));
 			m_objInputStream = new ObjectInputStream(m_socket.getInputStream());
-			m_outQueue = new ArrayList<NetPackage>();
+			m_outQueue = new ArrayList<>();
 		} catch (IOException e) {
 			e.printStackTrace();
 			m_parent.onConnectionError();
@@ -68,12 +68,10 @@ public class Client extends Thread {
 					break;
 				}
 				
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
+			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			
+
 			try {
 				sleep(1);
 			} catch (InterruptedException e) {
@@ -92,12 +90,13 @@ public class Client extends Thread {
 		m_outQueue.add(pack);
 	}
 	
-	public void immediateDiconnect() {
+	public void immediateDisconnect() {
 		m_run = false;
 		m_parent.onDisconnected();
 	}
 	
-	public void diconnect() {
+	public void disconnect() {
 		m_disconnect = true;
 	}
+
 }

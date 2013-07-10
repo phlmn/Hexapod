@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -47,7 +46,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	
 	Vec3[] m_legGoalPoints;
 	
-	ArrayList<String> m_lastCmds = new ArrayList<String>();
+	ArrayList<String> m_lastCmds = new ArrayList<>();
 	int m_cmdSelection = 0;
 	
 	Paint m_canvasBg;
@@ -77,7 +76,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	}
 	
 	@FXML
-	protected void button_connect_click(ActionEvent event) {
+	protected void button_connect_click() {
 		if(Main.getNetworking().isConnected()) {
 			Main.getNetworking().disconnect();				
 		}
@@ -88,7 +87,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	}
 	
 	@FXML
-	protected void button_saveWalkingScript_click(ActionEvent event) {
+	protected void button_saveWalkingScript_click() {
 		if(Main.getNetworking().isConnected()) {
 			Main.getNetworking().send(new WalkingScriptPackage(textarea_walkingScript.getText()));
 		}

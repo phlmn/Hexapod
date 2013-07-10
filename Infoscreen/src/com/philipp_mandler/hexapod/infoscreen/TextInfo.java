@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 public class TextInfo {
+
 	private Label m_object;
 	private String m_label;
 	private String m_content;
@@ -103,4 +104,5 @@ public class TextInfo {
 	public Label getObject() {
 		return m_object;
 	}
+
 }
