@@ -41,13 +41,14 @@ public class Main implements NetworkingEventListener {
 	int m_sensitivity = 8;
 
 	Servo servo;
-	Leg legs[];
 	
 	Controller m_gamePad = null;
 	
 	ArrayList<Module> m_modules;
 	
-	static ServerNetworking m_networking;
+	private static ServerNetworking m_networking;
+
+	private static ModuleManager m_moduleManager = new ModuleManager();
 	
 	public static void main(String[] args) {
 		String serialPort = "COM5";
@@ -58,11 +59,15 @@ public class Main implements NetworkingEventListener {
 		main.run();
 	}
 	
-	public Main(String serialPort) {		
+	public Main(String serialPort) {
 		m_modules = new ArrayList<Module>();
+
 		
 		servo = new Servo();
 		servo.init(serialPort, 100000);
+
+		m_moduleManager.registerModule(new WalkingModule(servo));
+		m_moduleManager.registerModule(new TestingModule());
 		
 		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
 		
@@ -102,9 +107,6 @@ public class Main implements NetworkingEventListener {
 		if(pack instanceof LegPositionPackage) {
 			LegPositionPackage posPack = (LegPositionPackage)pack;
 			DebugHelper.log("Position received\nLeg: " + posPack.getLegIndex() + "\nPosition: ( " + posPack.getGoalPosition().getX() + " | " + posPack.getGoalPosition().getY() + " | " + posPack.getGoalPosition().getZ() + " )");
-			if(posPack.getLegIndex() < legs.length && posPack.getLegIndex() > 0) {
-				legs[posPack.getLegIndex()].setGoalPosition(posPack.getGoalPosition());
-			}
 			Main.getNetworking().broadcast(pack, DeviceType.InfoScreen);
 		}
 	}
@@ -117,25 +119,25 @@ public class Main implements NetworkingEventListener {
 				case "module": 
 					if(cmd.length > 2) {
 						if(cmd[2].toLowerCase().equals("start")) {
-							switch(cmd[1]) {
-							case "walking": 
-								WalkingModule mod = new WalkingModule(servo);
-								startModule(mod);
-								if(mod != null)
-									mod.setGamepad(m_gamePad);
-								break;
-							default: DebugHelper.log("No such module found.");
-							}
+							if(!Main.getModuleManager().startModule(cmd[1]))
+								DebugHelper.log("No such module found.");
 						}
 						else if(cmd[2].toLowerCase().equals("stop")) {
-							stopModule(cmd[1]);
+							if(!Main.getModuleManager().stopModule(cmd[1]))
+								DebugHelper.log("No such module found.");
 						}
 						else if(cmd[2].toLowerCase().equals("status")) {
-							if(isModuleRunning(cmd[1].toLowerCase())) {
-								DebugHelper.log("The module \"" + cmd[1] + "\" is running.");
+							Module module = Main.getModuleManager().getModule(cmd[1]);
+							if(module != null) {
+								if(module.isRunning()) {
+									DebugHelper.log("The module \"" + cmd[1] + "\" is running.");
+								}
+								else {
+									DebugHelper.log("The module \"" + cmd[1] + "\" is not running.");
+								}
 							}
 							else {
-								DebugHelper.log("The module \"" + cmd[1] + "\" is not running.");
+								DebugHelper.log("No such module found.");
 							}
 						}
 						else {
@@ -150,14 +152,6 @@ public class Main implements NetworkingEventListener {
 		}
 	}
 	
-	public boolean isModuleRunning(String moduleName) {
-		for(Module mod: m_modules) {
-			if(mod.getName().equals(moduleName));
-				return true;
-		}
-		return false;
-	}
-	
 	private void showSyntax(String cmd) {
 		String answer;
 		switch(cmd) {
@@ -166,33 +160,7 @@ public class Main implements NetworkingEventListener {
 		}
 		DebugHelper.log(answer);
 	}
-	
-	public void startModule(Module module) {
-		for(Module mod: m_modules) {
-			if(mod.getName().equals(module.getName())) {
-				DebugHelper.log("This module is already running.");
-				return;
-			}
-		}
-		new ModuleThread(this, module).start();
-		m_networking.addEventListener(module);
-		m_modules.add(module);
-	}
-	
-	public void stopModule(String module) {
-		for(Module mod: m_modules) {
-			if(mod.getName().equals(module)) {
-				mod.stop();
-				return;
-			}
-		}
-	}
-	
-	public void unregsiterModule(Module module) {
-		m_networking.removeEventListener(module);
-		m_modules.remove(module);
-	}
-	
+
 	@Override
 	public void onClientDisconnected(ClientWorker client) {
 		DebugHelper.log("Client Disconnected (" + client.getDeviceType() + ") | IP: " + client.getSocket().getInetAddress() + ":" + client.getSocket().getPort());
@@ -205,5 +173,9 @@ public class Main implements NetworkingEventListener {
 	
 	public static ServerNetworking getNetworking() {
 		return m_networking;
+	}
+
+	public static ModuleManager getModuleManager() {
+		return m_moduleManager;
 	}
 }

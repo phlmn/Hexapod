@@ -20,7 +20,7 @@ import com.philipp_mandler.hexapod.hexapod.NetPackage;
 import com.philipp_mandler.hexapod.hexapod.Vec2;
 import com.philipp_mandler.hexapod.hexapod.WalkingScriptPackage;
 
-public class WalkingModule implements Module {
+public class WalkingModule extends Module {
 	
 	private boolean m_running = true;
 	
@@ -50,6 +50,19 @@ public class WalkingModule implements Module {
 		m_scriptEngine = factory.getEngineByName("JavaScript");
 		
 		m_legUpdater = new LegUpdater(m_servoController);
+
+
+		m_legs = new Leg[6];
+
+		m_legs[1] = new Leg(1, Data.upperLeg, Data.lowerLeg, new Vec2(90, 210), -1.0122f + Math.PI, new SingleServo(m_servoController, 10, 4096, 0), new SingleServo(m_servoController, 11, 4096, -0.35), new SingleServo(m_servoController, 12, 4096, -0.6), m_servoController, true);
+		m_legs[3] = new Leg(3, Data.upperLeg, Data.lowerLeg, new Vec2(130, 0), Math.PI, new SingleServo(m_servoController, 13, 4096, 0), new SingleServo(m_servoController, 14, 4096, -0.35), new SingleServo(m_servoController, 15, 4096, -0.6), m_servoController, true);
+		m_legs[5] = new Leg(5, Data.upperLeg, Data.lowerLeg, new Vec2(90, -210), 1.0122f + Math.PI, new SingleServo(m_servoController, 16, 4096, 0), new SingleServo(m_servoController, 17, 4096, -0.35), new SingleServo(m_servoController, 18, 4096, -0.6), m_servoController, true);
+
+		m_legs[0] = new Leg(0, Data.upperLeg, Data.lowerLeg, new Vec2(-90, 210), -1.0122f, new SingleServo(m_servoController, 7, 4096, 0), new SingleServo(m_servoController, 8, 4096, 0.35), new SingleServo(m_servoController, 9, 4096, 0.6), m_servoController, false);
+		m_legs[2] = new Leg(2, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, new SingleServo(m_servoController, 4, 4096, 0), new SingleServo(m_servoController, 5, 4096, 0.35), new SingleServo(m_servoController, 6, 4096, 0.6), m_servoController, false);
+		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1.0122f, new SingleServo(m_servoController, 1, 4096, 0), new SingleServo(m_servoController, 2, 4096, 0.35), new SingleServo(m_servoController, 3, 4096, 0.6), m_servoController, false);
+
+
 	}
 	
 	public void setGamepad(Controller gamepad) {
@@ -69,38 +82,26 @@ public class WalkingModule implements Module {
 	}
 
 	@Override
-	public void run() {
-		
-		m_legs = new Leg[6];
-		
-		m_legs[1] = new Leg(1, Data.upperLeg, Data.lowerLeg, new Vec2(90, 210), -1.0122f + Math.PI, new SingleServo(m_servoController, 10, 4096, 0), new SingleServo(m_servoController, 11, 4096, -0.35), new SingleServo(m_servoController, 12, 4096, -0.6), m_servoController, true);
-		m_legs[3] = new Leg(3, Data.upperLeg, Data.lowerLeg, new Vec2(130, 0), Math.PI, new SingleServo(m_servoController, 13, 4096, 0), new SingleServo(m_servoController, 14, 4096, -0.35), new SingleServo(m_servoController, 15, 4096, -0.6), m_servoController, true);
-		m_legs[5] = new Leg(5, Data.upperLeg, Data.lowerLeg, new Vec2(90, -210), 1.0122f + Math.PI, new SingleServo(m_servoController, 16, 4096, 0), new SingleServo(m_servoController, 17, 4096, -0.35), new SingleServo(m_servoController, 18, 4096, -0.6), m_servoController, true);
-		
-		m_legs[0] = new Leg(0, Data.upperLeg, Data.lowerLeg, new Vec2(-90, 210), -1.0122f, new SingleServo(m_servoController, 7, 4096, 0), new SingleServo(m_servoController, 8, 4096, 0.35), new SingleServo(m_servoController, 9, 4096, 0.6), m_servoController, false);
-		m_legs[2] = new Leg(2, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, new SingleServo(m_servoController, 4, 4096, 0), new SingleServo(m_servoController, 5, 4096, 0.35), new SingleServo(m_servoController, 6, 4096, 0.6), m_servoController, false);
-		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1.0122f, new SingleServo(m_servoController, 1, 4096, 0), new SingleServo(m_servoController, 2, 4096, 0.35), new SingleServo(m_servoController, 3, 4096, 0.6), m_servoController, false);
-		
-		for(Leg leg : m_legs) {		
+	public void onStart() {
+		for(Leg leg : m_legs) {
 			m_legUpdater.addLeg(leg);
 		}
-		
 		m_legUpdater.start();
-		
+
 		Robot robot = new Robot(m_legs);
-		
+
 		m_scriptEngine.put("robot", robot);
-		
-		Invocable inv = (Invocable)m_scriptEngine;
-		
+
+
+
 		File gaitScript = new File(this.getClass().getResource("gait.js").getPath());
-		
+
 		if(gaitScript.exists() && gaitScript.isFile()) {
 			try {
 				m_scriptEngine.eval(new FileReader(gaitScript));
 				m_jsModule = m_scriptEngine.get("module");
 				m_scriptLoaded = true;
-				DebugHelper.log("Default walking script loaded.");				
+				DebugHelper.log("Default walking script loaded.");
 			} catch (FileNotFoundException e1) {
 				DebugHelper.log("Default walking script not found.", Log.WARNING);
 				DebugHelper.log(e1.toString());
@@ -112,77 +113,73 @@ public class WalkingModule implements Module {
 		else {
 			DebugHelper.log("Default walking script not found.", Log.WARNING);
 		}
-		
-		
-		double time = System.currentTimeMillis() * 1000000 + System.nanoTime();
-		
-		while(m_running) {
-			if(m_scriptLoaded) {
-				double newtime = System.currentTimeMillis() * 1000000 + System.nanoTime();
-				double elapsedTime = newtime - time;
-				
-				time = newtime;
-				
-				if(m_gamepad != null) {
-					if(m_gamepad.poll()) {				
-						EventQueue events = m_gamepad.getEventQueue();
-						Event event = new Event();
-						while(events.getNextEvent(event)) {
-							if(!event.getComponent().isAnalog()) {
-								if(event.getComponent().getIdentifier() == Identifier.Button._1) {
-									if(event.getValue() == 1.0) {
-										DebugHelper.log("Gamepad Sesitivity: " + ++m_sensitivity);
-									}
-								}
-								else if(event.getComponent().getIdentifier() == Identifier.Button._0) {
-									if(event.getValue() == 1.0) {
-										if(m_sensitivity > 1)
-											DebugHelper.log("Gamepad Sesitivity: " + --m_sensitivity);
-									}
-								}
-							}
-						}
-						
-						Vec2 gamePadSpeed = new Vec2((double)m_gamepad_x.getPollData(), (double)m_gamepad_y.getPollData());
-						if(gamePadSpeed.getLength() > 0.1) {	
-							gamePadSpeed.multiply(m_sensitivity);
-							m_speed.set(gamePadSpeed);
-						}
-						else {
-							m_speed.set(0.0, 0.0);
-						}
-					}
-					else {
-						m_gamepad = null;
-					}
-				}
-				try {
-					inv.invokeMethod(m_jsModule, "walk", elapsedTime / 1000000.0, m_speed);
-				} catch (Exception e) {
-					e.printStackTrace();
-					DebugHelper.log("Walking script: Running function walk failed.");
-					DebugHelper.log(e.toString());
-					m_scriptLoaded = false;
-				}
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			else {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
 	}
 
 	@Override
-	public void stop() {
-		m_running = false;
+	public void onStop() {
+		m_legUpdater.end();
+	}
+
+	@Override
+	public void tick(Time elapsedTime) {
+
+		if(m_scriptLoaded) {
+			Invocable inv = (Invocable)m_scriptEngine;
+
+			if(m_gamepad != null) {
+				if(m_gamepad.poll()) {
+					EventQueue events = m_gamepad.getEventQueue();
+					Event event = new Event();
+					while(events.getNextEvent(event)) {
+						if(!event.getComponent().isAnalog()) {
+							if(event.getComponent().getIdentifier() == Identifier.Button._1) {
+								if(event.getValue() == 1.0) {
+									DebugHelper.log("Gamepad Sesitivity: " + ++m_sensitivity);
+								}
+							}
+							else if(event.getComponent().getIdentifier() == Identifier.Button._0) {
+								if(event.getValue() == 1.0) {
+									if(m_sensitivity > 1)
+										DebugHelper.log("Gamepad Sesitivity: " + --m_sensitivity);
+								}
+							}
+						}
+					}
+
+					Vec2 gamePadSpeed = new Vec2((double)m_gamepad_x.getPollData(), (double)m_gamepad_y.getPollData());
+					if(gamePadSpeed.getLength() > 0.1) {
+						gamePadSpeed.multiply(m_sensitivity);
+						m_speed.set(gamePadSpeed);
+					}
+					else {
+						m_speed.set(0.0, 0.0);
+					}
+				}
+				else {
+					m_gamepad = null;
+				}
+			}
+			try {
+				inv.invokeMethod(m_jsModule, "walk", elapsedTime.getMilliseconds(), m_speed);
+			} catch (Exception e) {
+				e.printStackTrace();
+				DebugHelper.log("Walking script: Running function walk failed.");
+				DebugHelper.log(e.toString());
+				m_scriptLoaded = false;
+			}
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
