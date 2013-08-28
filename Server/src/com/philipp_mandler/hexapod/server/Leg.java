@@ -1,7 +1,5 @@
 package com.philipp_mandler.hexapod.server;
 
-import SimpleDynamixel.Servo;
-
 import com.philipp_mandler.hexapod.hexapod.DeviceType;
 import com.philipp_mandler.hexapod.hexapod.LegPositionPackage;
 import com.philipp_mandler.hexapod.hexapod.LegServoPackage;
@@ -19,7 +17,7 @@ public class Leg {
 	private double m_angle;
 	private boolean m_rightSide;
 	
-	public Leg(int legID, double upperLegLength, double lowerLegLength, Vec2 position, double angle, SingleServo servo1, SingleServo servo2, SingleServo servo3, Servo servoController, boolean rightSide) {
+	public Leg(int legID, double upperLegLength, double lowerLegLength, Vec2 position, double angle, SingleServo servo1, SingleServo servo2, SingleServo servo3, boolean rightSide) {
 		m_legID = legID;
 		
 		m_servos = new SingleServo[3];

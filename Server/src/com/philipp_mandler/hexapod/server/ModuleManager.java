@@ -6,25 +6,38 @@ public class ModuleManager {
 
 	private ArrayList<Module> m_modules = new ArrayList<>();
 	private Time m_lastTime = new Time();
+	private boolean m_running = true;
 
 	public ModuleManager() {
-		Thread m_thread = new Thread(new Runnable() {
+		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Time tempTime = Time.fromNanoseconds(System.nanoTime());
-				Time m_elapsedTime = Time.fromNanoseconds(tempTime.getNanoseconds() - m_lastTime.getNanoseconds());
-				m_lastTime = tempTime;
+				while(m_running) {
+					Time tempTime = Time.fromNanoseconds(System.nanoTime());
+					Time m_elapsedTime = Time.fromNanoseconds(tempTime.getNanoseconds() - m_lastTime.getNanoseconds());
+					//System.out.println("Tick took: " + m_elapsedTime.getMilliseconds() + " ms");
+					m_lastTime = tempTime;
 
-				for(Module module : m_modules) {
-					if(module.isRunning())
-						module.tick(m_elapsedTime);
+					for(Module module : m_modules) {
+						if(module.isRunning())
+							module.tick(m_elapsedTime);
+					}
+					try {
+						Thread.sleep(0, 1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
 
 		m_lastTime.setNanoseconds(System.nanoTime());
 
-		m_thread.start();
+		thread.start();
+	}
+
+	public void stop() {
+		m_running = false;
 	}
 
 	public void registerModule(Module module) {
@@ -34,6 +47,7 @@ public class ModuleManager {
 			}
 		}
 		m_modules.add(module);
+
 	}
 
 	public void removeModule(String moduleName) {

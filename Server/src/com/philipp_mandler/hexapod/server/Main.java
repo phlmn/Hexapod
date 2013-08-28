@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
@@ -38,17 +41,14 @@ import com.philipp_mandler.hexapod.hexapod.NetPackage;
 
 public class Main implements NetworkingEventListener {
 	
-	int m_sensitivity = 8;
-
-	Servo servo;
-	
-	Controller m_gamePad = null;
-	
-	ArrayList<Module> m_modules;
-	
+	private int m_sensitivity = 8;
+	private ServoController m_servo;
+	private Controller m_gamePad = null;
+	private ArrayList<Module> m_modules;
 	private static ServerNetworking m_networking;
-
 	private static ModuleManager m_moduleManager = new ModuleManager();
+	private String m_serialPort;
+
 	
 	public static void main(String[] args) {
 		String serialPort = "COM5";
@@ -60,37 +60,48 @@ public class Main implements NetworkingEventListener {
 	}
 	
 	public Main(String serialPort) {
-		m_modules = new ArrayList<Module>();
+		m_serialPort = serialPort;
+	}
+	
+	public void run() {
 
-		
-		servo = new Servo();
-		servo.init(serialPort, 100000);
+		try {
+			m_networking = new ServerNetworking(8888);
+			m_networking.addEventListener(this);
+		} catch (IOException e) {
+			e.printStackTrace();
+			DebugHelper.log("Networking couldn't be initialized, aborting now.", Log.WARNING);
+			System.exit(0);
+		}
 
-		m_moduleManager.registerModule(new WalkingModule(servo));
+		m_modules = new ArrayList<>();
+
+		m_servo = new ServoController();
+		try {
+			m_servo.init(m_serialPort, 100000);
+		} catch (PortInUseException e) {
+			e.printStackTrace();
+		} catch (UnsupportedCommOperationException e) {
+			e.printStackTrace();
+		} catch (NoSuchPortException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		m_moduleManager.registerModule(new WalkingModule(m_servo));
 		m_moduleManager.registerModule(new TestingModule());
-		
+
 		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
-		
+
 		for(Controller controller : controllers) {
 			if(controller.getType() == Type.GAMEPAD) {
 				m_gamePad = controller;
 				DebugHelper.log("Gamepad connected.");
 			}
 		}
-	}
-	
-	public void run() {
-		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		
-		try {
-			m_networking = new ServerNetworking(8888);
-			m_networking.addEventListener(this);
-		} catch (IOException e) {
-			e.printStackTrace();
-			DebugHelper.log("Networking couldn't be initialized aborting now.", Log.WARNING);
-			System.exit(0);
-		}
+
+		BufferedReader  reader = new BufferedReader(new InputStreamReader(System.in));
 		
 		while(true) {
 			try {

@@ -20,7 +20,7 @@ import com.philipp_mandler.hexapod.hexapod.NetPackage;
 import com.philipp_mandler.hexapod.hexapod.Vec2;
 import com.philipp_mandler.hexapod.hexapod.WalkingScriptPackage;
 
-public class WalkingModule extends Module {
+public class WalkingModule extends Module implements NetworkingEventListener {
 	
 	private boolean m_running = true;
 	
@@ -28,7 +28,7 @@ public class WalkingModule extends Module {
 	
 	private Vec2 m_speed = new Vec2();
 	private Leg m_legs[];
-	private Servo m_servoController;
+	private ServoController m_servoController;
 	
 	private Controller m_gamepad;
 	private Component m_gamepad_x;
@@ -43,25 +43,28 @@ public class WalkingModule extends Module {
 	private LegUpdater m_legUpdater;
 	
 	
-	public WalkingModule(Servo servoController) {
+	public WalkingModule(ServoController servoController) {
 		m_servoController = servoController;
-		
+
 		ScriptEngineManager factory = new ScriptEngineManager();
 		m_scriptEngine = factory.getEngineByName("JavaScript");
-		
+
 		m_legUpdater = new LegUpdater(m_servoController);
 
 
 		m_legs = new Leg[6];
 
-		m_legs[1] = new Leg(1, Data.upperLeg, Data.lowerLeg, new Vec2(90, 210), -1.0122f + Math.PI, new SingleServo(m_servoController, 10, 4096, 0), new SingleServo(m_servoController, 11, 4096, -0.35), new SingleServo(m_servoController, 12, 4096, -0.6), m_servoController, true);
-		m_legs[3] = new Leg(3, Data.upperLeg, Data.lowerLeg, new Vec2(130, 0), Math.PI, new SingleServo(m_servoController, 13, 4096, 0), new SingleServo(m_servoController, 14, 4096, -0.35), new SingleServo(m_servoController, 15, 4096, -0.6), m_servoController, true);
-		m_legs[5] = new Leg(5, Data.upperLeg, Data.lowerLeg, new Vec2(90, -210), 1.0122f + Math.PI, new SingleServo(m_servoController, 16, 4096, 0), new SingleServo(m_servoController, 17, 4096, -0.35), new SingleServo(m_servoController, 18, 4096, -0.6), m_servoController, true);
+		m_legs[1] = new Leg(1, Data.upperLeg, Data.lowerLeg, new Vec2(90, 210), -1.0122f + Math.PI, new SingleServo(m_servoController, 10, 4096, 0), new SingleServo(m_servoController, 11, 4096, -0.35), new SingleServo(m_servoController, 12, 4096, -0.6), true);
+		m_legs[3] = new Leg(3, Data.upperLeg, Data.lowerLeg, new Vec2(130, 0), Math.PI, new SingleServo(m_servoController, 13, 4096, 0), new SingleServo(m_servoController, 14, 4096, -0.35), new SingleServo(m_servoController, 15, 4096, -0.6), true);
+		m_legs[5] = new Leg(5, Data.upperLeg, Data.lowerLeg, new Vec2(90, -210), 1.0122f + Math.PI, new SingleServo(m_servoController, 16, 4096, 0), new SingleServo(m_servoController, 17, 4096, -0.35), new SingleServo(m_servoController, 18, 4096, -0.6), true);
 
-		m_legs[0] = new Leg(0, Data.upperLeg, Data.lowerLeg, new Vec2(-90, 210), -1.0122f, new SingleServo(m_servoController, 7, 4096, 0), new SingleServo(m_servoController, 8, 4096, 0.35), new SingleServo(m_servoController, 9, 4096, 0.6), m_servoController, false);
-		m_legs[2] = new Leg(2, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, new SingleServo(m_servoController, 4, 4096, 0), new SingleServo(m_servoController, 5, 4096, 0.35), new SingleServo(m_servoController, 6, 4096, 0.6), m_servoController, false);
-		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1.0122f, new SingleServo(m_servoController, 1, 4096, 0), new SingleServo(m_servoController, 2, 4096, 0.35), new SingleServo(m_servoController, 3, 4096, 0.6), m_servoController, false);
+		m_legs[0] = new Leg(0, Data.upperLeg, Data.lowerLeg, new Vec2(-90, 210), -1.0122f, new SingleServo(m_servoController, 7, 4096, 0), new SingleServo(m_servoController, 8, 4096, 0.35), new SingleServo(m_servoController, 9, 4096, 0.6), false);
+		m_legs[2] = new Leg(2, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, new SingleServo(m_servoController, 4, 4096, 0), new SingleServo(m_servoController, 5, 4096, 0.35), new SingleServo(m_servoController, 6, 4096, 0.6), false);
+		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1.0122f, new SingleServo(m_servoController, 1, 4096, 0), new SingleServo(m_servoController, 2, 4096, 0.35), new SingleServo(m_servoController, 3, 4096, 0.6), false);
 
+		for(Leg leg : m_legs) {
+			m_legUpdater.addLeg(leg);
+		}
 
 	}
 	
@@ -83,16 +86,11 @@ public class WalkingModule extends Module {
 
 	@Override
 	public void onStart() {
-		for(Leg leg : m_legs) {
-			m_legUpdater.addLeg(leg);
-		}
+
 		m_legUpdater.start();
 
 		Robot robot = new Robot(m_legs);
-
 		m_scriptEngine.put("robot", robot);
-
-
 
 		File gaitScript = new File(this.getClass().getResource("gait.js").getPath());
 
@@ -113,11 +111,14 @@ public class WalkingModule extends Module {
 		else {
 			DebugHelper.log("Default walking script not found.", Log.WARNING);
 		}
+
+		Main.getNetworking().addEventListener(this);
 	}
 
 	@Override
 	public void onStop() {
-		m_legUpdater.end();
+		Main.getNetworking().removeEventListener(this);
+		m_legUpdater.stop();
 	}
 
 	@Override
@@ -166,18 +167,6 @@ public class WalkingModule extends Module {
 				DebugHelper.log("Walking script: Running function walk failed.");
 				DebugHelper.log(e.toString());
 				m_scriptLoaded = false;
-			}
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		else {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
 		}
 	}

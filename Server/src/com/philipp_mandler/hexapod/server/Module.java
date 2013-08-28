@@ -1,6 +1,6 @@
 package com.philipp_mandler.hexapod.server;
 
-public abstract class Module implements NetworkingEventListener {
+public abstract class Module {
 
 	private String m_name;
 	private boolean m_running = false;

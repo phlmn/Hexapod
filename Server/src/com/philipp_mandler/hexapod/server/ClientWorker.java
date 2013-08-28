@@ -91,7 +91,7 @@ public class ClientWorker extends Thread {
 			}
 		}
 		m_parent.clientDisconnected(this);
-		m_parent.unregisterClient(this);
+		m_parent.removeClient(this);
 		try {
 			m_objInputStream.close();
 		} catch (IOException e) {

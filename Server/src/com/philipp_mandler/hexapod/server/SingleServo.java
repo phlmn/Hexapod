@@ -4,14 +4,14 @@ import SimpleDynamixel.Servo;
 
 public class SingleServo {
 	
-	private Servo m_controller;
+	private ServoController m_controller;
 	private int m_servoID;
 	private int m_servoResolution;
 	private double m_offset;
 	private boolean m_connected;
 	private int m_goalPosition;
 	
-	public SingleServo(Servo controller, int id) {
+	public SingleServo(ServoController controller, int id) {
 		m_controller = controller;
 		m_servoID = id;
 		m_servoResolution = 4096;
@@ -19,7 +19,7 @@ public class SingleServo {
 		m_connected = ping();
 	}
 	
-	public SingleServo(Servo controller, int id, int servoResolution) {
+	public SingleServo(ServoController controller, int id, int servoResolution) {
 		m_controller = controller;
 		m_servoID = id;
 		m_servoResolution = servoResolution;
@@ -27,7 +27,7 @@ public class SingleServo {
 		m_connected = ping();
 	}
 	
-	public SingleServo(Servo controller, int id, int servoResolution, double offset) {
+	public SingleServo(ServoController controller, int id, int servoResolution, double offset) {
 		m_controller = controller;
 		m_servoID = id;
 		m_servoResolution = servoResolution;
@@ -202,7 +202,10 @@ public class SingleServo {
 	}
 	
 	public boolean ping() {
-		return m_connected = m_controller.ping(m_servoID);		
+		if(m_controller.initialized())
+			return m_connected = m_controller.ping(m_servoID);
+		else
+			return false;
 	}
 	
 	public boolean isConnected() {

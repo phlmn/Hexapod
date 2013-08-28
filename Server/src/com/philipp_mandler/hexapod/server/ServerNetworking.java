@@ -78,14 +78,14 @@ public class ServerNetworking {
 		m_clients.add(client);
 	}
 	
-	public void unregisterClient(ClientWorker client) {
+	public void removeClient(ClientWorker client) {
 		m_clients.remove(client);
 	}
 	
 	public void internalCmd(String cmd) {
-		String[] splitedCmd = cmd.split(" ");
+		String[] splitCmd = cmd.split(" ");
 		for(NetworkingEventListener listener : new ArrayList<NetworkingEventListener>(m_listeners)) {
-			listener.onCmdReceived(null, splitedCmd);
+			listener.onCmdReceived(null, splitCmd);
 		}
 	}
 	

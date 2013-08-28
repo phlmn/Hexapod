@@ -20,26 +20,6 @@ public class TestingModule extends Module {
 	}
 
 	@Override
-	public void onDataReceived(ClientWorker client, NetPackage pack) {
-
-	}
-
-	@Override
-	public void onCmdReceived(ClientWorker client, String[] cmd) {
-
-	}
-
-	@Override
-	public void onClientDisconnected(ClientWorker client) {
-
-	}
-
-	@Override
-	public void onClientConnected(ClientWorker client) {
-
-	}
-
-	@Override
 	public void tick(Time elapsedTime) {
 
 	}

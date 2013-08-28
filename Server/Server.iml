@@ -47,18 +47,18 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="jinput.jar">
+      <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/src/libs/jinput.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/jinput/jinput.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="RXTXcomm.jar">
+      <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/src/libs/RXTXcomm.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/rxtx/RXTXcomm.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
