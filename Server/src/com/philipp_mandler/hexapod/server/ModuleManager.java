@@ -38,6 +38,10 @@ public class ModuleManager {
 
 	public void stop() {
 		m_running = false;
+		for(Module module : m_modules) {
+			if(module.isRunning())
+				module.stop();
+		}
 	}
 
 	public void registerModule(Module module) {
@@ -102,6 +106,10 @@ public class ModuleManager {
 			}
 		}
 		return null;
+	}
+
+	public final ArrayList<Module> getModules() {
+		return m_modules;
 	}
 
 }

@@ -3,7 +3,6 @@ package com.philipp_mandler.hexapod.server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
@@ -11,7 +10,6 @@ import gnu.io.UnsupportedCommOperationException;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
-import SimpleDynamixel.Servo;
 
 import com.philipp_mandler.hexapod.hexapod.DeviceType;
 import com.philipp_mandler.hexapod.hexapod.LegPositionPackage;
@@ -40,14 +38,11 @@ import com.philipp_mandler.hexapod.hexapod.NetPackage;
  */             
 
 public class Main implements NetworkingEventListener {
-	
-	private int m_sensitivity = 8;
-	private ServoController m_servo;
-	private Controller m_gamePad = null;
-	private ArrayList<Module> m_modules;
+
 	private static ServerNetworking m_networking;
 	private static ModuleManager m_moduleManager = new ModuleManager();
 	private String m_serialPort;
+	private boolean m_running = true;
 
 	
 	public static void main(String[] args) {
@@ -74,43 +69,45 @@ public class Main implements NetworkingEventListener {
 			System.exit(0);
 		}
 
-		m_modules = new ArrayList<>();
-
-		m_servo = new ServoController();
+		ServoController m_servo = new ServoController();
 		try {
 			m_servo.init(m_serialPort, 100000);
-		} catch (PortInUseException e) {
-			e.printStackTrace();
-		} catch (UnsupportedCommOperationException e) {
-			e.printStackTrace();
-		} catch (NoSuchPortException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (PortInUseException | UnsupportedCommOperationException | NoSuchPortException | IOException e) {
 			e.printStackTrace();
 		}
 
-		m_moduleManager.registerModule(new WalkingModule(m_servo));
+		WalkingModule walkingModule = new WalkingModule(m_servo);
+		m_moduleManager.registerModule(walkingModule);
 		m_moduleManager.registerModule(new TestingModule());
 
 		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
 
 		for(Controller controller : controllers) {
 			if(controller.getType() == Type.GAMEPAD) {
-				m_gamePad = controller;
+				walkingModule.setGamepad(controller);
 				DebugHelper.log("Gamepad connected.");
+				break;
 			}
 		}
 
-		BufferedReader  reader = new BufferedReader(new InputStreamReader(System.in));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		
-		while(true) {
+		while(m_running) {
 			try {
 				String input = reader.readLine();
-				m_networking.internalCmd(input);				
+				if(input != null)
+					m_networking.internalCmd(input);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+
+		System.exit(0);
+	}
+
+	private void onExit() {
+		DebugHelper.log("Shutting down...");
+		Main.getModuleManager().stop();
 	}
 
 	@Override
@@ -159,6 +156,27 @@ public class Main implements NetworkingEventListener {
 						showSyntax("module");
 					}
 					break;
+				case "modules":
+					String out = "";
+					out += Main.getModuleManager().getModules().size() + " modules available";
+					for(Module module : Main.getModuleManager().getModules()) {
+
+						String statusText;
+						if(module.isRunning()) {
+							statusText = "running";
+						}
+						else {
+							statusText = "stopped";
+						}
+
+						out += "\n" + module.getName() + "\t\t " + statusText;
+					}
+					DebugHelper.log(out);
+					break;
+				case "exit":
+					onExit();
+					m_running = false;
+					break;
 			}
 		}
 	}
@@ -166,8 +184,8 @@ public class Main implements NetworkingEventListener {
 	private void showSyntax(String cmd) {
 		String answer;
 		switch(cmd) {
-		case "module": answer = "Syntax: module <module> <start|stop|status>"; break;
-		default: answer = "No such command found.";
+			case "module": answer = "Syntax: module <module> <start|stop|status>"; break;
+			default: answer = "No such command found.";
 		}
 		DebugHelper.log(answer);
 	}

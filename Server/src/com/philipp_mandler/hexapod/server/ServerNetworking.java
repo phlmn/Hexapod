@@ -16,8 +16,8 @@ public class ServerNetworking {
 
 	public ServerNetworking(int port) throws IOException {
 		m_serverSocket = new ServerSocket(port);
-		m_clients = new ArrayList<ClientWorker>();
-		m_listeners = new ArrayList<NetworkingEventListener>();
+		m_clients = new ArrayList<>();
+		m_listeners = new ArrayList<>();
 		
 		new ClientWorker(this, m_serverSocket).start();
 	}
@@ -43,12 +43,12 @@ public class ServerNetworking {
 		if(pack instanceof ConsolePackage) {
 			ConsolePackage consolePackage = (ConsolePackage)pack;
 			String[] cmd = consolePackage.getText().split(" ");
-			for(NetworkingEventListener listener : new ArrayList<NetworkingEventListener>(m_listeners)) {
+			for(NetworkingEventListener listener : new ArrayList<>(m_listeners)) {
 				listener.onCmdReceived(client, cmd);
 			}			
 		}
 		else {
-			for(NetworkingEventListener listener : new ArrayList<NetworkingEventListener>(m_listeners)) {
+			for(NetworkingEventListener listener : new ArrayList<>(m_listeners)) {
 				listener.onDataReceived(client, pack);
 			}	
 		}
@@ -84,7 +84,7 @@ public class ServerNetworking {
 	
 	public void internalCmd(String cmd) {
 		String[] splitCmd = cmd.split(" ");
-		for(NetworkingEventListener listener : new ArrayList<NetworkingEventListener>(m_listeners)) {
+		for(NetworkingEventListener listener : new ArrayList<>(m_listeners)) {
 			listener.onCmdReceived(null, splitCmd);
 		}
 	}
