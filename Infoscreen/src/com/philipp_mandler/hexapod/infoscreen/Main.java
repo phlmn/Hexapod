@@ -19,7 +19,7 @@ public class Main extends Application implements NetworkingEventListener {
 	MainWindowController controller;	
 	
 	@Override
-	public void start(Stage primaryStage) {	
+	public void start(Stage primaryStage) {
 		Main.getNetworking().addEventListener(this);
 		URL location = getClass().getResource("MainWindow.fxml");
 		FXMLLoader fxmlLoader = new FXMLLoader();

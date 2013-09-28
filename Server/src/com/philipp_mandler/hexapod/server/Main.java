@@ -80,16 +80,6 @@ public class Main implements NetworkingEventListener {
 		m_moduleManager.registerModule(walkingModule);
 		m_moduleManager.registerModule(new TestingModule());
 
-		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
-
-		for(Controller controller : controllers) {
-			if(controller.getType() == Type.GAMEPAD) {
-				walkingModule.setGamepad(controller);
-				DebugHelper.log("Gamepad connected.");
-				break;
-			}
-		}
-
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		
 		while(m_running) {
