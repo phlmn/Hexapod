@@ -58,7 +58,7 @@ public class KinectDisplay extends PApplet {
 	}
 
 	public void setKinectData(ByteBuffer buffer) {
-	 	m_kinectData = buffer;
+		m_kinectData = buffer;
 		m_kinectData.order(ByteOrder.LITTLE_ENDIAN);
 	}
 }
