@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 public class TestingModule extends Module implements DepthHandler {
 
 	private Context m_Context;
-	private Device m_Kinect;
+	private Device m_kinect;
 	private JFrame m_frame;
 	private KinectDisplay m_kinectDisplay;
 
@@ -28,12 +28,12 @@ public class TestingModule extends Module implements DepthHandler {
 		m_Context = Freenect.createContext();
 		DebugHelper.log("Devices detected: " + m_Context.numDevices());
 		if(m_Context.numDevices() > 0)
-			m_Kinect = m_Context.openDevice(0);
+			m_kinect = m_Context.openDevice(0);
 
-		if(m_Kinect != null) {
-			m_Kinect.setLed(LedStatus.GREEN);
-			m_Kinect.setDepthFormat(DepthFormat.D11BIT);
-			m_Kinect.startDepth(this);
+		if(m_kinect != null) {
+			m_kinect.setLed(LedStatus.GREEN);
+			m_kinect.setDepthFormat(DepthFormat.D11BIT);
+			m_kinect.startDepth(this);
 		}
 
 		if(!GraphicsEnvironment.isHeadless()) {
@@ -54,11 +54,11 @@ public class TestingModule extends Module implements DepthHandler {
 
 	@Override
 	protected void onStop() {
-		if(m_Kinect != null) {
-			m_Kinect.setLed(LedStatus.BLINK_GREEN);
-			m_Kinect.stopDepth();
-			m_Kinect.close();
-			m_Kinect = null;
+		if(m_kinect != null) {
+			m_kinect.setLed(LedStatus.BLINK_GREEN);
+			m_kinect.stopDepth();
+			m_kinect.close();
+			m_kinect = null;
 		}
 		m_Context.shutdown();
 
