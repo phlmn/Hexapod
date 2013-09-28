@@ -9,13 +9,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import net.java.games.input.Component;
-import net.java.games.input.Component.Identifier;
-import net.java.games.input.Controller;
-import net.java.games.input.Event;
-import net.java.games.input.EventQueue;
-import SimpleDynamixel.Servo;
-
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
 import com.philipp_mandler.hexapod.hexapod.Vec2;
 import com.philipp_mandler.hexapod.hexapod.WalkingScriptPackage;

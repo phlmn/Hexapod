@@ -1,7 +1,5 @@
 package com.philipp_mandler.hexapod.server;
 
-import SimpleDynamixel.Servo;
-
 public class SingleServo {
 	
 	private ServoController m_controller;
