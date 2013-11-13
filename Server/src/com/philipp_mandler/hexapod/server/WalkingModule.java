@@ -9,6 +9,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import com.philipp_mandler.hexapod.hexapod.JoystickPackage;
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
 import com.philipp_mandler.hexapod.hexapod.Vec2;
 import com.philipp_mandler.hexapod.hexapod.WalkingScriptPackage;
@@ -117,6 +118,11 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 				DebugHelper.log("Walking script not valid.", Log.WARNING);
 				DebugHelper.log(e1.toString(), Log.WARNING);
 			}
+		}
+		else if(pack instanceof JoystickPackage) {
+			JoystickPackage joyPack = (JoystickPackage)pack;
+			m_speed.set(joyPack.getData().getX() * 10, joyPack.getData().getY() * 10);
+			DebugHelper.log("Walking speed set to: " + m_speed.getX() + "  " + m_speed.getY());
 		}
 	}
 	

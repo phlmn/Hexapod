@@ -1,8 +1,10 @@
 package com.philipp_mandler.hexapod.server;
 
+import com.philipp_mandler.hexapod.hexapod.NetPackage;
+
 import java.util.ArrayList;
 
-public class ModuleManager {
+public class ModuleManager implements NetworkingEventListener {
 
 	private ArrayList<Module> m_modules = new ArrayList<>();
 	private Time m_lastTime = new Time();
@@ -112,4 +114,39 @@ public class ModuleManager {
 		return m_modules;
 	}
 
+	@Override
+	public void onDataReceived(ClientWorker client, NetPackage pack) {
+		for(Module module : m_modules) {
+			if(module.isRunning()) {
+				module.onDataReceived(client, pack);
+			}
+		}
+	}
+
+	@Override
+	public void onCmdReceived(ClientWorker client, String[] cmd) {
+		for(Module module : m_modules) {
+			if(module.isRunning()) {
+				module.onCmdReceived(client, cmd);
+			}
+		}
+	}
+
+	@Override
+	public void onClientDisconnected(ClientWorker client) {
+		for(Module module : m_modules) {
+			if(module.isRunning()) {
+				module.onClientDisconnected(client);
+			}
+		}
+	}
+
+	@Override
+	public void onClientConnected(ClientWorker client) {
+		for(Module module : m_modules) {
+			if(module.isRunning()) {
+				module.onClientConnected(client);
+			}
+		}
+	}
 }

@@ -117,7 +117,7 @@ public class ServoController {
 		public ReturnPacket() {
 			id = -1;
 			length = 0;
-			param = new ArrayList<Integer>();
+			param = new ArrayList();
 		}
 
 		public int checksum() {

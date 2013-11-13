@@ -5,4 +5,5 @@ import android.view.View;
 public interface JoystickListener {
 	
 	public void joystickPositionChanged(View view, float x, float y);
+
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:orientation="vertical"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent"
+			  android:paddingTop="7dp"
+			  android:paddingBottom="7dp"
+			  android:paddingLeft="14dp"
+			  android:paddingRight="14dp">
+
+	<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/dialog_connect_title"
+			android:id="@+id/textView"
+			android:layout_gravity="left"
+			android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+			android:paddingBottom="14dp"
+			android:paddingTop="7dp"/>
+
+	<EditText
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/edit_address"
+			android:layout_gravity="center"
+			android:width="260dp"
+			android:singleLine="true"
+			android:inputType="text"
+			android:hint="@string/dialog_connect_hint_hostname"
+			android:layout_marginBottom="7dp"/>
+
+	<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/dialog_connect_connect"
+			android:id="@+id/button_connect"
+			style="?android:borderlessButtonStyle"/>
+
+</LinearLayout>

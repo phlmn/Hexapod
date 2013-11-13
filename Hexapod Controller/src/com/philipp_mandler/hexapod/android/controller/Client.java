@@ -1,15 +1,15 @@
 package com.philipp_mandler.hexapod.android.controller;
 
+import com.philipp_mandler.hexapod.hexapod.DeviceType;
+import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.WelcomePackage;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.philipp_mandler.hexapod.hexapod.DeviceType;
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
-import com.philipp_mandler.hexapod.hexapod.WelcomePackage;
 
 public class Client extends Thread {
 	
@@ -35,7 +35,7 @@ public class Client extends Thread {
 			m_objOutputStream = new ObjectOutputStream(m_socket.getOutputStream());
 			m_objOutputStream.writeObject(new WelcomePackage(DeviceType.Controller));
 			m_objInputStream = new ObjectInputStream(m_socket.getInputStream());
-			m_outQueue = new ArrayList<NetPackage>();
+			m_outQueue = new ArrayList<>();
 		} catch (IOException e) {
 			e.printStackTrace();
 			m_parent.onConnectionError();
@@ -56,9 +56,7 @@ public class Client extends Thread {
 						m_parent.onDataReceived((NetPackage)input);
 				}
 				
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
+			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
 			}
 			try {
@@ -73,4 +71,5 @@ public class Client extends Thread {
 	public void send(NetPackage pack) {
 		m_outQueue.add(pack);
 	}
+
 }

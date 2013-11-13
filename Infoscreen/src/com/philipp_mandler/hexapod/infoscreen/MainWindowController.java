@@ -61,7 +61,7 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		
+
 		m_canvasBg = Color.web("#fff");
 		m_legEndColor = Color.web("#369ed3");
 		
@@ -71,6 +71,8 @@ public class MainWindowController implements Initializable, NetworkingEventListe
 		pane_canvasHolder.getChildren().add(m_legGoalCanvas);
 		
 		drawLegGoals();
+
+
 	}
 	
 	@FXML

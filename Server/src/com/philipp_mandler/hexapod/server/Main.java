@@ -95,6 +95,7 @@ public class Main implements NetworkingEventListener {
 	private void onExit() {
 		DebugHelper.log("Shutting down...");
 		Main.getModuleManager().stop();
+		Main.getNetworking().shutdown();
 	}
 
 	@Override
@@ -104,10 +105,12 @@ public class Main implements NetworkingEventListener {
 			DebugHelper.log("Position received\nLeg: " + posPack.getLegIndex() + "\nPosition: ( " + posPack.getGoalPosition().getX() + " | " + posPack.getGoalPosition().getY() + " | " + posPack.getGoalPosition().getZ() + " )");
 			Main.getNetworking().broadcast(pack, DeviceType.InfoScreen);
 		}
+
 	}
 	
 	@Override
 	public void onCmdReceived(ClientWorker client, String[] cmd) {
+		m_moduleManager.onCmdReceived(client, cmd);
 		if(cmd.length > 0) {
 			String mainCmd = cmd[0].toLowerCase();
 			switch(mainCmd) {
@@ -161,7 +164,6 @@ public class Main implements NetworkingEventListener {
 					DebugHelper.log(out);
 					break;
 				case "exit":
-					onExit();
 					m_running = false;
 					break;
 			}

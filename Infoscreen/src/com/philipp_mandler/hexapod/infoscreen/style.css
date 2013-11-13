@@ -12,6 +12,11 @@
 
 /* Console Scrollbar */
 
+#console, #console .content {
+	-fx-background-color: transparent;
+	-fx-text-fill: #fff;
+}
+
 #console .scroll-bar:vertical {
 	-fx-background-color: #111;
 }
@@ -67,6 +72,11 @@
 }
 
 /* Javascript Scrollbar */
+
+#javascript, #javascript .content {
+	-fx-background-radius:0;
+	-fx-background-color: transparent;
+}
 
 #javascript .scroll-bar:vertical,
 #javascript .scroll-bar:horizontal {

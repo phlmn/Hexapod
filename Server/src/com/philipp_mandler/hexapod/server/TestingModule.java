@@ -1,5 +1,6 @@
 package com.philipp_mandler.hexapod.server;
 
+import com.philipp_mandler.hexapod.hexapod.NetPackage;
 import org.openkinect.freenect.*;
 
 import javax.swing.*;
@@ -14,7 +15,7 @@ public class TestingModule extends Module implements DepthHandler {
 	private KinectDisplay m_kinectDisplay;
 
 	public TestingModule() {
-
+		m_Context = Freenect.createContext();
 	}
 
 	@Override
@@ -25,7 +26,7 @@ public class TestingModule extends Module implements DepthHandler {
 	@Override
 	protected void onStart() {
 		DebugHelper.log("Module started");
-		m_Context = Freenect.createContext();
+
 		DebugHelper.log("Devices detected: " + m_Context.numDevices());
 		if(m_Context.numDevices() > 0)
 			m_kinect = m_Context.openDevice(0);
@@ -58,12 +59,19 @@ public class TestingModule extends Module implements DepthHandler {
 			m_kinect.setLed(LedStatus.BLINK_GREEN);
 			m_kinect.stopDepth();
 			m_kinect.close();
+			m_kinect.stopVideo();
 			m_kinect = null;
 		}
-		m_Context.shutdown();
 
-		if(m_kinectDisplay != null) m_kinectDisplay.dispose();
-		if(m_frame != null) m_frame.dispose();
+		if(m_kinectDisplay != null) {
+			m_kinectDisplay.dispose();
+			m_kinectDisplay = null;
+		}
+
+		if(m_frame != null) {
+			m_frame.dispose();
+			m_frame = null;
+		}
 	}
 
 	@Override
@@ -75,5 +83,25 @@ public class TestingModule extends Module implements DepthHandler {
 	public void onFrameReceived(FrameMode frameMode, ByteBuffer byteBuffer, int i) {
 		if(m_kinectDisplay != null)
 			m_kinectDisplay.setKinectData(byteBuffer);
+	}
+
+	@Override
+	public void onDataReceived(ClientWorker client, NetPackage pack) {
+
+	}
+
+	@Override
+	public void onCmdReceived(ClientWorker client, String[] cmd) {
+
+	}
+
+	@Override
+	public void onClientDisconnected(ClientWorker client) {
+
+	}
+
+	@Override
+	public void onClientConnected(ClientWorker client) {
+
 	}
 }

@@ -6,5 +6,12 @@
     <string name="title_activity_main">Hexapod Controller</string>
     <string name="hexapod_stream">Hexapod Stream</string>
     <string name="menu_connect">Connect</string>
+    <string name="menu_disconnect">Disconnect</string>
+    <string name="menu_modules">Modules</string>
+    <string name="menu_console">Console</string>
+    <string name="toast_connection_error">"Connection Error.</string>
+    <string name="dialog_connect_title">Connect to Hexapod</string>
+	<string name="dialog_connect_hint_hostname">Hostname</string>
+	<string name="dialog_connect_connect">Connect</string>
 
 </resources>

@@ -1,9 +1,9 @@
 package com.philipp_mandler.hexapod.android.controller;
 
-import java.util.ArrayList;
-
 import com.philipp_mandler.hexapod.hexapod.ExitPackage;
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
+
+import java.util.ArrayList;
 
 public class Networking {
 	
@@ -12,7 +12,7 @@ public class Networking {
 	boolean m_connected = false;
 
 	public Networking() {		
-		m_listeners = new ArrayList<NetworkingEventListener>();		
+		m_listeners = new ArrayList<>();
 	}
 	
 	public void connect(String address, int port) {
@@ -95,4 +95,5 @@ public class Networking {
 	public boolean isConnected() {
 		return m_connected;
 	}
+
 }

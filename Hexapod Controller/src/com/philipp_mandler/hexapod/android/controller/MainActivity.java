@@ -1,26 +1,31 @@
 package com.philipp_mandler.hexapod.android.controller;
 
 import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickListener;
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickView;
-import com.philipp_mandler.hexapod.hexapod.JoystickPackage;
-import com.philipp_mandler.hexapod.hexapod.JoystickType;
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
-import com.philipp_mandler.hexapod.hexapod.Vec2;
+import com.philipp_mandler.hexapod.hexapod.*;
 
 public class MainActivity extends Activity implements NetworkingEventListener {
 	
 	JoystickView joystick1;
 	JoystickView joystick2;
 	
-	static Networking m_networking = new Networking();
+	private static Networking m_networking = new Networking();
 	
-	Handler m_handler;
+	private Handler m_handler;
+
+	private Menu m_optionsMenu;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,7 +39,7 @@ public class MainActivity extends Activity implements NetworkingEventListener {
 			
 			public void joystickPositionChanged(View view, float x, float y) {
 				if(m_networking.isConnected())
-					m_networking.send(new JoystickPackage(new Vec2(x, y), JoystickType.Rotation));
+					m_networking.send(new JoystickPackage(new Vec2(x, y), JoystickType.Direction));
 			}
 		});
         
@@ -42,41 +47,85 @@ public class MainActivity extends Activity implements NetworkingEventListener {
 			
 			public void joystickPositionChanged(View view, float x, float y) {
 				if(m_networking.isConnected())
-					m_networking.send(new JoystickPackage(new Vec2(x, y), JoystickType.Direction));
+					m_networking.send(new JoystickPackage(new Vec2(x, y), JoystickType.Rotation));
 			}
 		});
         
-        m_handler = new Handler();        
+        m_handler = new Handler(getMainLooper());
         m_networking.addEventListener(this);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+		m_optionsMenu = menu;
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
 
-    @Override
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.menu_connect:
+				if(m_networking.isConnected())
+					m_networking.disconnect();
+				else
+					new ConnectDialog().show(getFragmentManager(), "connect");
+				break;
+			case R.id.menu_modules: new ModuleDialog().show(getFragmentManager(), "modules"); break;
+			case R.id.menu_console: new ConsoleDialog().show(getFragmentManager(), "console"); break;
+		}
+		return super.onMenuItemSelected(featureId, item);
+	}
+
+	@Override
 	public void onDataReceived(NetPackage pack) {
-		
+		if(pack instanceof ConsolePackage) {
+			final ConsolePackage conPack = (ConsolePackage)pack;
+
+			final Context context = this.getApplicationContext();
+
+			m_handler.post(new Runnable() {
+				@Override
+				public void run() {
+					LinearLayout consoleContainer = (LinearLayout)findViewById(R.id.consoleView);
+					ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
+					boolean autoScroll = false;
+					if(scrollView.getHeight() - (scrollView.getScrollY() + consoleContainer.getHeight()) <= 40)
+						autoScroll = true;
+
+					TextView text = new TextView(context);
+					text.setTextColor(Color.BLACK);
+					text.setText(conPack.getText());
+					consoleContainer.addView(text);
+					if(autoScroll) {
+						scrollView.setScrollY(consoleContainer.getHeight() - scrollView.getHeight());
+					}
+				}
+			});
+		}
 	}
 	
 	@Override
 	public void onConnected() {
-		
+		m_optionsMenu.findItem(R.id.menu_connect).setTitle(R.string.menu_disconnect);
 	}
 
 	@Override
 	public void onDisconnected() {
-		
+		m_optionsMenu.findItem(R.id.menu_connect).setTitle(R.string.menu_connect);
 	}
 
 	@Override
 	public void onConnectionError() {
-		
+		Toast.makeText(this, R.string.toast_connection_error, Toast.LENGTH_SHORT).show();
 	}
 
 	public Handler getHandler() {
 		return m_handler;
 	}
+
+	public static Networking getNetworking() {
+		return m_networking;
+	}
+
 }

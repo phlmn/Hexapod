@@ -1,7 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/imageView1"
@@ -15,23 +14,35 @@
         android:src="@drawable/demo_bg"
         android:contentDescription="@string/hexapod_stream" />
 
-    <com.philipp_mandler.hexapod.android.controller.Joystick.JoystickView
+	<ScrollView
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:id="@+id/scrollView">
+
+		<LinearLayout
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/consoleView" />
+
+	</ScrollView>
+
+	<com.philipp_mandler.hexapod.android.controller.Joystick.JoystickView
         android:id="@+id/joystickView1"
         android:layout_width="260dp"
         android:layout_height="260dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="0dp"
-        android:layout_marginBottom="0dp" />
+        android:layout_marginLeft="-20dp"
+        android:layout_marginBottom="-20dp" />
     
      <com.philipp_mandler.hexapod.android.controller.Joystick.JoystickView
         android:id="@+id/joystickView2"
-        android:layout_width="260px"
-        android:layout_height="260px"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="0dp"
-        android:layout_marginBottom="0dp" />
-    
+        android:layout_marginRight="-20dp"
+        android:layout_marginBottom="-20dp" />
 
 </RelativeLayout>

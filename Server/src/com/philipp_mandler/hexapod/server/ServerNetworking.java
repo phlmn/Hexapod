@@ -88,5 +88,14 @@ public class ServerNetworking {
 			listener.onCmdReceived(null, splitCmd);
 		}
 	}
+
+	public void shutdown() {
+		m_listeners.clear();
+		try {
+			m_serverSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 }
