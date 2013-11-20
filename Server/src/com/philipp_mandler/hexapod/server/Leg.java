@@ -49,7 +49,7 @@ public class Leg {
 		return m_goalPosition;
 	}
 	
-	public void setToruqeEnabled(boolean enable) {
+	public void setTorqueEnabled(boolean enable) {
 		m_servos[0].setTorqueEnabled(enable);
 		m_servos[1].setTorqueEnabled(enable);
 		m_servos[2].setTorqueEnabled(enable);

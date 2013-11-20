@@ -28,28 +28,42 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 	private LegUpdater m_legUpdater;
 	
 	
-	public WalkingModule(ServoController servoController) {
+	public WalkingModule() {
+
+		setName("walking");
 
 		ScriptEngineManager factory = new ScriptEngineManager();
 		m_scriptEngine = factory.getEngineByName("JavaScript");
 
-		m_legUpdater = new LegUpdater(servoController);
+		m_legUpdater = new LegUpdater(this);
 
 
 		m_legs = new Leg[6];
 
-		m_legs[1] = new Leg(1, Data.upperLeg, Data.lowerLeg, new Vec2(90, 210), -1.0122f + Math.PI, new SingleServo(servoController, 10, 4096, 0), new SingleServo(servoController, 11, 4096, -0.35), new SingleServo(servoController, 12, 4096, -0.6), true);
+		/*m_legs[1] = new Leg(1, Data.upperLeg, Data.lowerLeg, new Vec2(90, 210), -1.0122f + Math.PI, new SingleServo(servoController, 10, 4096, 0), new SingleServo(servoController, 11, 4096, -0.35), new SingleServo(servoController, 12, 4096, -0.6), true);
 		m_legs[3] = new Leg(3, Data.upperLeg, Data.lowerLeg, new Vec2(130, 0), Math.PI, new SingleServo(servoController, 13, 4096, 0), new SingleServo(servoController, 14, 4096, -0.35), new SingleServo(servoController, 15, 4096, -0.6), true);
 		m_legs[5] = new Leg(5, Data.upperLeg, Data.lowerLeg, new Vec2(90, -210), 1.0122f + Math.PI, new SingleServo(servoController, 16, 4096, 0), new SingleServo(servoController, 17, 4096, -0.35), new SingleServo(servoController, 18, 4096, -0.6), true);
 
 		m_legs[0] = new Leg(0, Data.upperLeg, Data.lowerLeg, new Vec2(-90, 210), -1.0122f, new SingleServo(servoController, 7, 4096, 0), new SingleServo(servoController, 8, 4096, 0.35), new SingleServo(servoController, 9, 4096, 0.6), false);
 		m_legs[2] = new Leg(2, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, new SingleServo(servoController, 4, 4096, 0), new SingleServo(servoController, 5, 4096, 0.35), new SingleServo(servoController, 6, 4096, 0.6), false);
 		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1.0122f, new SingleServo(servoController, 1, 4096, 0), new SingleServo(servoController, 2, 4096, 0.35), new SingleServo(servoController, 3, 4096, 0.6), false);
+         */
 
-		for(Leg leg : m_legs) {
-			m_legUpdater.addLeg(leg);
-		}
+		ActuatorManager acs = Main.getActuatorManager();
 
+		m_legs[1] = new Leg(1, Data.upperLeg, Data.lowerLeg, new Vec2(90, 210), -1.0122f + Math.PI, acs.getLegServo(1, 0), acs.getLegServo(1, 1), acs.getLegServo(1, 2), true);
+		m_legs[3] = new Leg(3, Data.upperLeg, Data.lowerLeg, new Vec2(130, 0), Math.PI, acs.getLegServo(3, 0), acs.getLegServo(3, 1), acs.getLegServo(3, 2), true);
+		m_legs[5] = new Leg(5, Data.upperLeg, Data.lowerLeg, new Vec2(90, -210), 1.0122f + Math.PI, acs.getLegServo(5, 0), acs.getLegServo(5, 1), acs.getLegServo(5, 2), true);
+
+
+		m_legs[0] = new Leg(0, Data.upperLeg, Data.lowerLeg, new Vec2(-90, 210), -1.0122f, acs.getLegServo(0, 0), acs.getLegServo(0, 1), acs.getLegServo(0, 2), false);
+		m_legs[2] = new Leg(3, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, acs.getLegServo(2, 0), acs.getLegServo(2, 1), acs.getLegServo(2, 2), false);
+		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1.0122f, acs.getLegServo(4, 0), acs.getLegServo(4, 1), acs.getLegServo(4, 2), false);
+
+	}
+
+	public Leg[] getLegs() {
+		return m_legs;
 	}
 
 	@Override
@@ -163,11 +177,7 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 
 	@Override
 	public void onClientConnected(ClientWorker client) {
-		
+
 	}
 
-	@Override
-	public String getName() {
-		return "walking";
-	}
 }

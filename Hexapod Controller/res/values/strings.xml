@@ -13,5 +13,6 @@
     <string name="dialog_connect_title">Connect to Hexapod</string>
 	<string name="dialog_connect_hint_hostname">Hostname</string>
 	<string name="dialog_connect_connect">Connect</string>
+	<string name="dialog_console_send">Send</string>
 
 </resources>

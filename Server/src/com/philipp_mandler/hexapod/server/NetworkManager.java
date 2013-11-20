@@ -8,13 +8,13 @@ import com.philipp_mandler.hexapod.hexapod.ConsolePackage;
 import com.philipp_mandler.hexapod.hexapod.DeviceType;
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
 
-public class ServerNetworking {
+public class NetworkManager {
 	
 	private ServerSocket m_serverSocket;
 	private ArrayList<ClientWorker> m_clients;
 	private ArrayList<NetworkingEventListener> m_listeners;
 
-	public ServerNetworking(int port) throws IOException {
+	public NetworkManager(int port) throws IOException {
 		m_serverSocket = new ServerSocket(port);
 		m_clients = new ArrayList<>();
 		m_listeners = new ArrayList<>();

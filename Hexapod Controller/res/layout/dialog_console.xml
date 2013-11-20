@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:orientation="vertical"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent"
+		>
+
+	<ScrollView
+			android:layout_width="500dp"
+			android:layout_height="200dp"
+			android:id="@+id/scrollView" android:layout_gravity="center" android:layout_weight="1"
+			>
+		<LinearLayout
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/consoleContainer" android:paddingLeft="14dp" android:paddingTop="14dp"
+				android:paddingRight="14dp" android:paddingBottom="4dp">
+		</LinearLayout>
+	</ScrollView>
+	<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:layout_gravity="center_vertical"
+			android:background="#ddd" android:paddingRight="14dp" android:paddingLeft="14dp" android:paddingTop="7dp"
+			android:paddingBottom="7dp">
+		<EditText
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/edit_cmd"
+				android:layout_weight="1"
+				android:inputType="text"/>
+		<Button
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/dialog_console_send"
+				android:id="@+id/button_send"
+				style="?android:borderlessButtonStyle"/>
+	</LinearLayout>
+</LinearLayout>

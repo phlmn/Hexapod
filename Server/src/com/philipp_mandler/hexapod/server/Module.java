@@ -9,7 +9,7 @@ public abstract class Module implements NetworkingEventListener {
 		return m_name;
 	}
 
-	public void setName(String name) {
+	protected void setName(String name) {
 		m_name = name;
 	}
 

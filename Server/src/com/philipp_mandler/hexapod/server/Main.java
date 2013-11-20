@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.UnsupportedCommOperationException;
+import com.philipp_mandler.hexapod.hexapod.ModuleStatusPackage;
 
 import com.philipp_mandler.hexapod.hexapod.DeviceType;
 import com.philipp_mandler.hexapod.hexapod.LegPositionPackage;
@@ -36,8 +34,12 @@ import com.philipp_mandler.hexapod.hexapod.NetPackage;
 
 public class Main implements NetworkingEventListener {
 
-	private static ServerNetworking m_networking;
+	private static NetworkManager m_networking;
 	private static ModuleManager m_moduleManager = new ModuleManager();
+	private static ActuatorManager m_actuatorManager;
+
+	private static Config m_config;
+
 	private String m_serialPort;
 	private boolean m_running = true;
 
@@ -57,8 +59,10 @@ public class Main implements NetworkingEventListener {
 	
 	public void run() {
 
+		m_config = Config.load("conf.bin");
+
 		try {
-			m_networking = new ServerNetworking(8888);
+			m_networking = new NetworkManager(8888);
 			m_networking.addEventListener(this);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -66,16 +70,13 @@ public class Main implements NetworkingEventListener {
 			System.exit(0);
 		}
 
-		ServoController m_servo = new ServoController();
-		try {
-			m_servo.init(m_serialPort, 100000);
-		} catch (PortInUseException | UnsupportedCommOperationException | NoSuchPortException | IOException e) {
-			e.printStackTrace();
-		}
 
-		WalkingModule walkingModule = new WalkingModule(m_servo);
-		m_moduleManager.registerModule(walkingModule);
+
+		m_actuatorManager = new ActuatorManager(m_serialPort, 100000);
+
+		m_moduleManager.registerModule(new WalkingModule());
 		m_moduleManager.registerModule(new TestingModule());
+		m_moduleManager.registerModule(new CalibrationModule());
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		
@@ -89,6 +90,7 @@ public class Main implements NetworkingEventListener {
 			}
 		}
 
+		onExit();
 		System.exit(0);
 	}
 
@@ -96,6 +98,7 @@ public class Main implements NetworkingEventListener {
 		DebugHelper.log("Shutting down...");
 		Main.getModuleManager().stop();
 		Main.getNetworking().shutdown();
+		m_config.save();
 	}
 
 	@Override
@@ -163,6 +166,13 @@ public class Main implements NetworkingEventListener {
 					}
 					DebugHelper.log(out);
 					break;
+				case "modulestatus":
+					ModuleStatusPackage pack = new ModuleStatusPackage();
+					for(Module module: m_moduleManager.getModules()) {
+						pack.addModule(module.getName(), module.isRunning());
+					}
+					client.send(pack);
+					break;
 				case "exit":
 					m_running = false;
 					break;
@@ -189,11 +199,19 @@ public class Main implements NetworkingEventListener {
 		DebugHelper.log("Client Connected (" + client.getDeviceType() + ") | IP : " + client.getSocket().getInetAddress() + ":" + client.getSocket().getPort());
 	}
 	
-	public static ServerNetworking getNetworking() {
+	public static NetworkManager getNetworking() {
 		return m_networking;
 	}
 
 	public static ModuleManager getModuleManager() {
 		return m_moduleManager;
+	}
+
+	public static ActuatorManager getActuatorManager() {
+		return m_actuatorManager;
+	}
+
+	public static Config getConfig() {
+		return m_config;
 	}
 }

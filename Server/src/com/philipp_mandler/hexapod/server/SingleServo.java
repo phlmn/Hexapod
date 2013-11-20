@@ -40,6 +40,14 @@ public class SingleServo {
 	public int getPosValue()  {
 		return m_goalPosition;
 	}
+
+	public void setOffset(double offset) {
+		m_offset = offset;
+	}
+
+	public double getOffset() {
+		return m_offset;
+	}
 	
 	public double getGoalPosition() {
 		if(m_connected)

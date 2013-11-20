@@ -8,10 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.philipp_mandler.hexapod.hexapod.DeviceType;
-import com.philipp_mandler.hexapod.hexapod.ExitPackage;
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
-import com.philipp_mandler.hexapod.hexapod.WelcomePackage;
+import com.philipp_mandler.hexapod.hexapod.*;
 
 public class ClientWorker extends Thread {
 	
@@ -19,12 +16,12 @@ public class ClientWorker extends Thread {
 	private Socket m_clientSocket;
 	private ObjectOutputStream m_objOutputStream;
 	private ObjectInputStream m_objInputStream;
-	private ServerNetworking m_parent;
+	private NetworkManager m_parent;
 	private List<NetPackage> m_outQueue;
 	private DeviceType deviceType;
 	private boolean m_run;
 	
-	public ClientWorker(ServerNetworking parent, ServerSocket serverSocket) {
+	public ClientWorker(NetworkManager parent, ServerSocket serverSocket) {
 		m_parent = parent;
 		m_serverSocket = serverSocket;
 		m_outQueue = new ArrayList<NetPackage>();
@@ -117,6 +114,10 @@ public class ClientWorker extends Thread {
 	
 	public void send(NetPackage pack) {
 		m_outQueue.add(pack);
+	}
+
+	public void sendText(String msg) {
+		m_outQueue.add(new ConsolePackage(msg));
 	}
 	
 	public DeviceType getDeviceType() {

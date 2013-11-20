@@ -16,16 +16,20 @@ import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickListener;
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickView;
 import com.philipp_mandler.hexapod.hexapod.*;
 
+import java.util.ArrayList;
+
 public class MainActivity extends Activity implements NetworkingEventListener {
 	
-	JoystickView joystick1;
-	JoystickView joystick2;
+	private JoystickView joystick1;
+	private JoystickView joystick2;
 	
 	private static Networking m_networking = new Networking();
 	
 	private Handler m_handler;
 
 	private Menu m_optionsMenu;
+
+	private static ArrayList<String> m_consoleLog = new ArrayList<>();
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,7 +75,7 @@ public class MainActivity extends Activity implements NetworkingEventListener {
 				else
 					new ConnectDialog().show(getFragmentManager(), "connect");
 				break;
-			case R.id.menu_modules: new ModuleDialog().show(getFragmentManager(), "modules"); break;
+			case R.id.menu_modules: if(m_networking.isConnected()) m_networking.send(new ConsolePackage("modulestatus")); break;
 			case R.id.menu_console: new ConsoleDialog().show(getFragmentManager(), "console"); break;
 		}
 		return super.onMenuItemSelected(featureId, item);
@@ -83,6 +87,11 @@ public class MainActivity extends Activity implements NetworkingEventListener {
 			final ConsolePackage conPack = (ConsolePackage)pack;
 
 			final Context context = this.getApplicationContext();
+
+			while(m_consoleLog.size() > 100) {
+				m_consoleLog.remove(0);
+			}
+			m_consoleLog.add(conPack.getText());
 
 			m_handler.post(new Runnable() {
 				@Override
@@ -102,6 +111,11 @@ public class MainActivity extends Activity implements NetworkingEventListener {
 					}
 				}
 			});
+		}
+		else if(pack instanceof ModuleStatusPackage) {
+			ModuleDialog dialog = new ModuleDialog();
+			dialog.show(getFragmentManager(), "modules");
+			dialog.setModules(((ModuleStatusPackage) pack).getModules());
 		}
 	}
 	
@@ -126,6 +140,10 @@ public class MainActivity extends Activity implements NetworkingEventListener {
 
 	public static Networking getNetworking() {
 		return m_networking;
+	}
+
+	public static ArrayList<String> getConsoleLog() {
+		return m_consoleLog;
 	}
 
 }
