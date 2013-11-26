@@ -24,7 +24,7 @@ public class ClientWorker extends Thread {
 	public ClientWorker(NetworkManager parent, ServerSocket serverSocket) {
 		m_parent = parent;
 		m_serverSocket = serverSocket;
-		m_outQueue = new ArrayList<NetPackage>();
+		m_outQueue = new ArrayList<>();
 		m_run = true;
 		super.setName("Network client worker");
 	}

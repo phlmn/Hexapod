@@ -45,7 +45,7 @@ public class Main implements NetworkingEventListener {
 
 	
 	public static void main(String[] args) {
-		String serialPort = "COM5";
+		String serialPort = "/dev/ttyUSB0";
 		if(args.length > 0)
 			serialPort = args[0];
 		
@@ -72,7 +72,7 @@ public class Main implements NetworkingEventListener {
 
 
 
-		m_actuatorManager = new ActuatorManager(m_serialPort, 100000);
+		m_actuatorManager = new ActuatorManager(m_serialPort, 14400);
 
 		m_moduleManager.registerModule(new WalkingModule());
 		m_moduleManager.registerModule(new TestingModule());
