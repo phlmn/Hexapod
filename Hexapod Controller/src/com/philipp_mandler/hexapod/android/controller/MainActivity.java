@@ -3,6 +3,10 @@ package com.philipp_mandler.hexapod.android.controller;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -18,7 +22,7 @@ import com.philipp_mandler.hexapod.hexapod.*;
 
 import java.util.ArrayList;
 
-public class MainActivity extends Activity implements NetworkingEventListener {
+public class MainActivity extends Activity implements NetworkingEventListener, SensorEventListener {
 	
 	private JoystickView joystick1;
 	private JoystickView joystick2;
@@ -30,6 +34,9 @@ public class MainActivity extends Activity implements NetworkingEventListener {
 	private Menu m_optionsMenu;
 
 	private static ArrayList<String> m_consoleLog = new ArrayList<>();
+
+	private SensorManager m_sensorManager;
+	private Sensor m_gravitySensor;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +64,12 @@ public class MainActivity extends Activity implements NetworkingEventListener {
         
         m_handler = new Handler(getMainLooper());
         m_networking.addEventListener(this);
+
+
+		m_sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+
+		m_gravitySensor = m_sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+
     }
 
     @Override
@@ -146,4 +159,32 @@ public class MainActivity extends Activity implements NetworkingEventListener {
 		return m_consoleLog;
 	}
 
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+
+		float[] rotMatrix = new float[9];
+		SensorManager.getRotationMatrixFromVector(rotMatrix, event.values);
+
+		float angles[] = new float[3];
+		SensorManager.getOrientation(rotMatrix, angles);
+
+		if(m_networking.isConnected())
+			m_networking.send(new RotationPackage(new Vec3(event.values[0], event.values[1], event.values[2])));
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		m_sensorManager.registerListener(this, m_gravitySensor, SensorManager.SENSOR_DELAY_GAME);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		m_sensorManager.unregisterListener(this);
+	}
 }

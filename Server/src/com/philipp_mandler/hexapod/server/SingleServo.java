@@ -94,11 +94,11 @@ public class SingleServo {
 	
 	public double getCurrentPosition() {
 		if(m_connected)
-			return (m_controller.presentPosition(m_servoID) / (m_servoResolution - 1)) * (2 * Math.PI);
+			return ((double)m_controller.presentPosition(m_servoID) / (m_servoResolution - 1)) * (2 * Math.PI);
 		return -1;
 	}
 	
-	public boolean setMoovingSpeed(int speed) {
+	public boolean setMovingSpeed(int speed) {
 		if(m_connected)
 			return m_controller.setMovingSpeed(m_servoID, speed);
 		return false;

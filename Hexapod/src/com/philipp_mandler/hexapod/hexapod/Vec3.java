@@ -89,4 +89,34 @@ public class Vec3 implements Serializable {
 		m_z += obj.m_z;
 	}
 
+	public void rotate(Vec3 angles) {
+
+		// z-axis
+
+		double sinValue = Math.sin(angles.getZ());
+		double cosValue = Math.cos(angles.getZ());
+
+		m_x = m_x * cosValue - m_y * sinValue;
+		m_y = m_y * cosValue - m_x * sinValue;
+
+
+
+		// y-axis
+
+		sinValue = Math.sin(angles.getY());
+		cosValue = Math.cos(angles.getY());
+
+		m_z = m_z * cosValue - m_x * sinValue;
+		m_x = m_x * cosValue - m_z * sinValue ;
+
+
+		// x-axis
+
+		sinValue = Math.sin(angles.getX());
+		cosValue = Math.cos(angles.getX());
+
+		m_y = m_y * cosValue - m_z * sinValue;
+		m_z = m_z * cosValue - m_y * sinValue;
+	}
+
 }

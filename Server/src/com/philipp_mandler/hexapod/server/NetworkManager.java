@@ -90,6 +90,11 @@ public class NetworkManager {
 	}
 
 	public void shutdown() {
+		for(ClientWorker worker : m_clients) {
+			worker.disconnect();
+			m_clients.remove(worker);
+		}
+
 		m_listeners.clear();
 		try {
 			m_serverSocket.close();

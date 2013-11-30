@@ -15,6 +15,7 @@ public class ActuatorManager {
 
 	public ActuatorManager(String serialPort, int baudRate) {
 		try {
+			DebugHelper.log("Connect to serial Port " + serialPort + " with baud rate " + baudRate);
 			m_servoController.init(serialPort, baudRate);
 		} catch (PortInUseException | UnsupportedCommOperationException | NoSuchPortException | IOException e) {
 			e.printStackTrace();

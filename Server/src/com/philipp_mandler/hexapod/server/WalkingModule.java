@@ -35,7 +35,7 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 		ScriptEngineManager factory = new ScriptEngineManager();
 		m_scriptEngine = factory.getEngineByName("JavaScript");
 
-		m_legUpdater = new LegUpdater(this);
+		m_legUpdater = new LegUpdater();
 
 
 		m_legs = new Leg[6];
@@ -57,8 +57,28 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 
 
 		m_legs[0] = new Leg(0, Data.upperLeg, Data.lowerLeg, new Vec2(-90, 210), -1.0122f, acs.getLegServo(0, 0), acs.getLegServo(0, 1), acs.getLegServo(0, 2), false);
-		m_legs[2] = new Leg(3, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, acs.getLegServo(2, 0), acs.getLegServo(2, 1), acs.getLegServo(2, 2), false);
+		m_legs[2] = new Leg(2, Data.upperLeg, Data.lowerLeg, new Vec2(-130, 0), 0, acs.getLegServo(2, 0), acs.getLegServo(2, 1), acs.getLegServo(2, 2), false);
 		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1.0122f, acs.getLegServo(4, 0), acs.getLegServo(4, 1), acs.getLegServo(4, 2), false);
+
+
+
+		acs.getLegServo(0, 2).setOffset(-0.6);
+		acs.getLegServo(0, 1).setOffset(-0.32);
+
+		acs.getLegServo(1, 2).setOffset(0.6);
+		acs.getLegServo(1, 1).setOffset(0.32);
+
+		acs.getLegServo(2, 2).setOffset(-0.6);
+		acs.getLegServo(2, 1).setOffset(-0.32);
+
+		acs.getLegServo(3, 2).setOffset(0.6);
+		acs.getLegServo(3, 1).setOffset(0.32);
+
+		acs.getLegServo(4, 2).setOffset(-0.6);
+		acs.getLegServo(4, 1).setOffset(-0.32);
+
+		acs.getLegServo(5, 2).setOffset(0.6);
+		acs.getLegServo(5, 1).setOffset(0.32);
 
 	}
 
@@ -68,8 +88,6 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 
 	@Override
 	public void onStart() {
-
-		m_legUpdater.start();
 
 		Robot robot = new Robot(m_legs);
 		m_scriptEngine.put("robot", robot);
@@ -93,6 +111,8 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 		else {
 			DebugHelper.log("Default walking script not found.", Log.WARNING);
 		}
+
+		m_legUpdater.start();
 
 		Main.getNetworking().addEventListener(this);
 	}

@@ -34,9 +34,12 @@ public class CalibrationModule extends Module {
 					if(m_currentServo != null) {
 						m_currentServo.setOffset(0);
 
-						Main.getConfig().setServoOffset(m_currentServo.getID(), -m_currentServo.getCurrentPosition());
+						double value = -m_currentServo.getCurrentPosition();
+						Main.getConfig().setServoOffset(m_currentServo.getID(), value);
 						Main.getConfig().save();
-						m_currentServo.setOffset(-m_currentServo.getCurrentPosition());
+						m_currentServo.setOffset(value);
+
+						client.sendText("New offset of Servo " + m_currentServo.getID() + " set to " + value);
 
 						m_currentServo.setLed(false);
 						m_currentServo = null;

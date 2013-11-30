@@ -72,11 +72,13 @@ public class Main implements NetworkingEventListener {
 
 
 
-		m_actuatorManager = new ActuatorManager(m_serialPort, 14400);
+		m_actuatorManager = new ActuatorManager(m_serialPort, 57000);
 
 		m_moduleManager.registerModule(new WalkingModule());
 		m_moduleManager.registerModule(new TestingModule());
 		m_moduleManager.registerModule(new CalibrationModule());
+		m_moduleManager.registerModule(new LegTest());
+		m_moduleManager.registerModule(new TwistModule());
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		
@@ -103,6 +105,7 @@ public class Main implements NetworkingEventListener {
 
 	@Override
 	public void onDataReceived(ClientWorker client, NetPackage pack) {
+		m_moduleManager.onDataReceived(client, pack);
 		if(pack instanceof LegPositionPackage) {
 			LegPositionPackage posPack = (LegPositionPackage)pack;
 			DebugHelper.log("Position received\nLeg: " + posPack.getLegIndex() + "\nPosition: ( " + posPack.getGoalPosition().getX() + " | " + posPack.getGoalPosition().getY() + " | " + posPack.getGoalPosition().getZ() + " )");

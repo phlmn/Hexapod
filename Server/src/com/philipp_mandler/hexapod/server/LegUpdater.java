@@ -1,15 +1,28 @@
 package com.philipp_mandler.hexapod.server;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class LegUpdater {
 	
 	private boolean m_running = false;
-	private WalkingModule m_walkingModule;
 
-	public LegUpdater(WalkingModule walkingModule) {
-		m_walkingModule = walkingModule;
+	private ArrayList<Leg> m_legs = new ArrayList<>();
+
+	public LegUpdater() {
+
+	}
+
+
+	public void removeLeg(Leg leg) {
+		m_legs.remove(leg);
+	}
+
+	public void clearLegs(Leg leg) {
+		m_legs.clear();
+	}
+
+	public void addLeg(Leg leg) {
+		m_legs.add(leg);
 	}
 
 	public void start() {
@@ -20,7 +33,7 @@ public class LegUpdater {
 			public void run() {
 				while(m_running) {
 
-					for(Leg leg : m_walkingModule.getLegs()) {
+					for(Leg leg : m_legs) {
 						leg.updateServos();
 					}
 
@@ -33,7 +46,7 @@ public class LegUpdater {
 					}
 				}
 			}
-		});
+		}).start();
 	}
 	
 	public void stop() {

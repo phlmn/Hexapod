@@ -16,9 +16,9 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
+    <orderEntry type="module" module-name="Hexapod" exported="" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="jdk" jdkName="1.7" jdkType="JavaSDK" />
-    <orderEntry type="module" module-name="Hexapod" exported="" />
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
