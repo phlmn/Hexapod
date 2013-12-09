@@ -87,4 +87,13 @@ public class Vec2 implements Serializable {
 		divide(getLength());
 	}
 
+	public Vec2 sub(Vec2 obj) {
+		return new Vec2(m_x - obj.m_x, m_y - obj.m_y);
+	}
+
+	public void add(Vec2 obj) {
+		m_x += obj.m_x;
+		m_y += obj.m_y;
+	}
+
 }

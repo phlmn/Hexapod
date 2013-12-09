@@ -22,7 +22,7 @@ public class ActuatorManager {
 		}
 
 		for(int i = 0; i < 18; i++) {
-			m_legServos[i] = new SingleServo(m_servoController, i + 1, 4096, Main.getConfig().getServoOffset(i + 1));
+			m_legServos[i] = new SingleServo(m_servoController, i + 1, 4096, Data.servoAngleOffsets[i]);
 		}
 	}
 

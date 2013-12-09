@@ -1,8 +1,5 @@
 package com.philipp_mandler.hexapod.server;
 
-import com.philipp_mandler.hexapod.hexapod.DeviceType;
-import com.philipp_mandler.hexapod.hexapod.LegPositionPackage;
-import com.philipp_mandler.hexapod.hexapod.LegServoPackage;
 import com.philipp_mandler.hexapod.hexapod.Vec2;
 import com.philipp_mandler.hexapod.hexapod.Vec3;
 
@@ -55,17 +52,20 @@ public class Leg {
 		m_servos[2].setTorqueEnabled(enable);
 	}
 	
-	public void moveLegToPosition(Vec3 goal) {
+	private void moveLegToPosition(Vec3 goal) {
 		moveLegToRelativePosition(new Vec3(goal.getX() - m_position.getX(), goal.getY() - m_position.getY(), goal.getZ()));
 	}
 	
-	public void moveLegToRelativePosition(Vec3 goal) {
+	private void moveLegToRelativePosition(Vec3 goal) {
+
+		Vec3 tmpGoal = goal.sum(new Vec3(0, 0, Data.servoPosOffsetZ));
 
 		// calculate s2
 
 		double a = m_upperLeg;
 		double b = m_lowerLeg;
-		double c = goal.getLength();
+		double c = tmpGoal.getLength();
+
 
 		double gamma = Math.acos((Math.pow(c, 2) - Math.pow(a, 2) - Math.pow(b, 2)) / (-2 * a * b));
 
@@ -82,7 +82,7 @@ public class Leg {
 
 		// calculate s0
 
-		Vec2 topGoal = new Vec2(goal.getX(), goal.getY());
+		Vec2 topGoal = new Vec2(tmpGoal.getX(), tmpGoal.getY());
 
 		double s0;
 
@@ -98,7 +98,14 @@ public class Leg {
 
 		double beta = Math.acos((Math.pow(b, 2) - Math.pow(c, 2) - Math.pow(a, 2)) / (-2 * c * a));
 
-		double s1 = Math.atan2(goal.getX(), goal.getZ());
+		double s1;
+
+		if(m_rightSide)
+			s1 = Math.atan2(topGoal.getLength(), tmpGoal.getZ());
+		else {
+			s1 = Math.atan2(-topGoal.getLength(), tmpGoal.getZ());
+		}
+
 		if(m_rightSide)
 			s1 = s1 - beta + Math.PI / 2;
 		else
@@ -114,7 +121,10 @@ public class Leg {
 			m_servos[2].setGoalPosition(s2);
 		}
 
+	}
 
+	public void transform(Vec3 transformation) {
+		m_goalPosition.add(transformation);
 	}
 	
 	public void setLegID(int id) {

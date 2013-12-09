@@ -89,6 +89,10 @@ public class Vec3 implements Serializable {
 		m_z += obj.m_z;
 	}
 
+	public Vec3 sub(Vec3 obj) {
+		return new Vec3(m_x - obj.m_x, m_y - obj.m_y, m_z - obj.m_z);
+	}
+
 	public void rotate(Vec3 angles) {
 
 		// z-axis
@@ -97,8 +101,7 @@ public class Vec3 implements Serializable {
 		double cosValue = Math.cos(angles.getZ());
 
 		m_x = m_x * cosValue - m_y * sinValue;
-		m_y = m_y * cosValue - m_x * sinValue;
-
+		m_y = m_x * sinValue + m_y * cosValue;
 
 
 		// y-axis

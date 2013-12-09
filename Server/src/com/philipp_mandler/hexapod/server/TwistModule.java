@@ -1,19 +1,20 @@
 package com.philipp_mandler.hexapod.server;
 
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
-import com.philipp_mandler.hexapod.hexapod.RotationPackage;
-import com.philipp_mandler.hexapod.hexapod.Vec2;
-import com.philipp_mandler.hexapod.hexapod.Vec3;
+import com.philipp_mandler.hexapod.hexapod.*;
 
 public class TwistModule extends Module {
 
 	private LegGroup m_legGroup;
 
-	private double m_height = -120;
+	private double m_height = -100;
+
+	private double m_heightOffset = 0;
 
 	private LegUpdater m_legUpdater;
 
 	private Vec3 m_rotation = new Vec3();
+
+	private boolean m_lifted = false;
 
 
 	public TwistModule() {
@@ -33,32 +34,10 @@ public class TwistModule extends Module {
 		m_legs[4] = new Leg(4, Data.upperLeg, Data.lowerLeg, new Vec2(-90, -210), 1.0122f, acs.getLegServo(4, 0), acs.getLegServo(4, 1), acs.getLegServo(4, 2), false);
 
 
-
-		acs.getLegServo(0, 2).setOffset(-0.6);
-		acs.getLegServo(0, 1).setOffset(-0.32);
-
-		acs.getLegServo(1, 2).setOffset(0.6);
-		acs.getLegServo(1, 1).setOffset(0.32);
-
-		acs.getLegServo(2, 2).setOffset(-0.6);
-		acs.getLegServo(2, 1).setOffset(0.00);
-
-		acs.getLegServo(3, 2).setOffset(0.6);
-		acs.getLegServo(3, 1).setOffset(0.32);
-
-		acs.getLegServo(4, 2).setOffset(-0.6);
-		acs.getLegServo(4, 1).setOffset(-0.32);
-
-		acs.getLegServo(5, 2).setOffset(0.6);
-		acs.getLegServo(5, 1).setOffset(0.32);
-
-
-
-
 		//LegGroup triangle1 = new LegGroup(new Leg[] {m_legs[0], m_legs[3], m_legs[4]}, new Vec2[] {new Vec2(-200, 310), new Vec2(300, 0), new Vec2(-200, -310)});
 		//LegGroup triangle2 = new LegGroup(new Leg[] {m_legs[1], m_legs[2], m_legs[5]}, new Vec2[] {new Vec2(200, 310), new Vec2(-300, 0), new Vec2(200, -310)});
 
-		m_legGroup = new LegGroup(new Leg[] {m_legs[0], m_legs[3], m_legs[4], m_legs[1], m_legs[2], m_legs[5]}, new Vec2[] {new Vec2(-200, 310), new Vec2(300, 0), new Vec2(-200, -310), new Vec2(200, 310), new Vec2(-300, 0), new Vec2(200, -310)});
+		m_legGroup = new LegGroup(new Leg[] {m_legs[0], m_legs[3], m_legs[4], m_legs[1], m_legs[2], m_legs[5]}, new Vec2[] {new Vec2(-180, 320), new Vec2(280, 0), new Vec2(-180, -320), new Vec2(180, 320), new Vec2(-280, 0), new Vec2(180, -320)});
 
 
 		m_legGroup.setTranslation(new Vec3(0, 0, 20));
@@ -85,11 +64,18 @@ public class TwistModule extends Module {
 
 	@Override
 	public void tick(Time elapsedTime) {
-		if(m_legGroup.getTranslation().getZ() > m_height) {
-			m_legGroup.translate(new Vec3(0, 0, - elapsedTime.getSeconds() * 30));
-
+		if(!m_lifted) {
+			if(m_legGroup.getTranslation().getZ() > m_height) {
+				m_legGroup.translate(new Vec3(0, 0, - elapsedTime.getSeconds() * 30));
+			}
+			else {
+				m_lifted = true;
+			}
 		}
-		m_legGroup.setRotation(m_rotation);
+		else {
+			m_legGroup.setTranslation(new Vec3(0, 0, m_height - m_heightOffset));
+			m_legGroup.setRotation(m_rotation);
+		}
 		m_legGroup.moveLegs();
 	}
 
@@ -100,11 +86,19 @@ public class TwistModule extends Module {
 
 			Vec3 rawRot = rotPack.getValue();
 
+			m_rotation.setX((rawRot.getX() / 9.81 * (Math.PI / 2)) / 2.0);
+			m_rotation.setY(-((rawRot.getY() / 9.81 * (Math.PI / 2)) / 2));
 
-			Vec3 rot = new Vec3((rawRot.getX() / 9.81 * (Math.PI / 2)) / 2.0, -((rawRot.getY() / 9.81 * (Math.PI / 2)) / 2), 0);
+		}
+		else if(pack instanceof JoystickPackage) {
+			JoystickPackage joyPack = (JoystickPackage)pack;
 
-			m_rotation = rot;
-
+			if(joyPack.getType() == JoystickType.Direction) {
+				m_heightOffset = joyPack.getData().getY() * 70;
+			}
+			else if(joyPack.getType() == JoystickType.Rotation) {
+				m_rotation.setZ(joyPack.getData().getX() * 0.2);
+			}
 		}
 	}
 
