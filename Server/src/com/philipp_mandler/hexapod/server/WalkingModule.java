@@ -9,6 +9,7 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 	private Vec2 m_oldSpeed = new Vec2();
 	private Leg m_legs[];
 	private Vec3[] m_endPositions = new Vec3[6];
+	private double m_speedFactor;
 
 	private LegUpdater m_legUpdater;
 
@@ -63,6 +64,8 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 			m_endPositions[i] = new Vec3(new Vec3(m_defaultPositions[i], 0));
 		}
 
+		m_speedFactor = 0.2;
+
 		m_legUpdater.start();
 
 		Main.getNetworking().addEventListener(this);
@@ -93,14 +96,13 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 		}
 		else {
 
-			double speedFactor = 0.5;
 
-			double duration = 800 / 6 / speedFactor; // duration per case, 800ms per step
+			double duration = 800 / 6 / m_speedFactor; // duration per case, 800ms per step
 
 			Vec2 speed = new Vec2(m_speed);
-			speed.multiply(120 * speedFactor); // max 100mm/sec
+			speed.multiply(150 * m_speedFactor); // max 100mm/sec
 
-			double speedR = m_rotSpeed / 3 * speedFactor;
+			double speedR = m_rotSpeed / 2 * m_speedFactor;
 
             double preferredHeight = 140;
 			double stepHeight = 40;
@@ -154,7 +156,7 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 
 							pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
 							pos.setZ(0);
-							pos.rotate(new Vec3(0, 0, -speedR * elapsedTime.getSeconds()));
+							pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
 							if(m_stepTime.getMilliseconds() >= duration) m_caseStep[legID] = 4;
 							break;
@@ -163,7 +165,7 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 
 							pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
 							pos.setZ(0);
-							pos.rotate(new Vec3(0, 0, -speedR * elapsedTime.getSeconds()));
+							pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
 							if(m_stepTime.getMilliseconds() >= duration) m_caseStep[legID] = 5;
 							break;
@@ -172,7 +174,7 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 
 							pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
 							pos.setZ(0);
-							pos.rotate(new Vec3(0, 0, -speedR * elapsedTime.getSeconds()));
+							pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
 							if(m_stepTime.getMilliseconds() >= duration) m_caseStep[legID] = 6;
 							break;
@@ -181,7 +183,7 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 
 							pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
 							pos.setZ(0);
-							pos.rotate(new Vec3(0, 0, -speedR * elapsedTime.getSeconds()));
+							pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
 							m_endPositions[legID] = new Vec3(pos.getX(), pos.getY(), pos.getZ());
 
@@ -197,7 +199,15 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 				}
 
 				if (m_stepTime.getMilliseconds() < duration) m_stepTime.setNanoseconds(m_stepTime.getNanoseconds() + elapsedTime.getNanoseconds());
-				else m_stepTime.setNanoseconds(0);
+				else {
+					if(m_speed.getLength() < Math.abs(m_rotSpeed)) {
+						m_speedFactor = Math.abs(m_rotSpeed) * 0.8 + 0.2;
+					}
+					else {
+						m_speedFactor = m_speed.getLength() * 0.8 + 0.2;
+					}
+					m_stepTime.setNanoseconds(0);
+				}
 			}
 		}
 

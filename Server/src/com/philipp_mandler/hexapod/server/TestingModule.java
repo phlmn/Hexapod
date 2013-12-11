@@ -1,10 +1,13 @@
 package com.philipp_mandler.hexapod.server;
 
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.oio.OioSocketChannel;
 import org.openkinect.freenect.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class TestingModule extends Module implements DepthHandler {
@@ -13,9 +16,11 @@ public class TestingModule extends Module implements DepthHandler {
 	private Device m_kinect;
 	private JFrame m_frame;
 	private KinectDisplay m_kinectDisplay;
+	//private SocketChannel m_socketChannel;
 
 	public TestingModule() {
 		m_Context = Freenect.createContext();
+		//m_socketChannel = new OioSocketChannel(new Socket());
 	}
 
 	@Override
