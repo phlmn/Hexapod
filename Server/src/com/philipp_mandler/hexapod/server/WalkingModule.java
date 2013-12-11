@@ -6,7 +6,6 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 
 	private Vec2 m_speed = new Vec2();
 	private double m_rotSpeed = 0.0;
-	private Vec2 m_oldSpeed = new Vec2();
 	private Leg m_legs[];
 	private Vec3[] m_endPositions = new Vec3[6];
 	private double m_speedFactor;
@@ -193,9 +192,6 @@ public class WalkingModule extends Module implements NetworkingEventListener {
 					}
 
 					leg.setGoalPosition(pos.sum(new Vec3(0, 0, -preferredHeight)));
-					if(legID == 2) {
-						//DebugHelper.log(pos.getX() + "    " + pos.getY() + "    " + pos.getZ());
-					}
 				}
 
 				if (m_stepTime.getMilliseconds() < duration) m_stepTime.setNanoseconds(m_stepTime.getNanoseconds() + elapsedTime.getNanoseconds());
