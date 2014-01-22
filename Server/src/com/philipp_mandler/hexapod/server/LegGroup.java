@@ -13,8 +13,7 @@ public class LegGroup {
 	
 	
 	public LegGroup(Leg[] legs, Vec2[] relativePositions) {
-		
-		m_legs = legs;		
+		m_legs = legs;
 		m_relativePositions = relativePositions;
 		
 		m_translation = new Vec3();
@@ -22,23 +21,17 @@ public class LegGroup {
 	}
 	
 	public void moveLegs() {
-		
+		// reposition all legs from the LegGroup
 		for(int i = 0; i < m_legs.length; i++) {
 			if(m_legs[i] == null || m_relativePositions[i] == null) continue;
-			//Vec2 tmpPoint = new Vec2(m_relativePositions[i]);
-			//tmpPoint.rotate(new Vec2(), m_rotation.getZ());
 
 			Vec3 tmpPoint = new Vec3(m_relativePositions[i], 0);
 
 			tmpPoint.rotate(m_rotation);
 
-
 			Vec3 finalPoint = new Vec3(tmpPoint.getX() + m_translation.getX(), tmpPoint.getY() + m_translation.getY(), tmpPoint.getZ() + m_translation.getZ());
 
 			m_legs[i].setGoalPosition(finalPoint);
-			if(i == 0) {
-				//DebugHelper.log(finalPoint.getX() + "  " + finalPoint.getY() + "  " + finalPoint.getZ());
-			}
 		}
 	}
 	

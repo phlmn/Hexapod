@@ -38,8 +38,6 @@ public class Main implements NetworkingEventListener {
 	private static ModuleManager m_moduleManager = new ModuleManager();
 	private static ActuatorManager m_actuatorManager;
 
-	private static Config m_config;
-
 	private String m_serialPort;
 	private boolean m_running = true;
 
@@ -59,8 +57,7 @@ public class Main implements NetworkingEventListener {
 	
 	public void run() {
 
-		m_config = Config.load("conf.bin");
-
+		// initialize NetworkManager
 		try {
 			m_networking = new NetworkManager(8888);
 			m_networking.addEventListener(this);
@@ -70,18 +67,16 @@ public class Main implements NetworkingEventListener {
 			System.exit(0);
 		}
 
+		// initialize ActuatorManager
+		m_actuatorManager = new ActuatorManager(m_serialPort, 57600); //57600
 
-
-		m_actuatorManager = new ActuatorManager(m_serialPort, 57000);
-
-		m_moduleManager.registerModule(new WalkingModule());
+		// register Modules
+		m_moduleManager.registerModule(new MobilityModule());
 		m_moduleManager.registerModule(new TestingModule());
-		m_moduleManager.registerModule(new CalibrationModule());
 		m_moduleManager.registerModule(new LegTest());
-		m_moduleManager.registerModule(new TwistModule());
 
+		// handle console inout
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		
 		while(m_running) {
 			try {
 				String input = reader.readLine();
@@ -97,26 +92,21 @@ public class Main implements NetworkingEventListener {
 	}
 
 	private void onExit() {
+		// clean up
 		DebugHelper.log("Shutting down...");
 		Main.getModuleManager().stop();
 		Main.getNetworking().shutdown();
-		m_config.save();
 	}
 
 	@Override
 	public void onDataReceived(ClientWorker client, NetPackage pack) {
-		m_moduleManager.onDataReceived(client, pack);
-		if(pack instanceof LegPositionPackage) {
-			LegPositionPackage posPack = (LegPositionPackage)pack;
-			DebugHelper.log("Position received\nLeg: " + posPack.getLegIndex() + "\nPosition: ( " + posPack.getGoalPosition().getX() + " | " + posPack.getGoalPosition().getY() + " | " + posPack.getGoalPosition().getZ() + " )");
-			Main.getNetworking().broadcast(pack, DeviceType.InfoScreen);
-		}
 
 	}
 	
 	@Override
 	public void onCmdReceived(ClientWorker client, String[] cmd) {
-		m_moduleManager.onCmdReceived(client, cmd);
+
+		// handle commands
 		if(cmd.length > 0) {
 			String mainCmd = cmd[0].toLowerCase();
 			switch(mainCmd) {
@@ -212,9 +202,5 @@ public class Main implements NetworkingEventListener {
 
 	public static ActuatorManager getActuatorManager() {
 		return m_actuatorManager;
-	}
-
-	public static Config getConfig() {
-		return m_config;
 	}
 }

@@ -1,13 +1,10 @@
 package com.philipp_mandler.hexapod.server;
 
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.oio.OioSocketChannel;
 import org.openkinect.freenect.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class TestingModule extends Module implements DepthHandler {
@@ -32,16 +29,19 @@ public class TestingModule extends Module implements DepthHandler {
 	protected void onStart() {
 		DebugHelper.log("Module started");
 
+		// detect devices
 		DebugHelper.log("Devices detected: " + m_Context.numDevices());
 		if(m_Context.numDevices() > 0)
 			m_kinect = m_Context.openDevice(0);
 
+		// start Kinect
 		if(m_kinect != null) {
 			m_kinect.setLed(LedStatus.GREEN);
 			m_kinect.setDepthFormat(DepthFormat.D11BIT);
 			m_kinect.startDepth(this);
 		}
 
+		// create Kinect output window
 		if(!GraphicsEnvironment.isHeadless()) {
 			m_kinectDisplay = new KinectDisplay();
 
@@ -60,6 +60,7 @@ public class TestingModule extends Module implements DepthHandler {
 
 	@Override
 	protected void onStop() {
+		// stop Kinect
 		if(m_kinect != null) {
 			m_kinect.setLed(LedStatus.BLINK_GREEN);
 			m_kinect.stopDepth();
@@ -68,11 +69,13 @@ public class TestingModule extends Module implements DepthHandler {
 			m_kinect = null;
 		}
 
+		// dispose Kinect output window
 		if(m_kinectDisplay != null) {
 			m_kinectDisplay.dispose();
 			m_kinectDisplay = null;
 		}
 
+		// dispose Kinect display frame
 		if(m_frame != null) {
 			m_frame.dispose();
 			m_frame = null;
@@ -86,6 +89,7 @@ public class TestingModule extends Module implements DepthHandler {
 
 	@Override
 	public void onFrameReceived(FrameMode frameMode, ByteBuffer byteBuffer, int i) {
+		// send received Kinect frame  to KinectDisplay
 		if(m_kinectDisplay != null)
 			m_kinectDisplay.setKinectData(byteBuffer);
 	}

@@ -12,7 +12,6 @@ public class LegUpdater {
 
 	}
 
-
 	public void removeLeg(Leg leg) {
 		m_legs.remove(leg);
 	}
@@ -28,6 +27,7 @@ public class LegUpdater {
 	public void start() {
 		if(m_running) return;
 		m_running = true;
+		// start new Thread for sync updating the leg servos
 		new Thread(new Runnable() {
 			@Override
 			public void run() {

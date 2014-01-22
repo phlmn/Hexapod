@@ -11,13 +11,13 @@ public class ModuleManager implements NetworkingEventListener {
 	private boolean m_running = true;
 
 	public ModuleManager() {
+		// handle main ticks of modules
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				while(m_running) {
 					Time tempTime = Time.fromNanoseconds(System.nanoTime());
 					Time m_elapsedTime = Time.fromNanoseconds(tempTime.getNanoseconds() - m_lastTime.getNanoseconds());
-					//System.out.println("Tick took: " + m_elapsedTime.getMilliseconds() + " ms");
 					m_lastTime = tempTime;
 
 					for(Module module : m_modules) {
@@ -39,6 +39,7 @@ public class ModuleManager implements NetworkingEventListener {
 	}
 
 	public void stop() {
+		// break loop und stop modules
 		m_running = false;
 		for(Module module : m_modules) {
 			if(module.isRunning())
@@ -47,6 +48,7 @@ public class ModuleManager implements NetworkingEventListener {
 	}
 
 	public void registerModule(Module module) {
+		// register module to loop
 		for(Module tempModule : m_modules) {
 			if(module.getName().equals(tempModule.getName())) {
 				return;
@@ -57,6 +59,7 @@ public class ModuleManager implements NetworkingEventListener {
 	}
 
 	public void removeModule(String moduleName) {
+		// remove module from loop
 		for(Module module : m_modules) {
 			if(module.getName().equals(moduleName)) {
 				m_modules.remove(module);
@@ -66,15 +69,18 @@ public class ModuleManager implements NetworkingEventListener {
 	}
 
 	public void removeModule(Module module) {
+		// remove module from loop
 		m_modules.remove(module);
 	}
 
 	public void startModule(Module module) {
+		// start module
 		if(m_modules.contains(module) && !module.isRunning())
 			module.start();
 	}
 
 	public boolean startModule(String moduleName) {
+		// start module by name
 		for(Module module : m_modules) {
 			if(module.getName().equals(moduleName) && !module.isRunning()) {
 				if(!module.isRunning())
@@ -86,11 +92,13 @@ public class ModuleManager implements NetworkingEventListener {
 	}
 
 	public void stopModule(Module module) {
+		// stop module
 		if(m_modules.contains(module) && module.isRunning())
 			module.stop();
 	}
 
 	public boolean stopModule(String moduleName) {
+		// stop module by name
 		for(Module module : m_modules) {
 			if(module.getName().equals(moduleName)) {
 				if(module.isRunning())
@@ -102,6 +110,7 @@ public class ModuleManager implements NetworkingEventListener {
 	}
 
 	public Module getModule(String moduleName) {
+		// get a module by name
 		for(Module module : m_modules) {
 			if(module.getName().equals(moduleName)) {
 				return module;
@@ -116,6 +125,7 @@ public class ModuleManager implements NetworkingEventListener {
 
 	@Override
 	public void onDataReceived(ClientWorker client, NetPackage pack) {
+		// forward network data to running modules
 		for(Module module : m_modules) {
 			if(module.isRunning()) {
 				module.onDataReceived(client, pack);
@@ -125,6 +135,7 @@ public class ModuleManager implements NetworkingEventListener {
 
 	@Override
 	public void onCmdReceived(ClientWorker client, String[] cmd) {
+		// forward commands to running modules
 		for(Module module : m_modules) {
 			if(module.isRunning()) {
 				module.onCmdReceived(client, cmd);
@@ -134,6 +145,7 @@ public class ModuleManager implements NetworkingEventListener {
 
 	@Override
 	public void onClientDisconnected(ClientWorker client) {
+		// forward client info to modules
 		for(Module module : m_modules) {
 			if(module.isRunning()) {
 				module.onClientDisconnected(client);
@@ -143,6 +155,7 @@ public class ModuleManager implements NetworkingEventListener {
 
 	@Override
 	public void onClientConnected(ClientWorker client) {
+		// forward client info to modules
 		for(Module module : m_modules) {
 			if(module.isRunning()) {
 				module.onClientConnected(client);

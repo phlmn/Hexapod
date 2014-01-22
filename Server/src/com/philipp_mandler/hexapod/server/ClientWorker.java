@@ -1,5 +1,7 @@
 package com.philipp_mandler.hexapod.server;
 
+import com.philipp_mandler.hexapod.hexapod.*;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,8 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.philipp_mandler.hexapod.hexapod.*;
 
 public class ClientWorker extends Thread {
 	
@@ -31,6 +31,8 @@ public class ClientWorker extends Thread {
 	
 	@Override
 	public void run() {
+
+		// wait while no client is connected
 		while(m_clientSocket == null) {
 			try {				
 				m_clientSocket = m_serverSocket.accept();
@@ -47,16 +49,24 @@ public class ClientWorker extends Thread {
 				}
 			}
 		}
-		
+
+		// register the client to NetworkManager
 		m_parent.registerClient(this);
+
+		// create a new ClientWorker to handle next client
 		new ClientWorker(m_parent, m_serverSocket).start();
-		
+
+		// handle communication
 		while(m_clientSocket.isConnected() && m_run) {
 			try {
+
+				// handle network output
 				while(!m_outQueue.isEmpty()) {
 					m_objOutputStream.writeObject(m_outQueue.get(0));
 					m_outQueue.remove(0);
 				}
+
+				// handle network input
 				while(m_clientSocket.getInputStream().available() > 0) {
 					Object input = m_objInputStream.readObject();
 					if(input instanceof NetPackage) {
@@ -87,7 +97,10 @@ public class ClientWorker extends Thread {
 				DebugHelper.log(e.toString(), Log.ERROR);
 			}
 		}
+
 		m_parent.clientDisconnected(this);
+
+		// unregister client from NetworkManager
 		m_parent.removeClient(this);
 		try {
 			m_objInputStream.close();
@@ -109,15 +122,13 @@ public class ClientWorker extends Thread {
 	}
 	
 	public void disconnect() {
+		// break loop
 		m_run = false;
 	}
 	
 	public void send(NetPackage pack) {
+		// add NetPackage to outgoing queue
 		m_outQueue.add(pack);
-	}
-
-	public void sendText(String msg) {
-		m_outQueue.add(new ConsolePackage(msg));
 	}
 	
 	public DeviceType getDeviceType() {

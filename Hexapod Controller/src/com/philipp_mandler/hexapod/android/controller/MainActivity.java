@@ -2,7 +2,6 @@ package com.philipp_mandler.hexapod.android.controller;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickListener;
@@ -23,10 +21,7 @@ import com.philipp_mandler.hexapod.hexapod.*;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity implements NetworkingEventListener, SensorEventListener {
-	
-	private JoystickView joystick1;
-	private JoystickView joystick2;
-	
+
 	private static Networking m_networking = new Networking();
 	
 	private Handler m_handler;
@@ -37,37 +32,42 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 
 	private SensorManager m_sensorManager;
 	private Sensor m_gravitySensor;
+
+	private ArrayList<ButtonGroup> m_buttonGroups = new ArrayList<>();
+
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        joystick1 = (JoystickView)findViewById(R.id.joystickView1);
-        joystick2 = (JoystickView)findViewById(R.id.joystickView2);
+
+		// add joystick listeners
+
+		JoystickView joystick1 = (JoystickView) findViewById(R.id.joystickView1);
+		JoystickView joystick2 = (JoystickView) findViewById(R.id.joystickView2);
         
         joystick1.addListener(new JoystickListener() {
-			
+
 			public void joystickPositionChanged(View view, float x, float y) {
-				if(m_networking.isConnected())
+				if (m_networking.isConnected())
 					m_networking.send(new JoystickPackage(new Vec2(x, y), JoystickType.Direction));
 			}
 		});
         
         joystick2.addListener(new JoystickListener() {
-			
+
 			public void joystickPositionChanged(View view, float x, float y) {
-				if(m_networking.isConnected())
+				if (m_networking.isConnected())
 					m_networking.send(new JoystickPackage(new Vec2(x, y), JoystickType.Rotation));
 			}
 		});
         
         m_handler = new Handler(getMainLooper());
+
         m_networking.addEventListener(this);
 
 
 		m_sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-
 		m_gravitySensor = m_sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
 
     }
@@ -99,47 +99,103 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 		if(pack instanceof ConsolePackage) {
 			final ConsolePackage conPack = (ConsolePackage)pack;
 
-			final Context context = this.getApplicationContext();
-
 			while(m_consoleLog.size() > 100) {
 				m_consoleLog.remove(0);
 			}
 			m_consoleLog.add(conPack.getText());
-
-			m_handler.post(new Runnable() {
-				@Override
-				public void run() {
-					LinearLayout consoleContainer = (LinearLayout)findViewById(R.id.consoleView);
-					ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
-					boolean autoScroll = false;
-					if(scrollView.getHeight() - (scrollView.getScrollY() + consoleContainer.getHeight()) <= 40)
-						autoScroll = true;
-
-					TextView text = new TextView(context);
-					text.setTextColor(Color.BLACK);
-					text.setText(conPack.getText());
-					consoleContainer.addView(text);
-					if(autoScroll) {
-						scrollView.setScrollY(consoleContainer.getHeight() - scrollView.getHeight());
-					}
-				}
-			});
 		}
 		else if(pack instanceof ModuleStatusPackage) {
+			// response for module status received
 			ModuleDialog dialog = new ModuleDialog();
 			dialog.show(getFragmentManager(), "modules");
 			dialog.setModules(((ModuleStatusPackage) pack).getModules());
+		}
+		else if(pack instanceof ButtonGroupPackage) {
+			// add ButtonGroup
+			ButtonGroupPackage buttonGroupPackage = (ButtonGroupPackage)pack;
+			if(!buttonGroupPackage.getDelete()) {
+				LinearLayout container = (LinearLayout)findViewById(R.id.buttons);
+				LinearLayout layout = new LinearLayout(this);
+				ButtonGroup buttonGroup = new ButtonGroup(buttonGroupPackage, layout);
+				TextView text = new TextView(this);
+				text.setText(buttonGroupPackage.getLabel());
+				layout.addView(text);
+				container.addView(layout);
+				m_buttonGroups.add(buttonGroup);
+			}
+			else {
+				// remove ButtonGroup
+				for(ButtonGroup group : m_buttonGroups) {
+					if(group.getID().equals(buttonGroupPackage.getID())) {
+						LinearLayout container = (LinearLayout)findViewById(R.id.buttons);
+						container.removeView(group.getView());
+						m_buttonGroups.remove(group);
+						break;
+					}
+				}
+			}
+		}
+		else if(pack instanceof ButtonPackage) {
+			// add Buttons to ButtonGroup
+			final ButtonPackage buttonPackage = (ButtonPackage)pack;
+			if(!buttonPackage.getDelete()) {
+				// search the destination group
+				for(ButtonGroup group : m_buttonGroups) {
+					if(group.getID().equals(buttonPackage.getGroup())) {
+						// add button
+						LinearLayout container = (LinearLayout)group.getView();
+						android.widget.Button button = new android.widget.Button(this);
+						button.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								MainActivity.getNetworking().send(new ConsolePackage(buttonPackage.getCommand()));
+
+							}
+						});
+						button.setText(buttonPackage.getLabel());
+						group.addButton(new Button(buttonPackage, button));
+						container.addView(button);
+						break;
+					}
+				}
+			}
+			else {
+				// remove the button
+				for(ButtonGroup group : m_buttonGroups) {
+					if(group.getID().equals(buttonPackage.getGroup())) {
+						for(Button button: group.getButtons()) {
+							if(buttonPackage.getID().equals(button.getID())) {
+								LinearLayout container = (LinearLayout)group.getView();
+								container.removeView(button.getView());
+								group.removeButton(button);
+								break;
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+		else if(pack instanceof NotificationPackage) {
+			NotificationPackage notificationPackage = (NotificationPackage)pack;
+			Toast.makeText(this, notificationPackage.getText(), Toast.LENGTH_SHORT).show();
 		}
 	}
 	
 	@Override
 	public void onConnected() {
+		//rename connect button
 		m_optionsMenu.findItem(R.id.menu_connect).setTitle(R.string.menu_disconnect);
 	}
 
 	@Override
 	public void onDisconnected() {
+		// rename disconnect button
 		m_optionsMenu.findItem(R.id.menu_connect).setTitle(R.string.menu_connect);
+
+		// clear all buttons
+		LinearLayout container = (LinearLayout)findViewById(R.id.buttons);
+		container.removeAllViews();
 	}
 
 	@Override
@@ -161,7 +217,7 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-
+		// handle orientation sensor changes
 		float[] rotMatrix = new float[9];
 		SensorManager.getRotationMatrixFromVector(rotMatrix, event.values);
 
@@ -179,12 +235,16 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		// register sensor listener
 		m_sensorManager.registerListener(this, m_gravitySensor, SensorManager.SENSOR_DELAY_GAME);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+
+		// unregister sensor listener
 		m_sensorManager.unregisterListener(this);
 	}
 }

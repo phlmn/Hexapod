@@ -25,7 +25,8 @@ public class Leg {
 		m_servos[0] = servo1;
 		m_servos[1] = servo2;
 		m_servos[2] = servo3;
-		
+
+		// ping each servo
 		for(SingleServo servo : m_servos) {
 			if(!servo.ping())
 				DebugHelper.log("Servo (ID: " + servo.getID() + ") from Leg (ID: " + legID + ") couldn't be found.", Log.WARNING);
@@ -57,6 +58,9 @@ public class Leg {
 	}
 	
 	private void moveLegToRelativePosition(Vec3 goal) {
+
+		// INVERSE KINEMATICS
+
 
 		Vec3 tmpGoal = goal.sum(new Vec3(0, 0, Data.servoPosOffsetZ));
 
@@ -94,6 +98,8 @@ public class Leg {
 		}
 
 
+
+
 		// calculate s1
 
 		double beta = Math.acos((Math.pow(b, 2) - Math.pow(c, 2) - Math.pow(a, 2)) / (-2 * c * a));
@@ -112,9 +118,7 @@ public class Leg {
 			s1 = s1 + beta + Math.PI * 1.5;
 
 
-		//DebugHelper.log(s0 + "   " + s1 + "   " + s2);
-
-
+		// set servo positions
 		if(!(Double.isNaN(s0) || Double.isNaN(s1) || Double.isNaN(s2) || Double.isInfinite(s0) || Double.isInfinite(s1) || Double.isInfinite(s2))) {
 			m_servos[0].setGoalPosition(s0);
 			m_servos[1].setGoalPosition(s1);
@@ -124,6 +128,7 @@ public class Leg {
 	}
 
 	public void transform(Vec3 transformation) {
+		// transform goal position
 		m_goalPosition.add(transformation);
 	}
 	
@@ -136,6 +141,7 @@ public class Leg {
 	}
 	
 	public void updateServos() {
+		// calculate inverse kinematics
 		if(m_goalPosition != null)
 			moveLegToPosition(m_goalPosition);	
 	}

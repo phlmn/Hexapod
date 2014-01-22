@@ -3,6 +3,8 @@ package com.philipp_mandler.hexapod.android.controller.Joystick;
 import java.util.ArrayList;
 
 import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 import com.philipp_mandler.hexapod.android.controller.R;
 
 import android.content.Context;
@@ -63,10 +65,12 @@ public class JoystickView extends View {
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		getDisplay().getMetrics(m_metrics);
+		WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		display.getMetrics(m_metrics);
 
 		m_maxDistance = 60 * m_metrics.density;
-		m_touchRadius = 40 * m_metrics.density;
+		m_touchRadius = 50 * m_metrics.density;
 	}
 
 	@Override

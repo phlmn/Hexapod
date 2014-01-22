@@ -5,17 +5,20 @@ import java.util.List;
 
 import com.philipp_mandler.hexapod.hexapod.ConsolePackage;
 
-public class DebugHelper {	
-	static List<Log> loggs = new ArrayList<Log>();
+public class DebugHelper {
+	// storage for all log entries
+	static List<Log> m_logs = new ArrayList<>();
 	
 	public static void log(String text) {
+		// default logging
 		DebugHelper.log(text, Log.INFO);
 	}
 	
 	public static void log(String text, int level) {
+		// create log with specified level
 		System.out.println(text);
 		Log log = new Log(text, level);
-		loggs.add(log);
+		m_logs.add(log);
 		if(Main.getNetworking() != null) {
 			if(level == Log.INFO) {
 				Main.getNetworking().broadcast(new ConsolePackage(text));

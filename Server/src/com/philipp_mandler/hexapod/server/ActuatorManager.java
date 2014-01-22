@@ -13,7 +13,11 @@ public class ActuatorManager {
 
 	private SingleServo[] m_legServos = new SingleServo[18];
 
+	private SingleServo[] m_kinectServos = new SingleServo[2];
+
 	public ActuatorManager(String serialPort, int baudRate) {
+
+		// connect to serial port
 		try {
 			DebugHelper.log("Connect to serial Port " + serialPort + " with baud rate " + baudRate);
 			m_servoController.init(serialPort, baudRate);
@@ -21,16 +25,23 @@ public class ActuatorManager {
 			e.printStackTrace();
 		}
 
+		// initialize leg servos
 		for(int i = 0; i < 18; i++) {
 			m_legServos[i] = new SingleServo(m_servoController, i + 1, 4096, Data.servoAngleOffsets[i]);
 		}
+
+		// initialize Kinect servos
+		m_kinectServos[0] = new SingleServo(m_servoController, 19, 1024, 0);
+		m_kinectServos[1] = new SingleServo(m_servoController, 20, 1024, 0);
 	}
 
 	public int getServoID(int legID, int servoPos) {
+		// calculate leg servo id from leg and position
 		return (legID * 3) + servoPos + 1;
 	}
 
 	public SingleServo getLegServo(int legID, int servoPos) {
+		// return the servo object from leg id and position
 		if(-1 <= legID && legID <= 5) {
 			if(0 <= servoPos && servoPos <= 2) {
 				return m_legServos[getServoID(legID, servoPos) - 1];
@@ -39,8 +50,15 @@ public class ActuatorManager {
 		return null;
 	}
 
-	public void syncUpdateLegServos() {
+	public SingleServo getKinectServo(int pos) {
+		// return the Kinect servo: 0 - rotate, 1 - tilt
+		if(pos == 0 || pos == 1)
+			return m_kinectServos[pos];
+		return null;
+	}
 
+	public void syncUpdateLegServos() {
+		// update all leg servos at once
 		ArrayList<Integer> values = new ArrayList<>();
 		ArrayList<Integer> ids = new ArrayList<>();
 
