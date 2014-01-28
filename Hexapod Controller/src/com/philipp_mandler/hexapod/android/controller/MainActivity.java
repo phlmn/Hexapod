@@ -196,6 +196,7 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 		// clear all buttons
 		LinearLayout container = (LinearLayout)findViewById(R.id.buttons);
 		container.removeAllViews();
+		m_buttonGroups.clear();
 	}
 
 	@Override

@@ -1,40 +1,60 @@
 package com.philipp_mandler.hexapod.server;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
+
 public class SingleServo {
 	
 	private ServoController m_controller;
 	private int m_servoID;
 	private int m_servoResolution;
 	private double m_offset;
+	private double m_deadZone;
 	private boolean m_connected;
 	private int m_goalPosition;
+	private boolean m_sync = false;
 	
-	public SingleServo(ServoController controller, int id) {
+	public SingleServo(ServoController controller, int id, boolean sync) {
 		m_controller = controller;
 		m_servoID = id;
 		m_servoResolution = 4096;
 		m_offset = 0;
+		m_sync = sync;
 		m_connected = ping();
 	}
 	
-	public SingleServo(ServoController controller, int id, int servoResolution) {
+	public SingleServo(ServoController controller, int id, boolean sync, int servoResolution) {
 		m_controller = controller;
 		m_servoID = id;
 		m_servoResolution = servoResolution;
 		m_offset = 0;
+		m_sync = sync;
 		m_connected = ping();
 	}
 	
-	public SingleServo(ServoController controller, int id, int servoResolution, double offset) {
+	public SingleServo(ServoController controller, int id, boolean sync, int servoResolution, double offset) {
 		m_controller = controller;
 		m_servoID = id;
 		m_servoResolution = servoResolution;
 		m_offset = offset;
+		m_sync = sync;
+		m_connected = ping();
+	}
+
+	public SingleServo(ServoController controller, int id, boolean sync, int servoResolution, double offset, double deadZone) {
+		m_controller = controller;
+		m_servoID = id;
+		m_servoResolution = servoResolution;
+		m_offset = offset;
+		m_deadZone = deadZone;
+		m_sync = sync;
 		m_connected = ping();
 	}
 	
 	public void setGoalPosition(double rad) {
-		m_goalPosition = (int)Math.round((rad + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0)) % m_servoResolution;
+		m_goalPosition = (int)Math.round((((rad / (Math.PI * 2)) * (2 * Math.PI) - (m_deadZone / 2 * Math.PI)) + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0)) % m_servoResolution;
+
+		if(!m_sync)
+			m_controller.setGoalPosition(m_servoID, m_goalPosition);
 	}
 	
 	public int getPosValue()  {
@@ -47,6 +67,14 @@ public class SingleServo {
 
 	public double getOffset() {
 		return m_offset;
+	}
+
+	public void setDeadZone(double deadZone) {
+		m_deadZone = deadZone;
+	}
+
+	public double getDeadZone() {
+		return m_deadZone;
 	}
 	
 	public double getGoalPosition() {
@@ -80,7 +108,7 @@ public class SingleServo {
 		return -1;
 	}
 	
-	public int getCurrentVoltage() {
+	public double getCurrentVoltage() {
 		if(m_connected)
 			return m_controller.presentVolt(m_servoID);
 		return -1;
@@ -94,6 +122,7 @@ public class SingleServo {
 	
 	public double getCurrentPosition() {
 		if(m_connected)
+			//TODO: fix
 			return ((double)m_controller.presentPosition(m_servoID) / (m_servoResolution - 1)) * (2 * Math.PI);
 		return -1;
 	}

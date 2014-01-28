@@ -74,6 +74,11 @@ public class Main implements NetworkingEventListener {
 		m_moduleManager.registerModule(new MobilityModule());
 		m_moduleManager.registerModule(new TestingModule());
 		m_moduleManager.registerModule(new LegTest());
+		m_moduleManager.registerModule(new VisionModule());
+		m_moduleManager.registerModule(new BatteryModule());
+
+		// start modules
+		m_moduleManager.startModule("battery");
 
 		// handle console inout
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));

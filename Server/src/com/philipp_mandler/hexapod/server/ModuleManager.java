@@ -16,6 +16,7 @@ public class ModuleManager implements NetworkingEventListener {
 			@Override
 			public void run() {
 				while(m_running) {
+					// calculate elapsed time
 					Time tempTime = Time.fromNanoseconds(System.nanoTime());
 					Time m_elapsedTime = Time.fromNanoseconds(tempTime.getNanoseconds() - m_lastTime.getNanoseconds());
 					m_lastTime = tempTime;
@@ -33,7 +34,7 @@ public class ModuleManager implements NetworkingEventListener {
 			}
 		});
 
-		m_lastTime.setNanoseconds(System.nanoTime());
+		m_lastTime = Time.fromNanoseconds(System.nanoTime());
 
 		thread.start();
 	}

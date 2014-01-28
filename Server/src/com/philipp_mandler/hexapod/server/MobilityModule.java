@@ -281,7 +281,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 			}
 
 			if(!idle) {
-				if (m_stepTime.getMilliseconds() < duration) m_stepTime.fromNanoseconds(m_stepTime.getNanoseconds() + elapsedTime.getNanoseconds());
+				if (m_stepTime.getMilliseconds() < duration) m_stepTime = Time.fromNanoseconds(m_stepTime.getNanoseconds() + elapsedTime.getNanoseconds());
 				else {
 					if(m_speed.getLength() < Math.abs(m_rotSpeed)) {
 						m_speedFactor = Math.abs(m_rotSpeed) * 0.8 + 0.2;
@@ -289,7 +289,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					else {
 						m_speedFactor = m_speed.getLength() * 0.8 + 0.2;
 					}
-					m_stepTime.fromNanoseconds(0);
+					m_stepTime = Time.fromNanoseconds(0);
 				}
 			}
 		}

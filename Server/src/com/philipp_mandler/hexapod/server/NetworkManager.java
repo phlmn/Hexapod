@@ -87,7 +87,7 @@ public class NetworkManager {
 
 		// send Buttons to new connected client
 		for(ButtonGroup buttonGroup : m_buttonGroups) {
-			broadcast(buttonGroup.toPackage());
+			client.send(buttonGroup.toPackage());
 			for(Button button : buttonGroup.getButtons()) {
 				client.send(button.toPackage());
 			}
@@ -127,8 +127,8 @@ public class NetworkManager {
 
 	public void shutdown() {
 		// disconnect all clients
-		for(ClientWorker worker : m_clients) {
-			worker.disconnect();
+		for(ClientWorker clientWorker : m_clients) {
+			clientWorker.disconnect();
 		}
 
 		// clear client list

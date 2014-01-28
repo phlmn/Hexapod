@@ -27,12 +27,12 @@ public class ActuatorManager {
 
 		// initialize leg servos
 		for(int i = 0; i < 18; i++) {
-			m_legServos[i] = new SingleServo(m_servoController, i + 1, 4096, Data.servoAngleOffsets[i]);
+			m_legServos[i] = new SingleServo(m_servoController, i + 1, true, 4096, Data.servoAngleOffsets[i]);
 		}
 
 		// initialize Kinect servos
-		m_kinectServos[0] = new SingleServo(m_servoController, 19, 1024, 0);
-		m_kinectServos[1] = new SingleServo(m_servoController, 20, 1024, 0);
+		m_kinectServos[0] = new SingleServo(m_servoController, 19, false, 1024, 0, 0.104);
+		m_kinectServos[1] = new SingleServo(m_servoController, 20, false, 1024, 0, 0.104);
 	}
 
 	public int getServoID(int legID, int servoPos) {

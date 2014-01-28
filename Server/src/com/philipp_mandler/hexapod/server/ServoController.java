@@ -1129,13 +1129,13 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 		}
 	}
 
-	public int presentVolt(int id) {
+	public double presentVolt(int id) {
 		synchronized (m_lock) {
-			readData(id, DX_CMD_PRESENT_VOLT, 2);
+			readData(id, DX_CMD_PRESENT_VOLT, 1);
 			if (handleReturnStatus(id)) {
-				if (m_returnPacket.param.size() != 2)
+				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return m_returnPacket.param.get(0).intValue() / 10.0;
 			} else
 				return -1;
 		}
