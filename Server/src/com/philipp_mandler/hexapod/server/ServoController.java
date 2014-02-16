@@ -111,13 +111,18 @@ public class ServoController {
 	protected boolean m_regWriteFlag = false;
 
 
-	protected Object m_lock = new Object();
+	protected final Object m_lock = new Object();
 
 	class ReturnPacket {
+		public int id;
+		public int length;
+		public int error;
+		public ArrayList<Integer> param;
+
 		public ReturnPacket() {
 			id = -1;
 			length = 0;
-			param = new ArrayList();
+			param = new ArrayList<>();
 		}
 
 		public int checksum() {
@@ -137,15 +142,10 @@ public class ServoController {
 			retStr += "length: " + length + "\n";
 			retStr += "error: " + error + "\n";
 			for (int i = 0; i < param.size(); i++)
-				retStr += "param" + i + ": " + param.get(i).intValue() + "\n";
+				retStr += "param" + i + ": " + param.get(i) + "\n";
 
 			return retStr;
 		}
-
-		public int id;
-		public int length;
-		public int error;
-		public ArrayList<Integer> param;
 	}
 
 	private SerialPort m_serial;
@@ -323,7 +323,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -335,7 +335,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return (m_returnPacket.param.get(0).intValue());
+				return (m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -368,7 +368,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return m_returnPacket.param.get(0).intValue();
+				return m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
@@ -389,7 +389,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return (m_returnPacket.param.get(0).intValue());
+				return (m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -410,7 +410,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return (m_returnPacket.param.get(0).intValue());
+				return (m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -431,7 +431,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return (m_returnPacket.param.get(0).intValue());
+				return (m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -452,7 +452,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return (m_returnPacket.param.get(0).intValue());
+				return (m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -473,7 +473,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return (m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue();
+				return (m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
@@ -496,7 +496,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return (m_returnPacket.param.get(0).intValue());
+				return (m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -517,7 +517,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return (m_returnPacket.param.get(0).intValue());
+				return (m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -538,7 +538,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return (m_returnPacket.param.get(0).intValue());
+				return (m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -619,7 +619,7 @@ public class ServoController {
 	}
 
 	public synchronized int[] pingAll() {
-		ArrayList<Integer> servoList = new ArrayList<Integer>();
+		ArrayList<Integer> servoList = new ArrayList<>();
 		for (int i = 0; i < DX_LAST_ID; i++) {
 			if (ping(i))
 				servoList.add(i);
@@ -627,7 +627,7 @@ public class ServoController {
 
 		int[] retArray = new int[servoList.size()];
 		for (int i = 0; i < servoList.size(); i++)
-			retArray[i] = servoList.get(i).intValue();
+			retArray[i] = servoList.get(i);
 
 		return retArray;
 	}
@@ -646,7 +646,7 @@ public class ServoController {
 
 		int[] retArray = new int[servoList.size()];
 		for (int i = 0; i < servoList.size(); i++)
-			retArray[i] = servoList.get(i).intValue();
+			retArray[i] = servoList.get(i);
 
 		return retArray;
 	}
@@ -685,14 +685,14 @@ public class ServoController {
 	}
 
 	public synchronized void beginRegWrite() {
-		if (m_regWriteFlag == true)
+		if (m_regWriteFlag)
 			return;
 
 		m_regWriteFlag = true;
 	}
 
 	public synchronized boolean endRegWrite() {
-		if (m_regWriteFlag == false)
+		if (!m_regWriteFlag)
 			return false;
 
 		m_regWriteFlag = false;
@@ -835,7 +835,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -856,7 +856,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -877,7 +877,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -898,7 +898,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -920,7 +920,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return m_returnPacket.param.get(0).intValue();
+				return m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
@@ -941,7 +941,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return m_returnPacket.param.get(0).intValue();
+				return m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
@@ -962,7 +962,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return m_returnPacket.param.get(0).intValue();
+				return m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
@@ -984,7 +984,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return m_returnPacket.param.get(0).intValue();
+				return m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
@@ -1005,7 +1005,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return m_returnPacket.param.get(0).intValue();
+				return m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
@@ -1026,7 +1026,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return m_returnPacket.param.get(0).intValue();
+				return m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
@@ -1047,7 +1047,7 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return m_returnPacket.param.get(0).intValue();
+				return m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
@@ -1069,37 +1069,21 @@ public class ServoController {
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				// System.out.println(_returnPacket.toString());
-				return (m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue();
+				return (m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0);
 			} else
 				return -1;
 		}
 	}
 
 	public int presentPosition(int id) {
-/*
-        readData(id,DX_CMD_PRESENT_POS,2);
-long startTime = System.currentTimeMillis();
-        if(handleReturnStatus(id))
-        {
-System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
-            if(_returnPacket.param.size() != 2)
-                          return -1;
-            return((_returnPacket.param.get(1).intValue() << 8) + _returnPacket.param.get(0).intValue());
-        }
-        else
-            return -1;
-*/
 		synchronized (m_lock) {
 			readData(id, DX_CMD_PRESENT_POS, 2);
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2) {
-					//System.out.println("less parameter error: " + errorStr(_error));
 					return -1;
 				}
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else {
-				//System.out.println("handleReturnStatus error: " + errorStr(_error));
 				return -1;
 			}
 		}
@@ -1111,7 +1095,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -1123,7 +1107,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -1135,7 +1119,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return -1;
-				return m_returnPacket.param.get(0).intValue() / 10.0;
+				return m_returnPacket.param.get(0) / 10.0;
 			} else
 				return -1;
 		}
@@ -1147,7 +1131,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}
@@ -1159,7 +1143,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return false;
-				return (m_returnPacket.param.get(0).intValue() > 0);
+				return (m_returnPacket.param.get(0) > 0);
 			} else
 				return false;
 		}
@@ -1172,7 +1156,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return false;
-				return (m_returnPacket.param.get(0).intValue() > 0);
+				return (m_returnPacket.param.get(0) > 0);
 			} else
 				return false;
 		}
@@ -1197,7 +1181,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return false;
-				return (m_returnPacket.param.get(0).intValue() > 0);
+				return (m_returnPacket.param.get(0) > 0);
 			} else
 				return false;
 		}
@@ -1221,7 +1205,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return false;
-				return (m_returnPacket.param.get(0).intValue() > 0);
+				return (m_returnPacket.param.get(0) > 0);
 			} else
 				return false;
 		}
@@ -1245,7 +1229,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 1)
 					return false;
-				return m_returnPacket.param.get(0).intValue() > 0;
+				return m_returnPacket.param.get(0) > 0;
 			} else
 				return false;
 		}
@@ -1267,7 +1251,7 @@ System.out.println("xxx readtime:" + (System.currentTimeMillis()- startTime));
 			if (handleReturnStatus(id)) {
 				if (m_returnPacket.param.size() != 2)
 					return -1;
-				return ((m_returnPacket.param.get(1).intValue() << 8) + m_returnPacket.param.get(0).intValue());
+				return ((m_returnPacket.param.get(1) << 8) + m_returnPacket.param.get(0));
 			} else
 				return -1;
 		}

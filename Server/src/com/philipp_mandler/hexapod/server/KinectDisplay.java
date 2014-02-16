@@ -53,6 +53,199 @@ public class KinectDisplay extends PApplet {
 			}
 
 
+
+			// find Ground
+
+			ChunkManager groundChunks = new ChunkManager();
+
+
+			for(Chunk chunk : chunks.getChunks()) {
+
+				// check if there is a chunk below
+				boolean skipChunk = false;
+				for(Chunk tmpChunk : chunks.getChunks()) {
+					 if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getX() == chunk.getOrigin().getZ()) {
+						 if(tmpChunk.getOrigin().getY() < chunk.getOrigin().getY())
+							 skipChunk = true;
+					 }
+				}
+				 // skip chunk if there is at least one below
+				if(skipChunk) continue;
+
+
+				Chunk currentChunk = chunk;
+
+				for(int x = 0; x < 64; x++) {
+					for(int z = 0; z < 64; z++) {
+						int topHeight = -1;
+						boolean foundSolid = false;
+						boolean foundGround = false;
+						Chunk foundChunk = chunk;
+						while(!foundGround) {
+							for(int y = 0; y < 64; y++) {
+								if(currentChunk.getBlock(new Vec3i(x, y, z))) {
+									foundSolid = true;
+									topHeight = y;
+									foundChunk = currentChunk;
+								}
+								else {
+									if(foundSolid) {
+										foundGround = true;
+										break;
+									}
+								}
+							}
+
+							// continue at chunk above
+							if(!foundGround) {
+								Chunk topChunk = chunks.getChunkAt(new Vec3i(currentChunk.getOrigin().getX(), currentChunk.getOrigin().getY() + 1, currentChunk.getOrigin().getZ()));
+								if(topChunk != null) {
+									currentChunk = topChunk;
+								}
+								else {
+									break;
+								}
+							}
+						}
+						if(topHeight != -1) {
+							groundChunks.setBlock(new Vec3i(x + (foundChunk.getOrigin().getX() * 64), topHeight + (foundChunk.getOrigin().getY() * 64), z + (foundChunk.getOrigin().getZ() * 64)), true);
+						}
+						currentChunk = chunk;
+					}
+				}
+			}
+
+
+			// clean ground voxels
+
+
+			double heightSum = 0;
+			double voxelCount = 0;
+
+			ChunkManager cleanedGroundChunks = new ChunkManager();
+
+			for(Chunk chunk : groundChunks.getChunks()) {
+
+				// check if there is a chunk below
+				boolean skipChunk = false;
+				for(Chunk tmpChunk : chunks.getChunks()) {
+					if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getX() == chunk.getOrigin().getZ()) {
+						if(tmpChunk.getOrigin().getY() < chunk.getOrigin().getY())
+							skipChunk = true;
+					}
+				}
+				// skip chunk if there is at least one below
+				if(skipChunk) continue;
+
+
+				Chunk currentChunk = chunk;
+
+				for(int x = 0; x < 64; x++) {
+					for(int z = 0; z < 64; z++) {
+						boolean foundGround = false;
+						while(!foundGround) {
+							for(int y = 0; y < 64; y++) {
+								if(currentChunk.getBlock(new Vec3i(x, y, z))) {
+									foundGround = true;
+									Vec3i globalPos = new Vec3i(x + currentChunk.getOrigin().getX() * 64, y + currentChunk.getOrigin().getY() * 64, z + currentChunk.getOrigin().getZ() * 64);
+									int blockAround = 0;
+									for(int i = -1; i <= 1; i++) {
+										for(int j = -1; j <= 1; j++) {
+											for(int k = -1; k <= 1; k++) {
+												if(i == 0 && j == 0 && k == 0) continue;
+												if(groundChunks.getBlock(globalPos.sum(new Vec3i(i, j, k)))) blockAround++;
+											}
+										}
+									}
+									if(blockAround > 2) {
+										cleanedGroundChunks.setBlock(globalPos, true);
+										heightSum += globalPos.getY();
+										voxelCount++;
+									}
+								}
+							}
+
+							// continue at chunk above
+							if(!foundGround) {
+								Chunk topChunk = chunks.getChunkAt(new Vec3i(currentChunk.getOrigin().getX(), currentChunk.getOrigin().getY() + 1, currentChunk.getOrigin().getZ()));
+								if(topChunk != null) {
+									currentChunk = topChunk;
+								}
+								else {
+									break;
+								}
+							}
+						}
+						currentChunk = chunk;
+					}
+				}
+			}
+
+
+
+			// second cleaning
+
+			for(Chunk chunk : cleanedGroundChunks.getChunks()) {
+
+				// check if there is a chunk below
+				boolean skipChunk = false;
+				for(Chunk tmpChunk : chunks.getChunks()) {
+					if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getX() == chunk.getOrigin().getZ()) {
+						if(tmpChunk.getOrigin().getY() < chunk.getOrigin().getY())
+							skipChunk = true;
+					}
+				}
+				// skip chunk if there is at least one below
+				if(skipChunk) continue;
+
+
+				Chunk currentChunk = chunk;
+
+				int maxHeight = (int)Math.floor(heightSum / voxelCount);
+
+				for(int x = 0; x < 64; x++) {
+					for(int z = 0; z < 64; z++) {
+						boolean foundGround = false;
+						while(!foundGround) {
+							for(int y = 0; y < 64; y++) {
+								if(currentChunk.getBlock(new Vec3i(x, y, z))) {
+									foundGround = true;
+									Vec3i globalPos = new Vec3i(x + currentChunk.getOrigin().getX() * 64, y + currentChunk.getOrigin().getY() * 64, z + currentChunk.getOrigin().getZ() * 64);
+									if(globalPos.getY() > maxHeight) {
+										currentChunk.setBlock(new Vec3i(x, y, z), false);
+									}
+									else {
+										cleanedGroundChunks.setBlock(globalPos.sum(new Vec3i(0, -1, 0)), true);
+										cleanedGroundChunks.setBlock(globalPos.sum(new Vec3i(0, -2, 0)), true);
+										cleanedGroundChunks.setBlock(globalPos.sum(new Vec3i(0, -3, 0)), true);
+									}
+								}
+							}
+
+							// continue at chunk above
+							if(!foundGround) {
+								Chunk topChunk = chunks.getChunkAt(new Vec3i(currentChunk.getOrigin().getX(), currentChunk.getOrigin().getY() + 1, currentChunk.getOrigin().getZ()));
+								if(topChunk != null) {
+									currentChunk = topChunk;
+								}
+								else {
+									break;
+								}
+							}
+						}
+						currentChunk = chunk;
+					}
+				}
+			}
+
+
+
+
+
+
+
+
+
 			// graphics output
 
 			background(0);
@@ -67,13 +260,22 @@ public class KinectDisplay extends PApplet {
 			g.rotate(-0.25f, 1, 0, 0);
 			g.rotate(-0.25f, 0, 1, 0);
 			for(Chunk chunk : chunks.getChunks()) {
+				Chunk groundChunk = cleanedGroundChunks.getChunkAt(chunk.getOrigin());
 				for(int x = 0; x < 64; x++) {
 					for(int y = 0; y < 64; y++) {
 						for(int z = 0; z < 64; z++) {
 							if(chunk.getBlock(new Vec3i(x, y, z))) {
 								g.pushMatrix();
 								g.translate((x + (chunk.getOrigin().getX() * 64)) * scale, -(y + (chunk.getOrigin().getY() * 64)) * scale, -(z + (chunk.getOrigin().getZ() * 64)) * scale);
-								g.box(scale);
+								g.fill(0xFF, 0xFF, 0xFF);
+								boolean hide = false;
+								if(groundChunk != null) {
+									if(groundChunk.getBlock(new Vec3i(x, y, z))) {
+										hide = true;
+										g.fill(0xFF, 0x00, 0x00);
+									}
+								}
+								if(!hide) g.box(scale);
 								g.popMatrix();
 							}
 						}

@@ -14,7 +14,7 @@ public class VisionModule extends Module {
 
 	@Override
 	protected void onStart() {
-		m_servoRotate.setGoalPosition(Math.PI);
+		m_servoRotate.setGoalPosition(Math.PI + 0.2);
 		m_servoTilt.setGoalPosition(Math.PI);
 	}
 

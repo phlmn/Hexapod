@@ -46,6 +46,10 @@ public class Leg {
 	public Vec3 getGoalPosition() {
 		return m_goalPosition;
 	}
+
+	public Vec3 getRelativeGoalPosition() {
+		return new Vec3(m_goalPosition.getX() - m_position.getX(), m_goalPosition.getY() - m_position.getY(), m_goalPosition.getZ());
+	}
 	
 	public void setTorqueEnabled(boolean enable) {
 		m_servos[0].setTorqueEnabled(enable);
@@ -144,6 +148,10 @@ public class Leg {
 		// calculate inverse kinematics
 		if(m_goalPosition != null)
 			moveLegToPosition(m_goalPosition);	
+	}
+
+	public boolean isRightSided() {
+		return m_rightSide;
 	}
 	
 	public SingleServo[] getServos() {

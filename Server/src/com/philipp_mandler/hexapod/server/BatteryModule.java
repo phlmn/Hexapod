@@ -3,6 +3,7 @@ package com.philipp_mandler.hexapod.server;
 
 import com.philipp_mandler.hexapod.hexapod.BatteryPackage;
 import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.NotificationPackage;
 
 public class BatteryModule extends Module {
 
@@ -28,9 +29,19 @@ public class BatteryModule extends Module {
 		m_time = Time.fromNanoseconds(m_time.getNanoseconds() + elapsedTime.getNanoseconds());
 		if(m_time.getSeconds() > 10) {
 			m_time = Time.fromNanoseconds(0);
-			double charge = (m_servo.getCurrentVoltage() - 10.5) / 4.0;
-			DebugHelper.log("Battery: " + charge);
-			Main.getNetworking().broadcast(new BatteryPackage(charge));
+			double raw = m_servo.getCurrentVoltage();
+			if(raw != -1) {
+				double charge = (raw - 10.6) / 2.0;
+				DebugHelper.log("Battery: " + charge);
+				Main.getNetworking().broadcast(new BatteryPackage(charge));
+				if(charge < 0.1) {
+					Main.getNetworking().broadcast(new NotificationPackage("Low Battery!"));
+				}
+			}
+			else {
+				DebugHelper.log("Battery: unknown");
+				Main.getNetworking().broadcast(new BatteryPackage(-1));
+			}
 		}
 	}
 

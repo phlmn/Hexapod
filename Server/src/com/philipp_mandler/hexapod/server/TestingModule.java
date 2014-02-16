@@ -31,8 +31,7 @@ public class TestingModule extends Module implements DepthHandler {
 
 		// detect devices
 		DebugHelper.log("Devices detected: " + m_Context.numDevices());
-		if(m_Context.numDevices() > 0)
-			m_kinect = m_Context.openDevice(0);
+		m_kinect = Main.getSensorManager().getKinect();
 
 		// start Kinect
 		if(m_kinect != null) {

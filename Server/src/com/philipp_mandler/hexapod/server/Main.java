@@ -37,6 +37,7 @@ public class Main implements NetworkingEventListener {
 	private static NetworkManager m_networking;
 	private static ModuleManager m_moduleManager = new ModuleManager();
 	private static ActuatorManager m_actuatorManager;
+	private static SensorManager m_sensorManager;
 
 	private String m_serialPort;
 	private boolean m_running = true;
@@ -69,6 +70,8 @@ public class Main implements NetworkingEventListener {
 
 		// initialize ActuatorManager
 		m_actuatorManager = new ActuatorManager(m_serialPort, 57600); //57600
+
+		m_sensorManager = new SensorManager();
 
 		// register Modules
 		m_moduleManager.registerModule(new MobilityModule());
@@ -207,5 +210,9 @@ public class Main implements NetworkingEventListener {
 
 	public static ActuatorManager getActuatorManager() {
 		return m_actuatorManager;
+	}
+
+	public static SensorManager getSensorManager() {
+		return m_sensorManager;
 	}
 }

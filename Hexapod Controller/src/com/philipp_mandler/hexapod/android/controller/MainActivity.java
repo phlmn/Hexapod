@@ -219,14 +219,8 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		// handle orientation sensor changes
-		float[] rotMatrix = new float[9];
-		SensorManager.getRotationMatrixFromVector(rotMatrix, event.values);
-
-		float angles[] = new float[3];
-		SensorManager.getOrientation(rotMatrix, angles);
-
 		if(m_networking.isConnected())
-			m_networking.send(new RotationPackage(new Vec3(event.values[0], event.values[1], event.values[2])));
+			m_networking.send(new RotationPackage(new Vec3(event.values[0] / 9.81 * (Math.PI / 2), event.values[1] / 9.81 * (Math.PI / 2), event.values[2] / 9.81 * (Math.PI / 2))));
 	}
 
 	@Override

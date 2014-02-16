@@ -49,4 +49,8 @@ public class Vec3i implements Serializable{
 			return true;
 		return false;
 	}
+
+	public Vec3i sum(Vec3i obj) {
+		return new Vec3i(m_x + obj.m_x, m_y + obj.m_y, m_z + obj.m_z);
+	}
 }

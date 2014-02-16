@@ -93,6 +93,13 @@ public class Vec3 implements Serializable {
 		return new Vec3(m_x - obj.m_x, m_y - obj.m_y, m_z - obj.m_z);
 	}
 
+	public void normalize() {
+		double length = getLength();
+		m_x /= length;
+		m_y /= length;
+		m_z /= length;
+	}
+
 	public void rotate(Vec3 angles) {
 
 		// z-axis

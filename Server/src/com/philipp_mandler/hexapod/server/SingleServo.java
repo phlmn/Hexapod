@@ -103,8 +103,14 @@ public class SingleServo {
 	}
 	
 	public int getCurrentLoad() {
-		if(m_connected)
-			return m_controller.presentLoad(m_servoID);
+		if(m_connected) {
+			int load = m_controller.presentLoad(m_servoID);
+
+			if(load > 1023)
+				return 1024 - load;
+
+			return load;
+		}
 		return -1;
 	}
 	

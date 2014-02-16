@@ -45,4 +45,41 @@ public class ChunkManager {
 		return m_chunks;
 	}
 
+	public Chunk getChunkAt(Vec3i pos) {
+		for(Chunk chunk : m_chunks) {
+			if(chunk.getOrigin().equals(pos))
+				return chunk;
+		}
+
+		return null;
+	}
+
+	public boolean getBlock(Vec3i pos) {
+
+		Vec3i chunkOrigin = new Vec3i(pos.getX() / 64, pos.getY() / 64, pos.getZ() / 64);
+
+		if(pos.getX() < 0)
+			chunkOrigin.setX(chunkOrigin.getX() - 1);
+
+		if(pos.getY() < 0)
+			chunkOrigin.setY(chunkOrigin.getY() - 1);
+
+		if(pos.getZ() < 0)
+			chunkOrigin.setZ(chunkOrigin.getZ() - 1);
+
+		Chunk sourceChunk = null;
+		for(Chunk chunk : m_chunks) {
+			if(chunk.getOrigin().equals(chunkOrigin)) {
+				sourceChunk = chunk;
+				break;
+			}
+		}
+
+		if(sourceChunk == null) {
+			return false;
+		}
+
+		return sourceChunk.getBlock(new Vec3i(superModulo(pos.getX(), 64), superModulo(pos.getY(), 64), superModulo(pos.getZ(), 64)));
+	}
+
 }
