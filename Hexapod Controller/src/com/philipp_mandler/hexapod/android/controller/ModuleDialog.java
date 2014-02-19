@@ -1,15 +1,13 @@
 package com.philipp_mandler.hexapod.android.controller;
 
 import android.app.DialogFragment;
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.philipp_mandler.hexapod.hexapod.ConsolePackage;
+import com.philipp_mandler.hexapod.hexapod.net.ConsolePackage;
 import com.philipp_mandler.hexapod.hexapod.ModuleStatus;
 
 import java.util.ArrayList;

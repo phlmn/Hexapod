@@ -1,8 +1,10 @@
 package com.philipp_mandler.hexapod.server;
 
+import com.philipp_mandler.hexapod.hexapod.Vec2i;
 import com.philipp_mandler.hexapod.hexapod.Vec3i;
-import com.philipp_mandler.hexapod.hexapod.com.philipp_mandler.hexapod.hexapod.orientation.Chunk;
-import com.philipp_mandler.hexapod.hexapod.com.philipp_mandler.hexapod.hexapod.orientation.ChunkManager;
+import com.philipp_mandler.hexapod.hexapod.net.BooleanMapPackage;
+import com.philipp_mandler.hexapod.hexapod.net.HeightMapPackage;
+import com.philipp_mandler.hexapod.hexapod.orientation.*;
 import processing.core.PApplet;
 
 import java.nio.ByteBuffer;
@@ -12,6 +14,8 @@ public class KinectDisplay extends PApplet {
 
 	private static final long serialVersionUID = 8976369687969539326L;
 	private ByteBuffer m_kinectData;
+
+	private float rotation = 0;
 
 	@Override
 	public void setup() {
@@ -64,7 +68,7 @@ public class KinectDisplay extends PApplet {
 				// check if there is a chunk below
 				boolean skipChunk = false;
 				for(Chunk tmpChunk : chunks.getChunks()) {
-					 if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getX() == chunk.getOrigin().getZ()) {
+					 if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getZ() == chunk.getOrigin().getZ()) {
 						 if(tmpChunk.getOrigin().getY() < chunk.getOrigin().getY())
 							 skipChunk = true;
 					 }
@@ -118,6 +122,8 @@ public class KinectDisplay extends PApplet {
 
 			// clean ground voxels
 
+			HeightMapManager ground = new HeightMapManager();
+
 
 			double heightSum = 0;
 			double voxelCount = 0;
@@ -129,7 +135,7 @@ public class KinectDisplay extends PApplet {
 				// check if there is a chunk below
 				boolean skipChunk = false;
 				for(Chunk tmpChunk : chunks.getChunks()) {
-					if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getX() == chunk.getOrigin().getZ()) {
+					if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getZ() == chunk.getOrigin().getZ()) {
 						if(tmpChunk.getOrigin().getY() < chunk.getOrigin().getY())
 							skipChunk = true;
 					}
@@ -159,6 +165,7 @@ public class KinectDisplay extends PApplet {
 									}
 									if(blockAround > 2) {
 										cleanedGroundChunks.setBlock(globalPos, true);
+										ground.setHeight(new Vec2i(globalPos.getX(), globalPos.getZ()), globalPos.getY());
 										heightSum += globalPos.getY();
 										voxelCount++;
 									}
@@ -181,7 +188,7 @@ public class KinectDisplay extends PApplet {
 				}
 			}
 
-
+			 /*
 
 			// second cleaning
 
@@ -190,7 +197,7 @@ public class KinectDisplay extends PApplet {
 				// check if there is a chunk below
 				boolean skipChunk = false;
 				for(Chunk tmpChunk : chunks.getChunks()) {
-					if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getX() == chunk.getOrigin().getZ()) {
+					if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getZ() == chunk.getOrigin().getZ()) {
 						if(tmpChunk.getOrigin().getY() < chunk.getOrigin().getY())
 							skipChunk = true;
 					}
@@ -201,7 +208,7 @@ public class KinectDisplay extends PApplet {
 
 				Chunk currentChunk = chunk;
 
-				int maxHeight = (int)Math.floor(heightSum / voxelCount);
+				int maxHeight = (int)Math.floor(heightSum / voxelCount) + 5;
 
 				for(int x = 0; x < 64; x++) {
 					for(int z = 0; z < 64; z++) {
@@ -239,6 +246,90 @@ public class KinectDisplay extends PApplet {
 			}
 
 
+               */
+
+
+			ChunkManager obstacles = new ChunkManager();
+
+			for(Chunk chunk : chunks.getChunks()) {
+				Chunk groundChunk = cleanedGroundChunks.getChunkAt(chunk.getOrigin());
+				for(int x = 0; x < 64; x++) {
+					for(int y = 0; y < 64; y++) {
+						for(int z = 0; z < 64; z++) {
+							if(chunk.getBlock(new Vec3i(x, y, z))) {
+
+								Vec3i globalPos = new Vec3i(x + 64 * chunk.getOrigin().getX(), y + 64 * chunk.getOrigin().getY(), z + 64 * chunk.getOrigin().getZ());
+								boolean hide = false;
+
+								Integer groundHeight = ground.getHeight(new Vec2i(globalPos.getX(), globalPos.getZ()));
+								if(groundHeight != null) {
+									if(globalPos.getY() <= groundHeight) {
+										hide = true;
+									}
+								}
+								if(!hide) obstacles.setBlock(globalPos, true);
+							}
+						}
+					}
+				}
+			}
+
+
+
+
+
+			HeightMapManager obstacleHeightMap = new HeightMapManager();
+
+		  	BooleanMapManager obstacleMap = new BooleanMapManager();
+
+
+			for(Chunk chunk : obstacles.getChunks()) {
+
+				// check if there is a chunk below
+				boolean skipChunk = false;
+				for(Chunk tmpChunk : chunks.getChunks()) {
+					if(tmpChunk.getOrigin().getX() == chunk.getOrigin().getX() && tmpChunk.getOrigin().getZ() == chunk.getOrigin().getZ()) {
+						if(tmpChunk.getOrigin().getY() < chunk.getOrigin().getY())
+							skipChunk = true;
+					}
+				}
+				// skip chunk if there is at least one below
+				if(skipChunk) continue;
+
+
+				Chunk currentChunk = chunk;
+
+				for(int x = 0; x < 64; x++) {
+					for(int z = 0; z < 64; z++) {
+						boolean foundGround = false;
+						while(!foundGround) {
+							for(int y = 0; y < 64; y++) {
+								if(currentChunk.getBlock(new Vec3i(x, y, z))) {
+									foundGround = true;
+									Vec3i globalPos = new Vec3i(x + currentChunk.getOrigin().getX() * 64, y + currentChunk.getOrigin().getY() * 64, z + currentChunk.getOrigin().getZ() * 64);
+
+									obstacleHeightMap.setHeight(new Vec2i(globalPos.getX(), globalPos.getZ()), globalPos.getY());
+									obstacleMap.setValue(new Vec2i(globalPos.getX(), globalPos.getZ()), true);
+								}
+							}
+
+							// continue at chunk above
+							if(!foundGround) {
+								Chunk topChunk = chunks.getChunkAt(new Vec3i(currentChunk.getOrigin().getX(), currentChunk.getOrigin().getY() + 1, currentChunk.getOrigin().getZ()));
+								if(topChunk != null) {
+									currentChunk = topChunk;
+								}
+								else {
+									break;
+								}
+							}
+						}
+						currentChunk = chunk;
+					}
+				}
+			}
+
+
 
 
 
@@ -256,9 +347,15 @@ public class KinectDisplay extends PApplet {
 			float scale = 10;
 
 			g.pushMatrix();
-			g.translate(200, 300, -200);
-			g.rotate(-0.25f, 1, 0, 0);
-			g.rotate(-0.25f, 0, 1, 0);
+			g.translate(200, 300, -700);
+			/*g.rotate(-0.25f, 1, 0, 0);
+			g.rotate(-0.25f, 0, 1, 0);  */
+
+			g.rotate(rotation, 0, 1.0f, 0);
+			rotation += 0.01;
+
+			g.translate(0, 0, 1000);
+
 			for(Chunk chunk : chunks.getChunks()) {
 				Chunk groundChunk = cleanedGroundChunks.getChunkAt(chunk.getOrigin());
 				for(int x = 0; x < 64; x++) {
@@ -271,11 +368,10 @@ public class KinectDisplay extends PApplet {
 								boolean hide = false;
 								if(groundChunk != null) {
 									if(groundChunk.getBlock(new Vec3i(x, y, z))) {
-										hide = true;
 										g.fill(0xFF, 0x00, 0x00);
 									}
 								}
-								if(!hide) g.box(scale);
+								g.box(scale);
 								g.popMatrix();
 							}
 						}
@@ -296,6 +392,17 @@ public class KinectDisplay extends PApplet {
 			}
 
 			g.popMatrix();
+
+
+
+			for(BooleanMap map : obstacleMap.getBooleanMaps()) {
+				Main.getNetworking().broadcast(new BooleanMapPackage(map));
+			}
+
+
+
+
+			delay(2000);
 
 		}
 

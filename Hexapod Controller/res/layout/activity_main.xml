@@ -14,6 +14,9 @@
             android:src="@drawable/demo_bg"
             android:contentDescription="@string/hexapod_stream"
             android:adjustViewBounds="false" android:paddingLeft="0dp"/>
+    <view android:layout_width="fill_parent"
+          android:layout_height="fill_parent"
+          class="com.philipp_mandler.hexapod.android.controller.ObstacleView" android:id="@+id/obstacleView"/>
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"

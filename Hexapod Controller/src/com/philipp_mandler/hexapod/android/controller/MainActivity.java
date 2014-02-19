@@ -17,6 +17,10 @@ import android.widget.Toast;
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickListener;
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickView;
 import com.philipp_mandler.hexapod.hexapod.*;
+import com.philipp_mandler.hexapod.hexapod.net.*;
+import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMap;
+import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMapManager;
+import com.philipp_mandler.hexapod.hexapod.orientation.HeightMapManager;
 
 import java.util.ArrayList;
 
@@ -34,6 +38,8 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 	private Sensor m_gravitySensor;
 
 	private ArrayList<ButtonGroup> m_buttonGroups = new ArrayList<>();
+
+	private BooleanMapManager m_obstacleData = new BooleanMapManager();
 
 	
     @Override
@@ -61,6 +67,9 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 					m_networking.send(new JoystickPackage(new Vec2(x, y), JoystickType.Rotation));
 			}
 		});
+
+		ObstacleView obstacleView = (ObstacleView) findViewById(R.id.obstacleView);
+		m_obstacleData = obstacleView.getData();
         
         m_handler = new Handler(getMainLooper());
 
@@ -180,6 +189,12 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 			NotificationPackage notificationPackage = (NotificationPackage)pack;
 			Toast.makeText(this, notificationPackage.getText(), Toast.LENGTH_SHORT).show();
 		}
+		else if(pack instanceof BooleanMapPackage) {
+			BooleanMapPackage booleanMapPackage = (BooleanMapPackage) pack;
+			synchronized (m_obstacleData) {
+				m_obstacleData.replaceBooleanMap(booleanMapPackage.getMap());
+			}
+		}
 	}
 	
 	@Override
@@ -218,7 +233,7 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		// handle orientation sensor changes
+		// handle com.philipp_mandler.hexapod.hexapod.orientation sensor changes
 		if(m_networking.isConnected())
 			m_networking.send(new RotationPackage(new Vec3(event.values[0] / 9.81 * (Math.PI / 2), event.values[1] / 9.81 * (Math.PI / 2), event.values[2] / 9.81 * (Math.PI / 2))));
 	}

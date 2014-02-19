@@ -1,6 +1,9 @@
 package com.philipp_mandler.hexapod.server;
 
 import com.philipp_mandler.hexapod.hexapod.*;
+import com.philipp_mandler.hexapod.hexapod.net.ExitPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.WelcomePackage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

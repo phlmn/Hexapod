@@ -1,4 +1,4 @@
-package com.philipp_mandler.hexapod.hexapod.com.philipp_mandler.hexapod.hexapod.orientation;
+package com.philipp_mandler.hexapod.hexapod.orientation;
 
 import com.philipp_mandler.hexapod.hexapod.Vec3i;
 

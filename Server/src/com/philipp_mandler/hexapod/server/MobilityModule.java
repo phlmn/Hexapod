@@ -1,6 +1,10 @@
 package com.philipp_mandler.hexapod.server;
 
 import com.philipp_mandler.hexapod.hexapod.*;
+import com.philipp_mandler.hexapod.hexapod.net.JoystickPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NotificationPackage;
+import com.philipp_mandler.hexapod.hexapod.net.RotationPackage;
 
 import java.util.ArrayList;
 
@@ -529,6 +533,36 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 	@Override
 	public void onClientConnected(ClientWorker client) {
 
+	}
+
+	public void setWalkingSpeed(Vec2 speed) {
+		m_speed = speed;
+	}
+
+	public Vec2 getWalkingSpeed() {
+		return m_speed;
+	}
+
+	public void setRotationSpeed(double speed) {
+		if(speed > 1) m_rotSpeed = 1;
+		else if(speed < -1) m_rotSpeed = -1;
+		else m_rotSpeed = speed;
+	}
+
+	public double getRotationSpeed() {
+		return m_rotSpeed;
+	}
+
+	public boolean lifted() {
+		return (m_mode == 2);
+	}
+
+	public void lift() {
+		if(m_mode != 2) m_mode = 0;
+	}
+
+	public void drop() {
+		if(m_mode != 3) m_mode = 1;
 	}
 
 }

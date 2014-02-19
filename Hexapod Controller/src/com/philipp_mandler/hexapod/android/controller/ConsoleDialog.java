@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import com.philipp_mandler.hexapod.hexapod.ConsolePackage;
+import com.philipp_mandler.hexapod.hexapod.net.ConsolePackage;
 
 import java.util.ArrayList;
 

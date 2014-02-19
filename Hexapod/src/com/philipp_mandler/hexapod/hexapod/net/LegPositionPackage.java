@@ -1,5 +1,7 @@
-package com.philipp_mandler.hexapod.hexapod;
+package com.philipp_mandler.hexapod.hexapod.net;
 
+
+import com.philipp_mandler.hexapod.hexapod.Vec3;
 
 public class LegPositionPackage implements NetPackage {
 

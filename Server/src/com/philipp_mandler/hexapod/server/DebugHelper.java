@@ -3,7 +3,7 @@ package com.philipp_mandler.hexapod.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.philipp_mandler.hexapod.hexapod.ConsolePackage;
+import com.philipp_mandler.hexapod.hexapod.net.ConsolePackage;
 
 public class DebugHelper {
 	// storage for all log entries

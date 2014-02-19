@@ -1,4 +1,7 @@
-package com.philipp_mandler.hexapod.hexapod;
+package com.philipp_mandler.hexapod.hexapod.net;
+
+import com.philipp_mandler.hexapod.hexapod.JoystickType;
+import com.philipp_mandler.hexapod.hexapod.Vec2;
 
 public class JoystickPackage implements NetPackage {
 

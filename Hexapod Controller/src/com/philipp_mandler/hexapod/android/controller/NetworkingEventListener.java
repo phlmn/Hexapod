@@ -1,7 +1,7 @@
 package com.philipp_mandler.hexapod.android.controller;
 
 import android.os.Handler;
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 
 import java.util.EventListener;
 

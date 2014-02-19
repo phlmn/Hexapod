@@ -1,9 +1,9 @@
 package com.philipp_mandler.hexapod.server;
 
-import com.philipp_mandler.hexapod.hexapod.ButtonGroupPackage;
-import com.philipp_mandler.hexapod.hexapod.ConsolePackage;
+import com.philipp_mandler.hexapod.hexapod.net.ButtonGroupPackage;
+import com.philipp_mandler.hexapod.hexapod.net.ConsolePackage;
 import com.philipp_mandler.hexapod.hexapod.DeviceType;
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 
 import java.io.IOException;
 import java.net.ServerSocket;

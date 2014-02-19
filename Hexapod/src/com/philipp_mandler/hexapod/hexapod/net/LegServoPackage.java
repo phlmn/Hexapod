@@ -1,4 +1,4 @@
-package com.philipp_mandler.hexapod.hexapod;
+package com.philipp_mandler.hexapod.hexapod.net;
 
 public class LegServoPackage implements NetPackage {
 

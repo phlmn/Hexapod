@@ -1,9 +1,9 @@
 package com.philipp_mandler.hexapod.server;
 
 
-import com.philipp_mandler.hexapod.hexapod.BatteryPackage;
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
-import com.philipp_mandler.hexapod.hexapod.NotificationPackage;
+import com.philipp_mandler.hexapod.hexapod.net.BatteryPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NotificationPackage;
 
 public class BatteryModule extends Module {
 

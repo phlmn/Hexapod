@@ -1,4 +1,4 @@
-package com.philipp_mandler.hexapod.hexapod.com.philipp_mandler.hexapod.hexapod.orientation;
+package com.philipp_mandler.hexapod.hexapod.orientation;
 
 import com.philipp_mandler.hexapod.hexapod.Vec3i;
 
@@ -80,6 +80,10 @@ public class ChunkManager {
 		}
 
 		return sourceChunk.getBlock(new Vec3i(superModulo(pos.getX(), 64), superModulo(pos.getY(), 64), superModulo(pos.getZ(), 64)));
+	}
+
+	public void clear() {
+		m_chunks.clear();
 	}
 
 }

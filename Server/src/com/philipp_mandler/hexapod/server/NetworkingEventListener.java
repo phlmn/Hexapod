@@ -2,7 +2,7 @@ package com.philipp_mandler.hexapod.server;
 
 import java.util.EventListener;
 
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 
 public interface NetworkingEventListener extends EventListener {
 	public void onDataReceived(ClientWorker client, NetPackage pack);

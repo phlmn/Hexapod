@@ -1,8 +1,8 @@
 package com.philipp_mandler.hexapod.android.controller;
 
 import com.philipp_mandler.hexapod.hexapod.DeviceType;
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
-import com.philipp_mandler.hexapod.hexapod.WelcomePackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.WelcomePackage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

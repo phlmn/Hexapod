@@ -2,7 +2,7 @@ package com.philipp_mandler.hexapod.android.controller;
 
 
 import android.view.View;
-import com.philipp_mandler.hexapod.hexapod.ButtonPackage;
+import com.philipp_mandler.hexapod.hexapod.net.ButtonPackage;
 
 public class Button {
 

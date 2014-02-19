@@ -1,6 +1,6 @@
 package com.philipp_mandler.hexapod.server;
 
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 
 import java.util.ArrayList;
 

@@ -1,7 +1,7 @@
 package com.philipp_mandler.hexapod.android.controller;
 
-import com.philipp_mandler.hexapod.hexapod.ExitPackage;
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.ExitPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 
 import java.util.ArrayList;
 

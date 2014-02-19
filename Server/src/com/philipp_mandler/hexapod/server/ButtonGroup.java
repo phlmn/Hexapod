@@ -1,6 +1,6 @@
 package com.philipp_mandler.hexapod.server;
 
-import com.philipp_mandler.hexapod.hexapod.ButtonGroupPackage;
+import com.philipp_mandler.hexapod.hexapod.net.ButtonGroupPackage;
 
 import java.util.ArrayList;
 

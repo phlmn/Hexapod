@@ -4,11 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.philipp_mandler.hexapod.hexapod.ModuleStatusPackage;
+import com.philipp_mandler.hexapod.hexapod.net.ModuleStatusPackage;
 
-import com.philipp_mandler.hexapod.hexapod.DeviceType;
-import com.philipp_mandler.hexapod.hexapod.LegPositionPackage;
-import com.philipp_mandler.hexapod.hexapod.NetPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 
 /* 
  *   
@@ -76,14 +74,15 @@ public class Main implements NetworkingEventListener {
 		// register Modules
 		m_moduleManager.registerModule(new MobilityModule());
 		m_moduleManager.registerModule(new TestingModule());
-		m_moduleManager.registerModule(new LegTest());
 		m_moduleManager.registerModule(new VisionModule());
 		m_moduleManager.registerModule(new BatteryModule());
+		m_moduleManager.registerModule(new AutoModule());
+		m_moduleManager.registerModule(new VideoModule());
 
 		// start modules
 		m_moduleManager.startModule("battery");
 
-		// handle console inout
+		// handle console input
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		while(m_running) {
 			try {

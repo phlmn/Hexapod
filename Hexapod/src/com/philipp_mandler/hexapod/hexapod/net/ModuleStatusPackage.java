@@ -1,4 +1,6 @@
-package com.philipp_mandler.hexapod.hexapod;
+package com.philipp_mandler.hexapod.hexapod.net;
+
+import com.philipp_mandler.hexapod.hexapod.ModuleStatus;
 
 import java.util.ArrayList;
 

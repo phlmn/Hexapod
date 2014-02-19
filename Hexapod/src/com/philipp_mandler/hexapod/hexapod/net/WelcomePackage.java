@@ -1,4 +1,6 @@
-package com.philipp_mandler.hexapod.hexapod;
+package com.philipp_mandler.hexapod.hexapod.net;
+
+import com.philipp_mandler.hexapod.hexapod.DeviceType;
 
 public class WelcomePackage implements NetPackage {
 
