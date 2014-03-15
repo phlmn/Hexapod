@@ -31,7 +31,7 @@ public class BatteryModule extends Module {
 			m_time = Time.fromNanoseconds(0);
 			double raw = m_servo.getCurrentVoltage();
 			if(raw != -1) {
-				double charge = (raw - 10.6) / 2.0;
+				double charge = (raw - 10.6) / 1.6;
 				DebugHelper.log("Battery: " + charge);
 				Main.getNetworking().broadcast(new BatteryPackage(charge));
 				if(charge < 0.1) {

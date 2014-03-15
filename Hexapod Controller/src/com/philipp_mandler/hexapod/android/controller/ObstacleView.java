@@ -1,23 +1,25 @@
 package com.philipp_mandler.hexapod.android.controller;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import com.philipp_mandler.hexapod.hexapod.Vec2i;
 import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMap;
 import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMapManager;
-import com.philipp_mandler.hexapod.hexapod.orientation.HeightMap;
-import com.philipp_mandler.hexapod.hexapod.orientation.HeightMapManager;
+
+import java.io.ByteArrayInputStream;
 
 public class ObstacleView extends SurfaceView implements SurfaceHolder.Callback {
 
 	private Thread m_thread;
 	private boolean m_running;
-	private final BooleanMapManager m_data = new BooleanMapManager();
+	private final BooleanMapManager m_obstacleData = new BooleanMapManager();
+
+	private byte[] m_videoData;
+
+	private final Object m_lock = new Object();
 
 	public ObstacleView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -50,8 +52,8 @@ public class ObstacleView extends SurfaceView implements SurfaceHolder.Callback 
 		Vec2i offset = new Vec2i(600, -100);
 		int size = 5;
 
-		synchronized (m_data) {
-			for(BooleanMap map : m_data.getBooleanMaps()) {
+		synchronized (m_obstacleData) {
+			for(BooleanMap map : m_obstacleData.getBooleanMaps()) {
 				for(int y = 0; y < 64; y++) {
 					for(int x = 0; x < 64; x++) {
 						if(map.getValue(new Vec2i(x, y))) {
@@ -63,10 +65,33 @@ public class ObstacleView extends SurfaceView implements SurfaceHolder.Callback 
 			}
 		}
 
+		if(m_videoData != null) {
+			synchronized (m_lock) {
+				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(m_videoData);
+
+				Bitmap bitmap = BitmapFactory.decodeStream(byteArrayInputStream);
+
+				if(bitmap != null) {
+					Paint bitmapPaint = new Paint();
+					canvas.drawBitmap(bitmap, (canvas.getWidth() - bitmap.getWidth()) / 2, 0, bitmapPaint);
+				}
+			}
+		}
+
 	}
 
-	public BooleanMapManager getData() {
-		return m_data;
+	public BooleanMapManager getObstacleData() {
+		return m_obstacleData;
+	}
+
+	public byte[] getVideoData() {
+		return m_videoData;
+	}
+
+	public void setVideoData(byte[] data) {
+		synchronized (m_lock) {
+			m_videoData = data.clone();
+		}
 	}
 
 

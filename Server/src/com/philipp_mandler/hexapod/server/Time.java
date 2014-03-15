@@ -8,14 +8,17 @@ public class Time {
 
 	}
 
-	private void setNanoseconds(long nanoseconds) {
+	public void setNanoseconds(long nanoseconds) {
 		m_nanoseconds = nanoseconds;
+	}
+
+	public void add(Time time) {
+		m_nanoseconds += time.m_nanoseconds;
 	}
 
 	public long getNanoseconds() {
 		return m_nanoseconds;
 	}
-
 	public double getMicroseconds() {
 		// convert nanoseconds to microseconds
 		return m_nanoseconds / 1000.0;

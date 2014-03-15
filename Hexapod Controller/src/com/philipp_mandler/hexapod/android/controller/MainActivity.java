@@ -16,11 +16,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickListener;
 import com.philipp_mandler.hexapod.android.controller.Joystick.JoystickView;
-import com.philipp_mandler.hexapod.hexapod.*;
+import com.philipp_mandler.hexapod.hexapod.JoystickType;
+import com.philipp_mandler.hexapod.hexapod.Vec2;
+import com.philipp_mandler.hexapod.hexapod.Vec3;
 import com.philipp_mandler.hexapod.hexapod.net.*;
-import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMap;
 import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMapManager;
-import com.philipp_mandler.hexapod.hexapod.orientation.HeightMapManager;
 
 import java.util.ArrayList;
 
@@ -39,7 +39,9 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 
 	private ArrayList<ButtonGroup> m_buttonGroups = new ArrayList<>();
 
-	private BooleanMapManager m_obstacleData = new BooleanMapManager();
+	private BooleanMapManager m_obstacleData;
+
+	private ObstacleView m_obstacleView;
 
 	
     @Override
@@ -68,8 +70,8 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 			}
 		});
 
-		ObstacleView obstacleView = (ObstacleView) findViewById(R.id.obstacleView);
-		m_obstacleData = obstacleView.getData();
+		m_obstacleView = (ObstacleView) findViewById(R.id.obstacleView);
+		m_obstacleData = m_obstacleView.getObstacleData();
         
         m_handler = new Handler(getMainLooper());
 
@@ -194,6 +196,10 @@ public class MainActivity extends Activity implements NetworkingEventListener, S
 			synchronized (m_obstacleData) {
 				m_obstacleData.replaceBooleanMap(booleanMapPackage.getMap());
 			}
+		}
+		else if(pack instanceof VideoPackage) {
+			VideoPackage videoPackage = (VideoPackage)pack;
+			m_obstacleView.setVideoData(videoPackage.getByteBuffer());
 		}
 	}
 	

@@ -2,7 +2,6 @@ package com.philipp_mandler.hexapod.server;
 
 import com.philipp_mandler.hexapod.hexapod.Vec2i;
 import com.philipp_mandler.hexapod.hexapod.Vec3i;
-import com.philipp_mandler.hexapod.hexapod.net.BooleanMapPackage;
 import com.philipp_mandler.hexapod.hexapod.orientation.*;
 
 import java.nio.ByteBuffer;

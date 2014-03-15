@@ -45,9 +45,7 @@ public class Vec3i implements Serializable{
 	}
 
 	public boolean equals(Vec3i obj) {
-		if(obj.m_x == m_x && obj.m_y == m_y && obj.m_z == m_z)
-			return true;
-		return false;
+		return obj.m_x == m_x && obj.m_y == m_y && obj.m_z == m_z;
 	}
 
 	public Vec3i sum(Vec3i obj) {

@@ -6,7 +6,7 @@ import java.util.Map;
 public class ServoLoadReader {
 
 
-	private HashMap<SingleServo, Integer> m_values = new HashMap<>();
+	private final HashMap<SingleServo, Integer> m_values = new HashMap<>();
 
 	private Thread m_worker;
 
@@ -29,7 +29,9 @@ public class ServoLoadReader {
 	}
 
 	public int getLoad(SingleServo servo) {
-		return m_values.get(servo);
+		synchronized (m_values) {
+			return m_values.get(servo);
+		}
 	}
 
 	public void start() {
@@ -37,12 +39,14 @@ public class ServoLoadReader {
 			@Override
 			public void run() {
 				while(m_run) {
-					for(Map.Entry<SingleServo, Integer> entry: m_values.entrySet()) {
-						entry.setValue(entry.getKey().getCurrentLoad());
-						try {
-							Thread.sleep(2);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
+					synchronized (m_values) {
+						for(Map.Entry<SingleServo, Integer> entry: m_values.entrySet()) {
+							entry.setValue(entry.getKey().getCurrentLoad());
+							try {
+								Thread.sleep(20);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				}

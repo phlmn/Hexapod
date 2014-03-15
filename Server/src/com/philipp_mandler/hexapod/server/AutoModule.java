@@ -1,11 +1,8 @@
 package com.philipp_mandler.hexapod.server;
 
-
 import com.philipp_mandler.hexapod.hexapod.Vec2;
 import com.philipp_mandler.hexapod.hexapod.Vec2i;
-import com.philipp_mandler.hexapod.hexapod.net.BooleanMapPackage;
 import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
-import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMap;
 import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMapManager;
 
 import java.util.ArrayList;
@@ -70,15 +67,16 @@ public class AutoModule extends Module {
 							}
 						}
 
-						for(BooleanMap map : obstacleMap.getBooleanMaps()) {
+						/*for(BooleanMap map : obstacleMap.getBooleanMaps()) {
 							Main.getNetworking().broadcast(new BooleanMapPackage(map));
-						}
+						} */
 
 						if(obstacles == 0) {
 							if(m_mobilityModule.lifted()) {
 								synchronized (m_walkingSpeed) {
 									m_walkingSpeed.setX(0);
 									m_walkingSpeed.setY(0.6);
+									m_mobilityModule.setRotationSpeed(0);
 								}
 							}
 						}
@@ -86,6 +84,7 @@ public class AutoModule extends Module {
 							synchronized (m_walkingSpeed) {
 								m_walkingSpeed.setX(0);
 								m_walkingSpeed.setY(0);
+								m_mobilityModule.setRotationSpeed(0.4);
 							}
 						}
 

@@ -35,9 +35,7 @@ public class Vec2i implements Serializable {
 	}
 
 	public boolean equals(Vec2i obj) {
-		if(obj.m_x == m_x && obj.m_y == m_y)
-			return true;
-		return false;
+		return obj.m_x == m_x && obj.m_y == m_y;
 	}
 
 	public Vec2i sum(Vec2i obj) {

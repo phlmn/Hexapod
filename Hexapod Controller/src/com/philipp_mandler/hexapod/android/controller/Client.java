@@ -48,7 +48,7 @@ public class Client extends Thread {
 			try {
 				while(!m_outQueue.isEmpty()) {
 					m_objOutputStream.writeObject(m_outQueue.get(0));
-					m_outQueue.remove(0);					
+					m_outQueue.remove(0);
 				}
 				while(m_socket.getInputStream().available() > 0) {
 					Object input = m_objInputStream.readObject();

@@ -577,9 +577,8 @@ public class ServoController {
 			write(calcChecksum(m_curChecksum));
 
 			// handle reply
-			boolean ret = handleReturnStatus(id);
 
-			return ret;
+			return handleReturnStatus(id);
 		}
 	}
 
@@ -1476,10 +1475,8 @@ public class ServoController {
 
 		// data
 		timeout = origTimeout;
-		if (!waitForData(m_serial, timeout, m_delay, 4))
-			return false;
+		return waitForData(m_serial, timeout, m_delay, 4);
 
-		return true;
 	}
 
 	public static boolean waitForData(SerialPort serial, int timeout, int delay, int dataCount) {

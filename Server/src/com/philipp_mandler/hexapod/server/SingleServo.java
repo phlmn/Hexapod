@@ -1,7 +1,5 @@
 package com.philipp_mandler.hexapod.server;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
-
 public class SingleServo {
 	
 	private ServoController m_controller;

@@ -77,7 +77,6 @@ public class Main implements NetworkingEventListener {
 		m_moduleManager.registerModule(new VisionModule());
 		m_moduleManager.registerModule(new BatteryModule());
 		m_moduleManager.registerModule(new AutoModule());
-		m_moduleManager.registerModule(new VideoModule());
 
 		// start modules
 		m_moduleManager.startModule("battery");
