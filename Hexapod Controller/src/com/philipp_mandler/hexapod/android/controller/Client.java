@@ -55,7 +55,7 @@ public class Client extends Thread {
 					if(input instanceof NetPackage)			
 						m_parent.onDataReceived((NetPackage)input);
 				}
-				
+
 			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
 			}

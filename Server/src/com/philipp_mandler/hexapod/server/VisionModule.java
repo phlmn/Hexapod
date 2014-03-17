@@ -16,18 +16,19 @@ public class VisionModule extends Module implements DepthHandler {
 
 	private KinectWorker m_kinectWorker;
 
-	private boolean m_videoRunning = false;
-
-	private double m_rotation = 0;
-
 	private VideoStreamer m_videoStreamer;
 
 	private byte[] m_videoData = new byte[640 * 480 * 3];
 
+	private double m_rotation = 0;
+
+	private TimeTracker m_timeTracker;
 
 
 	public VisionModule() {
 		super.setName("vision");
+
+		m_timeTracker = Main.getTimeManager().createTracker("vision");
 	}
 
 	@Override
@@ -41,7 +42,6 @@ public class VisionModule extends Module implements DepthHandler {
 		m_kinectWorker.start();
 
 		m_videoStreamer = new VideoStreamer();
-
 		m_videoStreamer.start();
 
 		if(m_kinect != null) {
@@ -75,8 +75,12 @@ public class VisionModule extends Module implements DepthHandler {
 	}
 
 	@Override
-	public void tick(Time elapsedTime) {
+	public void tick(long tick, Time elapsedTime) {
+		m_timeTracker.startTracking(tick);
+
 		m_videoStreamer.tick(elapsedTime);
+
+		m_timeTracker.stopTracking();
 	}
 
 	@Override

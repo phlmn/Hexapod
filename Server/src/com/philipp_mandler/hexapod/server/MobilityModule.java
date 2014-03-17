@@ -53,10 +53,15 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 	private ArrayList<Vec3> m_lastGroundRotation = new ArrayList<>();
 
+	private TimeTracker m_timeTracker;
+
 
 	public MobilityModule() {
 
 		super.setName("mobility");
+
+		// create time trackers
+		m_timeTracker = Main.getTimeManager().createTracker("mobility");
 
 		m_buttonGroup = new ButtonGroup(getName(), "Mobility Module");
 		m_buttonGroup.addButton(new Button("lift", "Lift", getName() + " lift"));
@@ -103,7 +108,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 			m_legs[i].setGoalPosition(new Vec3(m_defaultPositions[i], 20));
 			m_currentWalkPositions[i] = new Vec3(m_defaultPositions[i], 20);
 			m_endPositions[i] = new Vec2(m_defaultPositions[i]);
-			m_loadOffsets[i] =  0.0;
+			m_loadOffsets[i] = 0.0;
 		}
 
 		m_speedFactor = 0.2;
@@ -126,12 +131,13 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 		Main.getNetworking().removeButtonGroup(m_buttonGroup);
 		Main.getNetworking().removeEventListener(this);
 		m_legUpdater.stop();
-
 		m_loadReader.stop();
 	}
 
 	@Override
-	public void tick(Time elapsedTime) {
+	public void tick(long tick, Time elapsedTime) {
+
+		m_timeTracker.startTracking(tick);
 
 		if(m_mode == 0) { // lifting
 			int readyLegs = 0;
@@ -164,6 +170,9 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				m_mode = 4;
 		}
 		else if(m_mode == 2) { // lifted
+
+			TimeTrackerAction action = m_timeTracker.trackAction("level");
+
 			if(m_groundAdaption) {
 				Vec3 gravity = new Vec3(Main.getSensorManager().getLevel().getZ(), Main.getSensorManager().getLevel().getX(), 0);
 
@@ -185,6 +194,10 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					m_groundRotation = new Vec3(average.getX(), average.getY(), 0);
 				}
 			}
+
+			action.stopTracking();
+
+			action = m_timeTracker.trackAction("prepare walking");
 
 
 			double duration = 800 / 6 / m_speedFactor; // duration per case, 800ms per step
@@ -225,7 +238,11 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				m_switchGait = null;
 			}
 
+			action.stopTracking();
+
 			if(m_groundAdaption) {
+
+				action = m_timeTracker.trackAction("get leg loads");
 
 				double sumLoad = 0;
 
@@ -254,6 +271,11 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 						m_loadOffsets[i] -= loadError / 2.0;
 					}
 				}     */
+
+
+				action.stopTracking();
+
+				action = m_timeTracker.trackAction("height correction");
 
 				double loadOffsetSum = 0;
 
@@ -300,7 +322,12 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 						m_loadOffsets[i] = 0;
 					}
 				}
+
+				action.stopTracking();
 			}
+
+
+			action = m_timeTracker.trackAction("sequencing");
 
 			if(m_walkingGait == WalkingGait.Ripple) {
 
@@ -313,7 +340,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				speed.multiply(0.3);
 				speedR *= 0.3;
 			}
-
 
 
 
@@ -559,6 +585,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					m_currentWalkPositions[legID] = new Vec3(pos);
 
 				}
+
 				if(idle) pos.setZ(0);
 				if(m_tilt) pos.rotate(m_rotation);
 				if(m_groundAdaption) pos.rotate(m_groundRotation);
@@ -566,6 +593,10 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				leg.setGoalPosition(pos.sum(new Vec3(0, 0, -preferredHeight)));
 
 			}
+
+			action.stopTracking();
+
+			action = m_timeTracker.trackAction("step calculation");
 
 			if(!idle) {
 				if (m_stepTime.getMilliseconds() < duration) m_stepTime = Time.fromNanoseconds(m_stepTime.getNanoseconds() + elapsedTime.getNanoseconds());
@@ -579,7 +610,11 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					m_stepTime = Time.fromNanoseconds(0);
 				}
 			}
+
+			action.stopTracking();
 		}
+
+		m_timeTracker.stopTracking();
 
 	}
 

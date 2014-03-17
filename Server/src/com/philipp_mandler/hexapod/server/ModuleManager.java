@@ -9,6 +9,7 @@ public class ModuleManager implements NetworkingEventListener {
 	private ArrayList<Module> m_modules = new ArrayList<>();
 	private Time m_lastTime = new Time();
 	private boolean m_running = true;
+	private long m_tick = 0;
 
 	public ModuleManager() {
 		// handle main ticks of modules
@@ -23,8 +24,10 @@ public class ModuleManager implements NetworkingEventListener {
 
 					for(Module module : m_modules) {
 						if(module.isRunning())
-							module.tick(m_elapsedTime);
+							module.tick(m_tick, m_elapsedTime);
 					}
+					m_tick++;
+
 					try {
 						Thread.sleep(0, 1000);
 					} catch (InterruptedException e) {

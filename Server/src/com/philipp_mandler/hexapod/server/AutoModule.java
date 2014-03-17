@@ -109,7 +109,7 @@ public class AutoModule extends Module {
 	}
 
 	@Override
-	public void tick(Time elapsedTime) {
+	public void tick(long tick, Time elapsedTime) {
 		m_mobilityModule.setWalkingSpeed(new Vec2(m_walkingSpeed));
 	}
 

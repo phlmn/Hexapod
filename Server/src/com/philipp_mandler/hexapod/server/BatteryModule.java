@@ -25,7 +25,7 @@ public class BatteryModule extends Module {
 	}
 
 	@Override
-	public void tick(Time elapsedTime) {
+	public void tick(long tick, Time elapsedTime) {
 		m_time = Time.fromNanoseconds(m_time.getNanoseconds() + elapsedTime.getNanoseconds());
 		if(m_time.getSeconds() > 10) {
 			m_time = Time.fromNanoseconds(0);

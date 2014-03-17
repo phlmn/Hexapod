@@ -12,6 +12,10 @@ public class Time {
 		m_nanoseconds = nanoseconds;
 	}
 
+	public void set(Time time) {
+		m_nanoseconds = time.m_nanoseconds;
+	}
+
 	public void add(Time time) {
 		m_nanoseconds += time.m_nanoseconds;
 	}

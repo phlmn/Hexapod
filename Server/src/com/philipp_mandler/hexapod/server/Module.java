@@ -30,5 +30,5 @@ public abstract class Module implements NetworkingEventListener {
 		onStop();
 	}
 
-	public abstract void tick(Time elapsedTime);
+	public abstract void tick(long tick, Time elapsedTime);
 }

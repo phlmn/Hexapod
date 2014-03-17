@@ -81,7 +81,7 @@ public class TestingModule extends Module implements DepthHandler {
 	}
 
 	@Override
-	public void tick(Time elapsedTime) {
+	public void tick(long tick, Time elapsedTime) {
 
 	}
 

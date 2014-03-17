@@ -36,6 +36,7 @@ public class Main implements NetworkingEventListener {
 	private static ModuleManager m_moduleManager = new ModuleManager();
 	private static ActuatorManager m_actuatorManager;
 	private static SensorManager m_sensorManager;
+	private static TimeManager m_timeManager;
 
 	private String m_serialPort;
 	private boolean m_running = true;
@@ -56,6 +57,7 @@ public class Main implements NetworkingEventListener {
 	
 	public void run() {
 
+
 		// initialize NetworkManager
 		try {
 			m_networking = new NetworkManager(8888);
@@ -65,6 +67,8 @@ public class Main implements NetworkingEventListener {
 			DebugHelper.log("Networking couldn't be initialized, aborting now.", Log.WARNING);
 			System.exit(0);
 		}
+
+		m_timeManager = new TimeManager(1000);
 
 		// initialize ActuatorManager
 		m_actuatorManager = new ActuatorManager(m_serialPort, 57600); //57600
@@ -102,6 +106,7 @@ public class Main implements NetworkingEventListener {
 		DebugHelper.log("Shutting down...");
 		Main.getModuleManager().stop();
 		Main.getNetworking().shutdown();
+		Main.getTimeManager().stop();
 	}
 
 	@Override
@@ -212,5 +217,9 @@ public class Main implements NetworkingEventListener {
 
 	public static SensorManager getSensorManager() {
 		return m_sensorManager;
+	}
+
+	public static TimeManager getTimeManager() {
+		return m_timeManager;
 	}
 }
