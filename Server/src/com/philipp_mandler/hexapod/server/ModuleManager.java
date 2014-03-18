@@ -3,10 +3,12 @@ package com.philipp_mandler.hexapod.server;
 import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ModuleManager implements NetworkingEventListener {
 
-	private ArrayList<Module> m_modules = new ArrayList<>();
+	private List<Module> m_modules = new CopyOnWriteArrayList<>();
 	private Time m_lastTime = new Time();
 	private boolean m_running = true;
 	private long m_tick = 0;
@@ -123,7 +125,7 @@ public class ModuleManager implements NetworkingEventListener {
 		return null;
 	}
 
-	public final ArrayList<Module> getModules() {
+	public final List<Module> getModules() {
 		return m_modules;
 	}
 

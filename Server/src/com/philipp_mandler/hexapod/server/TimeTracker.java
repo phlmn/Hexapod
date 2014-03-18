@@ -27,7 +27,7 @@ public class TimeTracker {
 			}
 		}
 
-		TimeTrackerAction a = new TimeTrackerAction(action);
+		TimeTrackerAction a = new TimeTrackerAction(action, m_size);
 		m_actions.add(a);
 		a.startTracking(m_tick);
 		return a;

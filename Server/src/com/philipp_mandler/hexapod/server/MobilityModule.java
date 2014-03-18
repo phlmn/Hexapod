@@ -7,6 +7,7 @@ import com.philipp_mandler.hexapod.hexapod.net.NotificationPackage;
 import com.philipp_mandler.hexapod.hexapod.net.RotationPackage;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MobilityModule extends Module implements NetworkingEventListener {
 
@@ -51,7 +52,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 	private Time m_stepTime = new Time();
 
-	private ArrayList<Vec3> m_lastGroundRotation = new ArrayList<>();
+	private List<Vec3> m_lastGroundRotation = new ArrayList<>();
 
 	private TimeTracker m_timeTracker;
 
@@ -171,14 +172,18 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 		}
 		else if(m_mode == 2) { // lifted
 
-			TimeTrackerAction action = m_timeTracker.trackAction("level");
+			TimeTrackerAction action;
 
 			if(m_groundAdaption) {
-				Vec3 gravity = new Vec3(Main.getSensorManager().getLevel().getZ(), Main.getSensorManager().getLevel().getX(), 0);
+				action = m_timeTracker.trackAction("level");
+
+				Vec3 raw = Main.getSensorManager().getLevel();
+
+				Vec3 gravity = new Vec3(raw.getZ(), raw.getX(), 0);
 
 				m_lastGroundRotation.add(m_groundRotation.sum(new Vec3(-gravity.getX() * 0.4, gravity.getY() * 0.4, 0)));
 
-				while( m_lastGroundRotation.size() > 300 )
+				while( m_lastGroundRotation.size() > 1000 )
 					m_lastGroundRotation.remove(0);
 
 				if(m_lastGroundRotation.size() > 0) {
@@ -193,9 +198,9 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 					m_groundRotation = new Vec3(average.getX(), average.getY(), 0);
 				}
-			}
 
-			action.stopTracking();
+				action.stopTracking();
+			}
 
 			action = m_timeTracker.trackAction("prepare walking");
 

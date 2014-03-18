@@ -10,9 +10,11 @@ public class TimeTrackerAction {
 	private boolean m_running = false;
 	private List<TimeTrackerEntry> m_values = new CopyOnWriteArrayList<>();
 	private long m_tick = 0;
+	private int m_size;
 
-	public TimeTrackerAction(String name) {
+	public TimeTrackerAction(String name, int size) {
 		m_name = name;
+		m_size = size;
 	}
 
 	public String getName() {
@@ -29,6 +31,9 @@ public class TimeTrackerAction {
 		if(m_running) {
 			TimeTrackerEntry entry = new TimeTrackerEntry(m_tick, m_startTime, Time.fromNanoseconds(System.nanoTime()));
 			m_values.add(0, entry);
+			while(m_values.size() > m_size) {
+				m_values.remove(m_values.size() - 1);
+			}
 			m_running = false;
 			return entry;
 		}

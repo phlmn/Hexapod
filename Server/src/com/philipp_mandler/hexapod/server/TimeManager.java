@@ -18,10 +18,10 @@ public class TimeManager {
 
 					String text = "";
 					for(TimeTracker tracker : m_timeTracker)  {
-						text += "Tracker: " + tracker.getName() + "    avg: " + tracker.getAverage(100).getMilliseconds() + "ms";
+						text += "Tracker: " + tracker.getName() + "    avg: " + tracker.getAverage(100).getNanoseconds() + "ns";
 
 						for(TimeTrackerAction a : tracker.getActions()) {
-							text += "\n\t" + a.getName() + "    avg: " + a.getAverage(100).getMilliseconds() + "ms";
+							text += "\n\t" + a.getName() + "    avg: " + a.getAverage(100).getNanoseconds() + "ns";
 						}
 
 						text += "\n\n";
