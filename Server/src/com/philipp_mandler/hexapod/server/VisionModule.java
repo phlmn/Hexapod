@@ -18,8 +18,6 @@ public class VisionModule extends Module implements DepthHandler {
 
 	private VideoStreamer m_videoStreamer;
 
-	private byte[] m_videoData = new byte[640 * 480 * 3];
-
 	private double m_rotation = 0;
 
 	private TimeTracker m_timeTracker;
@@ -42,20 +40,13 @@ public class VisionModule extends Module implements DepthHandler {
 		m_kinectWorker.start();
 
 		m_videoStreamer = new VideoStreamer();
-		m_videoStreamer.start();
 
 		if(m_kinect != null) {
 			m_kinect.setLed(LedStatus.GREEN);
 			m_kinect.setDepthFormat(DepthFormat.D11BIT);
 			m_kinect.startDepth(this);
 			m_kinect.setVideoFormat(VideoFormat.RGB);
-			m_kinect.startVideo(new VideoHandler() {
-				@Override
-				public void onFrameReceived(FrameMode frameMode, ByteBuffer byteBuffer, int i) {
-					byteBuffer.asReadOnlyBuffer().get(m_videoData);
-					m_videoStreamer.setVideoData(m_videoData);
-				}
-			});
+			m_kinect.startVideo(m_videoStreamer);
 		}
 	}
 
@@ -70,16 +61,12 @@ public class VisionModule extends Module implements DepthHandler {
 			m_kinect.stopVideo();
 			m_kinect = null;
 		}
-
-		m_videoStreamer.end();
 	}
 
 	@Override
 	public void tick(long tick, Time elapsedTime) {
 		m_timeTracker.startTracking(tick);
-
 		m_videoStreamer.tick(elapsedTime);
-
 		m_timeTracker.stopTracking();
 	}
 

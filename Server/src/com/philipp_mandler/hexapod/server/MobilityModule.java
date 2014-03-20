@@ -96,10 +96,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 		m_loadReader = new ServoLoadReader();
 
-		for(int i = 0; i < 6; i++) {
-			m_loadReader.registerServo(acs.getLegServo(i, 1));
-		}
-
 	}
 
 	@Override
@@ -253,10 +249,17 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				double legsOnGround = 0;
 
-				/*for(int i = 0; i < 6; i++) {
+				double loads[] = new double[6];
+
+
+				for(int i = 0; i < 6; i++) {
+					loads[i] = m_loadReader.getLoad(i);
+				}
+
+				for(int i = 0; i < 6; i++) {
 					if(m_caseStepRipple[i] != 1 && m_caseStepRipple[i] != 2) {
 						legsOnGround++;
-						double load = m_loadReader.getLoad(Main.getActuatorManager().getLegServo(i, 1));
+						double load = loads[i];
 						if(m_legs[i].isRightSided()) load = -load;
 						Vec2 pos2d = new Vec2(m_legs[i].getRelativeGoalPosition().getX(), m_legs[i].getRelativeGoalPosition().getY());
 						load = load / pos2d.getLength();
@@ -265,9 +268,9 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					}
 				}
 
-				/*for(int i = 0; i < 6; i++) {
+				for(int i = 0; i < 6; i++) {
 					if(m_caseStepRipple[i] != 1 && m_caseStepRipple[i] != 2) {
-						double load = m_loadReader.getLoad(Main.getActuatorManager().getLegServo(i, 1));
+						double load = loads[i];
 						if(m_legs[i].isRightSided()) load = -load;
 						Vec2 pos2d = new Vec2(m_legs[i].getRelativeGoalPosition().getX(), m_legs[i].getRelativeGoalPosition().getY());
 						load = load / pos2d.getLength();
@@ -275,7 +278,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 						m_loadOffsets[i] -= loadError / 2.0;
 					}
-				}     */
+				}
 
 
 				action.stopTracking();

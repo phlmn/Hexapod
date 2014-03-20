@@ -1,6 +1,6 @@
 package com.philipp_mandler.hexapod.server;
 
-import com.philipp_mandler.hexapod.hexapod.*;
+import com.philipp_mandler.hexapod.hexapod.DeviceType;
 import com.philipp_mandler.hexapod.hexapod.net.ExitPackage;
 import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 import com.philipp_mandler.hexapod.hexapod.net.WelcomePackage;
@@ -10,8 +10,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientWorker extends Thread {
 	
@@ -20,14 +20,13 @@ public class ClientWorker extends Thread {
 	private ObjectOutputStream m_objOutputStream;
 	private ObjectInputStream m_objInputStream;
 	private NetworkManager m_parent;
-	private List<NetPackage> m_outQueue;
+	private List<NetPackage> m_outQueue = new CopyOnWriteArrayList<>();
 	private DeviceType deviceType;
 	private boolean m_run;
 	
 	public ClientWorker(NetworkManager parent, ServerSocket serverSocket) {
 		m_parent = parent;
 		m_serverSocket = serverSocket;
-		m_outQueue = new ArrayList<>();
 		m_run = true;
 		super.setName("Network client worker");
 	}

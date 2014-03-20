@@ -2,13 +2,11 @@ package com.philipp_mandler.hexapod.server;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class ServoLoadReader {
 
-
-	private final HashMap<SingleServo, Integer> m_values = new HashMap<>();
-
-	private Thread m_worker;
+	private AtomicIntegerArray m_values = new AtomicIntegerArray(6);
 
 	private boolean m_run = false;
 
@@ -16,45 +14,30 @@ public class ServoLoadReader {
 
 	}
 
-	public void registerServo(SingleServo servo) {
-		m_values.put(servo, 0);
-	}
-
-	public void removeServo(SingleServo servo) {
-		m_values.remove(servo);
-	}
-
-	public void clearServos() {
-		m_values.clear();
-	}
-
-	public int getLoad(SingleServo servo) {
-		synchronized (m_values) {
-			return m_values.get(servo);
-		}
+	public int getLoad(int leg) {
+		return m_values.get(leg);
 	}
 
 	public void start() {
-		m_worker = new Thread(new Runnable() {
+		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while(m_run) {
-					synchronized (m_values) {
-						for(Map.Entry<SingleServo, Integer> entry: m_values.entrySet()) {
-							entry.setValue(entry.getKey().getCurrentLoad());
-							try {
-								Thread.sleep(20);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
+				m_run = true;
+				while (m_run) {
+					for (int i = 0; i < 6; i++) {
+						SingleServo servo = Main.getActuatorManager().getLegServo(i, 1);
+						if(servo != null) {
+							m_values.set(i, servo.getCurrentLoad());
+						}
+						try {
+							Thread.sleep(2);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
 						}
 					}
 				}
 			}
-		});
-
-		m_run = true;
-		m_worker.start();
+		}).start();
 	}
 
 	public void stop() {

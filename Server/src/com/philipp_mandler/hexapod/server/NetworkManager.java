@@ -1,27 +1,25 @@
 package com.philipp_mandler.hexapod.server;
 
+import com.philipp_mandler.hexapod.hexapod.DeviceType;
 import com.philipp_mandler.hexapod.hexapod.net.ButtonGroupPackage;
 import com.philipp_mandler.hexapod.hexapod.net.ConsolePackage;
-import com.philipp_mandler.hexapod.hexapod.DeviceType;
 import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class NetworkManager {
 	
 	private ServerSocket m_serverSocket;
-	private ArrayList<ClientWorker> m_clients;
-	private ArrayList<NetworkingEventListener> m_listeners;
-	private ArrayList<ButtonGroup> m_buttonGroups;
+	private List<ClientWorker> m_clients = new ArrayList<>();
+	private List<NetworkingEventListener> m_listeners = new ArrayList<>();
+	private List<ButtonGroup> m_buttonGroups = new ArrayList<>();
 
 	public NetworkManager(int port) throws IOException {
 		m_serverSocket = new ServerSocket(port);
-		m_clients = new ArrayList<>();
-		m_listeners = new ArrayList<>();
-		m_buttonGroups = new ArrayList<>();
 		
 		new ClientWorker(this, m_serverSocket).start();
 	}
