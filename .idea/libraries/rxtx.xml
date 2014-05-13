@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="rxtx">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Server/libs/rxtx/RXTXcomm-src.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libs/rxtx/RxTx20100928.zip!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libs/rxtx/RXTXcomm.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libs/rxtx/rxtx-native-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libs/rxtx/rxtx-native-linux.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libs/rxtx/RxTx20110203.zip!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libs/rxtx/rxtx-native-macosx.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libs/rxtx/RxTx20110203_unmodified.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

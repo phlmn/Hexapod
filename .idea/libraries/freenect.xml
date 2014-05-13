@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="freenect">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Server/libs/openkinect/freenect.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
