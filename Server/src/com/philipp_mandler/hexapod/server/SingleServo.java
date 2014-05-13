@@ -10,7 +10,6 @@ public class SingleServo {
 	private boolean m_connected;
 	private int m_goalPosition;
 	private boolean m_sync = false;
-	private double m_goalPositionRad;
 	
 	public SingleServo(ServoController controller, int id, boolean sync) {
 		m_controller = controller;
@@ -50,7 +49,6 @@ public class SingleServo {
 	}
 	
 	public void setGoalPosition(double rad) {
-		m_goalPositionRad = rad;
 		m_goalPosition = (int)Math.round((((rad / (Math.PI * 2)) * (2 * Math.PI) - (m_deadZone / 2 * Math.PI)) + m_offset) / (2.0 * Math.PI) * (m_servoResolution - 1.0)) % m_servoResolution;
 
 		if(!m_sync)
@@ -80,12 +78,8 @@ public class SingleServo {
 	public double getGoalPosition() {
 		if(m_connected)
 			// TODO: Fix it (offset)!!
-			return (m_controller.goalPosition(m_servoID) * (2.0 * Math.PI) / (m_servoResolution - 1.0));
+			return m_controller.goalPosition(m_servoID) * (2.0 * Math.PI) / (m_servoResolution - 1.0);
 		return -1;
-	}
-
-	public double getLastGoalPosition() {
-		return m_goalPositionRad;
 	}
 	
 	public boolean setMaxTorque(int torque) {
@@ -133,8 +127,7 @@ public class SingleServo {
 	public double getCurrentPosition() {
 		if(m_connected)
 			//TODO: fix
-			//return ((double)m_controller.presentPosition(m_servoID) / (m_servoResolution - 1)) * (2 * Math.PI);
-			return ((2 * Math.PI * (m_controller.presentPosition(m_servoID) + 0.25 * (m_deadZone - 0.63661977236758 * m_offset) * (m_servoResolution - 1.0))) / (m_servoResolution - 1.0));
+			return ((double)m_controller.presentPosition(m_servoID) / (m_servoResolution - 1)) * (2 * Math.PI);
 		return -1;
 	}
 	

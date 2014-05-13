@@ -82,10 +82,6 @@ public class Vec3 implements Serializable {
 		if(number == 0) return null;
 		return new Vec3(m_x / number, m_y / number, m_z / number);
 	}
-
-	public Vec3 multi(double factor) {
-		return new Vec3(m_x / factor, m_y / factor, m_z / factor);
-	}
 	
 	public void add(Vec3 obj) {
 		m_x += obj.m_x;

@@ -1,9 +1,7 @@
 package com.philipp_mandler.hexapod.server;
 
 
-import com.philipp_mandler.hexapod.hexapod.Vec2;
 import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
-import com.philipp_mandler.hexapod.hexapod.net.NotificationPackage;
 import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMapManager;
 import org.openkinect.freenect.*;
 
@@ -21,30 +19,19 @@ public class VisionModule extends Module implements DepthHandler {
 	private VideoStreamer m_videoStreamer;
 
 	private double m_rotation = 0;
-	private double m_tilt = 0;
 
 	private TimeTracker m_timeTracker;
-
-	private ButtonGroup m_buttonGroup;
-
-	private Vec2 m_rot = new Vec2();
 
 
 	public VisionModule() {
 		super.setName("vision");
 
 		m_timeTracker = Main.getTimeManager().createTracker("vision");
-
-		m_buttonGroup = new ButtonGroup(getName(), "Vision Module");
-		m_buttonGroup.addButton(new Button("left", "Left", getName() + " left"));
-		m_buttonGroup.addButton(new Button("right", "Right", getName() + " right"));
-		m_buttonGroup.addButton(new Button("up", "Up", getName() + " up"));
-		m_buttonGroup.addButton(new Button("down", "Down", getName() + " down"));
 	}
 
 	@Override
 	protected void onStart() {
-		if(m_servoRotate.isConnected()) m_servoRotate.setGoalPosition(Math.PI + m_rotation);
+		if(m_servoRotate.isConnected()) m_servoRotate.setGoalPosition(Math.PI + 0.2 + m_rotation);
 		if(m_servoTilt.isConnected()) m_servoTilt.setGoalPosition(Math.PI);
 
 		m_kinect = Main.getSensorManager().getKinect();
@@ -61,9 +48,6 @@ public class VisionModule extends Module implements DepthHandler {
 			m_kinect.setVideoFormat(VideoFormat.RGB);
 			m_kinect.startVideo(m_videoStreamer);
 		}
-
-		Main.getNetworking().addEventListener(this);
-		Main.getNetworking().addButtonGroup(m_buttonGroup);
 	}
 
 	@Override
@@ -77,9 +61,6 @@ public class VisionModule extends Module implements DepthHandler {
 			m_kinect.stopVideo();
 			m_kinect = null;
 		}
-
-		Main.getNetworking().addEventListener(this);
-		Main.getNetworking().removeButtonGroup(m_buttonGroup);
 	}
 
 	@Override
@@ -96,22 +77,7 @@ public class VisionModule extends Module implements DepthHandler {
 
 	@Override
 	public void onCmdReceived(ClientWorker client, String[] cmd) {
-		if(cmd.length > 1) {
-			if(cmd[0].toLowerCase().equals(getName())) {
-				if(cmd[1].toLowerCase().equals("up")) {
-					setTilt(m_tilt - 0.2);
-				}
-				else if(cmd[1].toLowerCase().equals("down")) {
-					setTilt(m_tilt + 0.2);
-				}
-				else if(cmd[1].toLowerCase().equals("right")) {
-					setRoation(m_rotation + 0.2);
-				}
-				else if(cmd[1].toLowerCase().equals("left")) {
-					setRoation(m_rotation - 0.2);
-				}
-			}
-		}
+
 	}
 
 	@Override
@@ -140,15 +106,6 @@ public class VisionModule extends Module implements DepthHandler {
 
 	public void setRoation(double rot) {
 		m_rotation = rot;
-		if(m_servoRotate.isConnected()) m_servoRotate.setGoalPosition(Math.PI + m_rotation);
-	}
-
-	public double getTilt() {
-		return m_rotation;
-	}
-
-	public void setTilt(double tilt) {
-		m_tilt = tilt;
-		if(m_servoTilt.isConnected()) m_servoTilt.setGoalPosition(Math.PI + m_tilt);
+		if(m_servoRotate.isConnected()) m_servoRotate.setGoalPosition(Math.PI + 0.2 + m_rotation);
 	}
 }

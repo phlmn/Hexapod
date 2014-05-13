@@ -63,10 +63,6 @@ public class Vec2 implements Serializable {
 		m_x /= divisor;
 		m_y /= divisor;
 	}
-
-	public Vec2 multi(double factor) {
-		return new Vec2(m_x * factor, m_y * factor);
-	}
 	
 	public void rotate(Vec2 center, double angle) {
 		double sinValue = Math.sin(angle);

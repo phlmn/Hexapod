@@ -16,7 +16,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 	private Leg m_legs[];
 	private Vec2[] m_endPositions = new Vec2[6];
 	private double m_speedFactor;
-	private Vec3 m_rotationGoal = new Vec3();
 	private Vec3 m_rotation = new Vec3();
 	private Vec3 m_groundRotation = new Vec3();
 	private boolean m_tilt = false;
@@ -464,8 +463,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 								pos.setZ(0);
 								pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
-								m_endPositions[legID] = new Vec2(pos.getX(), pos.getY());
-
 								if(m_stepTime.getMilliseconds() >= duration) m_caseStepTripod[legID] = 1;
 								break;
 
@@ -598,11 +595,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				}
 
 				if(idle) pos.setZ(0);
-
-				m_rotation.setX((m_rotationGoal.getX() - m_rotation.getX()) * elapsedTime.getSeconds() + m_rotation.getX());
-				m_rotation.setY((m_rotationGoal.getY() - m_rotation.getY()) * elapsedTime.getSeconds() + m_rotation.getY());
-				pos.rotate(m_rotation);
-
+				if(m_tilt) pos.rotate(m_rotation);
 				if(m_groundAdaption) pos.rotate(m_groundRotation);
 				if(m_groundAdaption) pos.add(new Vec3(0, 0, m_loadOffsets[legID]));
 				leg.setGoalPosition(pos.sum(new Vec3(0, 0, -preferredHeight)));
@@ -649,14 +642,9 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 			Vec3 rawRot = rotPack.getValue();
 
-			if(m_tilt) {
-				m_rotationGoal.setX(rawRot.getX() / 2);
-				m_rotationGoal.setY(-rawRot.getY() / 2);
-			}
-			else {
-				m_rotationGoal.setX(0);
-				m_rotationGoal.setY(0);
-			}
+			m_rotation.setX(rawRot.getX() / 2);
+			m_rotation.setY(-rawRot.getY() / 2);
+
 		}
 	}
 
@@ -707,32 +695,22 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					}
 				}
 				else if(cmd[1].toLowerCase().equals("toggle-tilt")) {
-					if(!m_groundAdaption) {
-						m_tilt = !m_tilt;
-						if(m_tilt) Main.getNetworking().broadcast(new NotificationPackage("Tilting activated."));
-						else Main.getNetworking().broadcast(new NotificationPackage("Tilting deactivated."));
-						if(!m_tilt) m_rotationGoal = new Vec3();
-					}
-					else Main.getNetworking().broadcast(new NotificationPackage("Error: Ground Adaption enabled."));
+					m_tilt = !m_tilt;
+					if(m_tilt) Main.getNetworking().broadcast(new NotificationPackage("Tilting activated."));
+					else Main.getNetworking().broadcast(new NotificationPackage("Tilting deactivated."));
 				}
 				else if(cmd[1].toLowerCase().equals("toggle-groundadaption")) {
-					if(Main.getSensorManager().getKinect() != null) {
-						m_lastGroundRotation.clear();
-						m_tilt = false;
-						for(int i = 0; i < 400; i++) {
-							m_lastGroundRotation.add(new Vec3());
-						}
-						for(int i = 0; i < 6; i++) {
-							m_loadOffsets[i] =  0.0;
-						}
+					m_lastGroundRotation.clear();
+					for(int i = 0; i < 400; i++) {
+						m_lastGroundRotation.add(new Vec3());
+					}
+					for(int i = 0; i < 6; i++) {
+						m_loadOffsets[i] =  0.0;
+					}
 
-						m_groundAdaption = !m_groundAdaption;
-						if(m_groundAdaption) Main.getNetworking().broadcast(new NotificationPackage("Adaption activated."));
-						else Main.getNetworking().broadcast(new NotificationPackage("Adaption deactivated."));
-					}
-					else {
-						Main.getNetworking().broadcast(new NotificationPackage("Missing Kinect."));
-					}
+					m_groundAdaption = !m_groundAdaption;
+					if(m_groundAdaption) Main.getNetworking().broadcast(new NotificationPackage("Adaption activated."));
+					else Main.getNetworking().broadcast(new NotificationPackage("Adaption deactivated."));
 				}
 				else if(cmd[1].toLowerCase().equals("drop")) {
 					if(m_mode != 3) m_mode = 1;
