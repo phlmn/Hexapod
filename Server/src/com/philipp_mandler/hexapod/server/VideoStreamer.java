@@ -67,7 +67,7 @@ public class VideoStreamer implements VideoHandler {
 
 	public void tick(Time elapsedTime) {
 		m_elapsedTime.add(elapsedTime);
-		if(m_elapsedTime.getSeconds() > 0.1) {
+		if(m_elapsedTime.getSeconds() > 0.2) {
 			m_send.set(true);
 			m_elapsedTime.setNanoseconds(0);
 		}

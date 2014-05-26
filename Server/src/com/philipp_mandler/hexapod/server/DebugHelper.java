@@ -31,4 +31,11 @@ public class DebugHelper {
 			}
 		}
 	}
+
+	public static void log(Exception e) {
+		// default logging
+		DebugHelper.log(e.getMessage(), Log.ERROR);
+	}
+
+
 }

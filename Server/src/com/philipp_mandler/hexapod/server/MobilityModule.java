@@ -6,9 +6,6 @@ import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 import com.philipp_mandler.hexapod.hexapod.net.NotificationPackage;
 import com.philipp_mandler.hexapod.hexapod.net.RotationPackage;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MobilityModule extends Module implements NetworkingEventListener {
 
 	private Vec2 m_speed = new Vec2();
@@ -17,15 +14,18 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 	private Vec2[] m_endPositions = new Vec2[6];
 	private double m_speedFactor;
 	private Vec3 m_rotation = new Vec3();
+	private Vec3 m_rotationGoal = new Vec3();
 	private Vec3 m_groundRotation = new Vec3();
 	private boolean m_tilt = false;
 	private ButtonGroup m_buttonGroup;
 
 	private boolean m_groundAdaption = false;
 
-	private ServoLoadReader m_loadReader;
+	private LegLoadReader m_loadReader;
 
 	private double m_loadOffsets[] = new double[6];
+	private Vec2 m_loadRotation[] = new Vec2[6];
+	private double m_preferredHeight = -10;
 
 	private LegUpdater m_legUpdater;
 
@@ -40,19 +40,17 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 	private int m_mode = 3; // 0: lifting, 1: dropping, 2: lifted, 3: dropped
 
 	private Vec2 m_defaultPositions[] = new Vec2[] {
-			new Vec2(-200, 310),
-			new Vec2(200, 310),
-			new Vec2(-300, 0),
-			new Vec2(300, 0),
-			new Vec2(-200, -310),
-			new Vec2(200, -310)
+			new Vec2(-180, 310),  //200
+			new Vec2(180, 310),
+			new Vec2(-260, 0), // 300
+			new Vec2(260, 0),
+			new Vec2(-180, -310),
+			new Vec2(180, -310)
 	};
 
 	private Vec3 m_currentWalkPositions[] = new Vec3[6];
 
 	private Time m_stepTime = new Time();
-
-	private List<Vec3> m_lastGroundRotation = new ArrayList<>();
 
 	private TimeTracker m_timeTracker;
 
@@ -94,7 +92,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 			m_legUpdater.addLeg(leg);
 		}
 
-		m_loadReader = new ServoLoadReader();
+		m_loadReader = new LegLoadReader(m_legs);
 
 	}
 
@@ -112,10 +110,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 		m_legUpdater.start();
 
-		m_lastGroundRotation.clear();
-		for(int i = 0; i < 400; i++) {
-			m_lastGroundRotation.add(new Vec3());
-		}
+		m_groundRotation = new Vec3();
 
 		Main.getNetworking().addEventListener(this);
 		Main.getNetworking().addButtonGroup(m_buttonGroup);
@@ -139,7 +134,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 		if(m_mode == 0) { // lifting
 			int readyLegs = 0;
 			for(Leg leg : m_legs) {
-				double m_preferredHeight = 140;
+				m_preferredHeight = 100;
 				double moveDist = ((leg.getGoalPosition().getZ() + m_preferredHeight) / 2 + 10) * elapsedTime.getSeconds();
 				if(leg.getGoalPosition().getZ() - moveDist > -m_preferredHeight)
 					leg.transform(new Vec3(0, 0, -moveDist));
@@ -154,7 +149,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 		else if(m_mode == 1) { // dropping
 			int readyLegs = 0;
 			for(Leg leg : m_legs) {
-				double m_preferredHeight = -10;
+				m_preferredHeight = -10;
 				double moveDist = ((leg.getGoalPosition().getZ() + m_preferredHeight) / 2 - 10) * elapsedTime.getSeconds();
 				if(leg.getGoalPosition().getZ() + moveDist < -m_preferredHeight)
 					leg.transform(new Vec3(0, 0, -moveDist));
@@ -177,23 +172,8 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				Vec3 gravity = new Vec3(raw.getZ(), raw.getX(), 0);
 
-				m_lastGroundRotation.add(m_groundRotation.sum(new Vec3(-gravity.getX() * 0.4, gravity.getY() * 0.4, 0)));
 
-				while( m_lastGroundRotation.size() > 1000 )
-					m_lastGroundRotation.remove(0);
-
-				if(m_lastGroundRotation.size() > 0) {
-
-					Vec3 sum = new Vec3();
-
-					for(Vec3 value : m_lastGroundRotation) {
-						sum.add(new Vec3(value.getX(), value.getY(), value.getZ()));
-					}
-
-					Vec3 average = sum.divide(m_lastGroundRotation.size());
-
-					m_groundRotation = new Vec3(average.getX(), average.getY(), 0);
-				}
+				m_groundRotation.add(new Vec3(-gravity.getX() * 0.001, gravity.getY() * 0.001, 0));
 
 				action.stopTracking();
 			}
@@ -208,7 +188,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 			double speedR = m_rotSpeed / 2 * m_speedFactor;
 
-            double preferredHeight = 140;
 			double stepHeight = 40;
 
 			if(m_groundAdaption)
@@ -246,37 +225,28 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				action = m_timeTracker.trackAction("get leg loads");
 
 				double sumLoad = 0;
-
 				double legsOnGround = 0;
 
-				double loads[] = new double[6];
-
-
-				for(int i = 0; i < 6; i++) {
-					loads[i] = m_loadReader.getLoad(i);
-				}
+				int loads[] = m_loadReader.getLoads();
+				double weightedLoads[] = new double[6];
 
 				for(int i = 0; i < 6; i++) {
+					// check if legs are touching ground
 					if(m_caseStepRipple[i] != 1 && m_caseStepRipple[i] != 2) {
 						legsOnGround++;
 						double load = loads[i];
 						if(m_legs[i].isRightSided()) load = -load;
 						Vec2 pos2d = new Vec2(m_legs[i].getRelativeGoalPosition().getX(), m_legs[i].getRelativeGoalPosition().getY());
-						load = load / pos2d.getLength();
+						weightedLoads[i] = load / pos2d.getLength();
 						sumLoad += load;
-						m_loadOffsets[i] = 0;
 					}
 				}
 
 				for(int i = 0; i < 6; i++) {
+					// check if legs are touching ground
 					if(m_caseStepRipple[i] != 1 && m_caseStepRipple[i] != 2) {
-						double load = loads[i];
-						if(m_legs[i].isRightSided()) load = -load;
-						Vec2 pos2d = new Vec2(m_legs[i].getRelativeGoalPosition().getX(), m_legs[i].getRelativeGoalPosition().getY());
-						load = load / pos2d.getLength();
-						double loadError = (sumLoad / legsOnGround) - load;
-
-						m_loadOffsets[i] -= loadError / 2.0;
+						double loadError = (sumLoad / legsOnGround) - weightedLoads[i];
+						m_loadOffsets[i] -= loadError * elapsedTime.getSeconds() * 20;
 					}
 				}
 
@@ -293,11 +263,13 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 
 				for(int i = 0; i < 6; i++) {
-					m_loadOffsets[i] -= loadOffsetSum / 6;
+					m_loadOffsets[i] -= loadOffsetSum / legsOnGround;
 				}
 
 
-				double correctionY = ((m_loadOffsets[1] + m_loadOffsets[3] + m_loadOffsets[5]) / 3 - (m_loadOffsets[0] + m_loadOffsets[2] + m_loadOffsets[4]) / 3) / 12;
+				/*
+
+				double correctionY = ((m_loadOffsets[1] + m_loadOffsets[3] + m_loadOffsets[5]) / 3 - (m_loadOffsets[0] + m_loadOffsets[2] + m_loadOffsets[4]) / 3) * elapsedTime.getSeconds() / 500;
 				m_loadOffsets[0] += correctionY;
 				m_loadOffsets[2] += correctionY;
 				m_loadOffsets[4] += correctionY;
@@ -306,12 +278,13 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				m_loadOffsets[3] -= correctionY;
 				m_loadOffsets[5] -= correctionY;
 
-				double correctionX = ((m_loadOffsets[0] + m_loadOffsets[1] ) / 2 - (m_loadOffsets[4] + m_loadOffsets[5]) / 2) / 12;
+				double correctionX = ((m_loadOffsets[0] + m_loadOffsets[1] ) / 2 - (m_loadOffsets[4] + m_loadOffsets[5]) / 2) * elapsedTime.getSeconds() / 500;
 				m_loadOffsets[4] += correctionX;
 				m_loadOffsets[5] += correctionX;
 
 				m_loadOffsets[0] -= correctionX;
 				m_loadOffsets[1] -= correctionX;
+
 
 
 				loadOffsetSum = 0;
@@ -325,11 +298,39 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					m_loadOffsets[i] -= loadOffsetSum / 6;
 				}
 
+				*/
+
 				for(int i = 0; i < 6; i++) {
 					if(m_caseStepRipple[i] == 1 || m_caseStepRipple[i] == 2) {
 						m_loadOffsets[i] = 0;
 					}
 				}
+
+
+				Vec2 rotSum = new Vec2();
+
+				for(int i = 0; i < 6; i++) {
+					Vec2 rot = new Vec2(-m_endPositions[i].getY(), -m_endPositions[i].getX());
+					rot.normalize();
+					rot.multiply(m_loadOffsets[i] * 0.01);
+					m_loadRotation[i] = rot;
+					rotSum.add(rot);
+				}
+
+				for(int i = 0; i < 6; i++) {
+					m_loadRotation[i].add(new Vec2(-rotSum.getX() / 6, -rotSum.getY() / 6));
+				}
+
+
+				Vec2 rotSum2 = new Vec2();
+
+				for(int i = 0; i < 6; i++) {
+					rotSum2.add(m_loadRotation[i]);
+				}
+
+				System.out.println(rotSum2.getX() + "   " + rotSum2.getY());
+
+
 
 				action.stopTracking();
 			}
@@ -463,6 +464,8 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 								pos.setZ(0);
 								pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
+								m_endPositions[legID] = new Vec2(pos.getX(), pos.getY());
+
 								if(m_stepTime.getMilliseconds() >= duration) m_caseStepTripod[legID] = 1;
 								break;
 
@@ -563,8 +566,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 								pos.setZ(0);
 								pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
-								m_endPositions[legID] = new Vec2(pos.getX(), pos.getY());
-
 								if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 11;
 								break;
 							case 11: // pull back slowly
@@ -595,10 +596,20 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				}
 
 				if(idle) pos.setZ(0);
-				if(m_tilt) pos.rotate(m_rotation);
-				if(m_groundAdaption) pos.rotate(m_groundRotation);
-				if(m_groundAdaption) pos.add(new Vec3(0, 0, m_loadOffsets[legID]));
-				leg.setGoalPosition(pos.sum(new Vec3(0, 0, -preferredHeight)));
+
+				m_rotation.setX((m_rotationGoal.getX() - m_rotation.getX()) * elapsedTime.getSeconds() + m_rotation.getX());
+				m_rotation.setY((m_rotationGoal.getY() - m_rotation.getY()) * elapsedTime.getSeconds() + m_rotation.getY());
+				pos.rotate(m_rotation);
+
+
+
+				if(m_groundAdaption) {
+					//pos.rotate(m_groundRotation);
+					pos.rotate(new Vec3(m_loadRotation[legID]));
+				}
+
+				//if(m_groundAdaption) pos.add(new Vec3(0, 0, m_loadOffsets[legID]));
+				leg.setGoalPosition(pos.sum(new Vec3(0, 0, -m_preferredHeight)));
 
 			}
 
@@ -642,8 +653,14 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 			Vec3 rawRot = rotPack.getValue();
 
-			m_rotation.setX(rawRot.getX() / 2);
-			m_rotation.setY(-rawRot.getY() / 2);
+			if(m_tilt) {
+				m_rotationGoal.setX(rawRot.getX() / 2);
+				m_rotationGoal.setY(-rawRot.getY() / 2);
+			}
+			else {
+				m_rotationGoal.setX(0);
+				m_rotationGoal.setY(0);
+			}
 
 		}
 	}
@@ -695,22 +712,28 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					}
 				}
 				else if(cmd[1].toLowerCase().equals("toggle-tilt")) {
-					m_tilt = !m_tilt;
-					if(m_tilt) Main.getNetworking().broadcast(new NotificationPackage("Tilting activated."));
-					else Main.getNetworking().broadcast(new NotificationPackage("Tilting deactivated."));
+					if(!m_groundAdaption) {
+						m_tilt = !m_tilt;
+						if(m_tilt) Main.getNetworking().broadcast(new NotificationPackage("Tilting activated."));
+						else Main.getNetworking().broadcast(new NotificationPackage("Tilting deactivated."));
+						if(!m_tilt) m_rotationGoal = new Vec3();
+					}
+					else Main.getNetworking().broadcast(new NotificationPackage("Error: Ground Adaption enabled."));
 				}
 				else if(cmd[1].toLowerCase().equals("toggle-groundadaption")) {
-					m_lastGroundRotation.clear();
-					for(int i = 0; i < 400; i++) {
-						m_lastGroundRotation.add(new Vec3());
-					}
-					for(int i = 0; i < 6; i++) {
-						m_loadOffsets[i] =  0.0;
-					}
+					if(Main.getSensorManager().getKinect() != null) {
+						m_tilt = false;
+						for(int i = 0; i < 6; i++) {
+							m_loadOffsets[i] =  0.0;
+						}
 
-					m_groundAdaption = !m_groundAdaption;
-					if(m_groundAdaption) Main.getNetworking().broadcast(new NotificationPackage("Adaption activated."));
-					else Main.getNetworking().broadcast(new NotificationPackage("Adaption deactivated."));
+						m_groundAdaption = !m_groundAdaption;
+						if(m_groundAdaption) Main.getNetworking().broadcast(new NotificationPackage("Adaption activated."));
+						else Main.getNetworking().broadcast(new NotificationPackage("Adaption deactivated."));
+					}
+					else {
+						Main.getNetworking().broadcast(new NotificationPackage("Missing Kinect."));
+					}
 				}
 				else if(cmd[1].toLowerCase().equals("drop")) {
 					if(m_mode != 3) m_mode = 1;

@@ -29,7 +29,7 @@ public class SensorManager {
 						}
 
 						try {
-							Thread.sleep(0, 500);
+							Thread.sleep(1);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}

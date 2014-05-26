@@ -31,8 +31,8 @@ public class ActuatorManager {
 		}
 
 		// initialize Kinect servos
-		m_kinectServos[0] = new SingleServo(m_servoController, 19, false, 1024, 0, 0.104);
-		m_kinectServos[1] = new SingleServo(m_servoController, 20, false, 1024, 0, 0.104);
+		m_kinectServos[0] = new SingleServo(m_servoController, 19, false, 1024, 0.2, 0.104);
+		m_kinectServos[1] = new SingleServo(m_servoController, 20, false, 1024, 0.1, 0.104);
 	}
 
 	public int getServoID(int legID, int servoPos) {
@@ -42,7 +42,7 @@ public class ActuatorManager {
 
 	public SingleServo getLegServo(int legID, int servoPos) {
 		// return the servo object from leg id and position
-		if(-1 <= legID && legID <= 5) {
+		if(0 <= legID && legID <= 5) {
 			if(0 <= servoPos && servoPos <= 2) {
 				return m_legServos[getServoID(legID, servoPos) - 1];
 			}

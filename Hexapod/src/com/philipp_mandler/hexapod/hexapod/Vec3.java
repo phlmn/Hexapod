@@ -33,6 +33,11 @@ public class Vec3 implements Serializable {
 		this.m_y = source.getY();
 		this.m_z = source.getZ();
 	}
+
+	public Vec3(Vec2 source) {
+		this.m_x = source.getX();
+		this.m_y = source.getY();
+	}
 	
 	public void set(double x, double y, double z) {
 		this.m_x = x;
@@ -94,10 +99,12 @@ public class Vec3 implements Serializable {
 	}
 
 	public void normalize() {
-		double length = getLength();
-		m_x /= length;
-		m_y /= length;
-		m_z /= length;
+		if(getLength() != 0) {
+			double length = getLength();
+			m_x /= length;
+			m_y /= length;
+			m_z /= length;
+		}
 	}
 
 	public void rotate(Vec3 angles) {

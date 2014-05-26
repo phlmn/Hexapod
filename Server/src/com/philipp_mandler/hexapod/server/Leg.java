@@ -74,7 +74,6 @@ public class Leg {
 		double b = m_lowerLeg;
 		double c = tmpGoal.getLength();
 
-
 		double gamma = Math.acos((Math.pow(c, 2) - Math.pow(a, 2) - Math.pow(b, 2)) / (-2 * a * b));
 
 
@@ -103,24 +102,20 @@ public class Leg {
 
 
 
-
 		// calculate s1
 
 		double beta = Math.acos((Math.pow(b, 2) - Math.pow(c, 2) - Math.pow(a, 2)) / (-2 * c * a));
 
 		double s1;
 
-		if(m_rightSide)
+		if(m_rightSide) {
 			s1 = Math.atan2(topGoal.getLength(), tmpGoal.getZ());
+			s1 = s1 - beta + Math.PI / 2;
+		}
 		else {
 			s1 = Math.atan2(-topGoal.getLength(), tmpGoal.getZ());
-		}
-
-		if(m_rightSide)
-			s1 = s1 - beta + Math.PI / 2;
-		else
 			s1 = s1 + beta + Math.PI * 1.5;
-
+		}
 
 		// set servo positions
 		if(!(Double.isNaN(s0) || Double.isNaN(s1) || Double.isNaN(s2) || Double.isInfinite(s0) || Double.isInfinite(s1) || Double.isInfinite(s2))) {
@@ -156,5 +151,9 @@ public class Leg {
 	
 	public SingleServo[] getServos() {
 		return m_servos;
+	}
+
+	public SingleServo getServo(int i) {
+		return m_servos[i];
 	}
 }

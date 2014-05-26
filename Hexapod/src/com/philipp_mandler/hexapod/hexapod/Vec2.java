@@ -84,7 +84,9 @@ public class Vec2 implements Serializable {
 	}
 	
 	public void normalize() {
-		divide(getLength());
+		if(getLength() != 0) {
+			divide(getLength());
+		}
 	}
 
 	public Vec2 sub(Vec2 obj) {

@@ -33,7 +33,7 @@ public class ServoController {
 	public final static int DX_ERROR_USR_NO_BEGIN = 1 << 12;
 	public final static int DX_ERROR_USR_DATA_TIMEOUT = 1 << 13;
 
-	// Instructions
+	// instructions
 	public final static int DX_INST_PING = 0x01;
 	public final static int DX_INST_READ_DATA = 0x02;
 	public final static int DX_INST_WRITE_DATA = 0x03;
@@ -107,46 +107,9 @@ public class ServoController {
 	public final static int DX_TYPE_MX_64 = 0x0136;
 	public final static int DX_TYPE_MX_106 = 0x0140;
 
-
 	protected boolean m_regWriteFlag = false;
 
-
 	protected final Object m_lock = new Object();
-
-	class ReturnPacket {
-		public int id;
-		public int length;
-		public int error;
-		public ArrayList<Integer> param;
-
-		public ReturnPacket() {
-			id = -1;
-			length = 0;
-			param = new ArrayList<>();
-		}
-
-		public int checksum() {
-			int ret = 0;
-			ret += id;
-			ret += length;
-			ret += error;
-
-			for (Integer aParam : param) ret += aParam;
-
-			return ServoController.calcChecksum(ret);
-		}
-
-		public String toString() {
-			String retStr = "";
-			retStr += "id: " + id + "\n";
-			retStr += "length: " + length + "\n";
-			retStr += "error: " + error + "\n";
-			for (int i = 0; i < param.size(); i++)
-				retStr += "param" + i + ": " + param.get(i) + "\n";
-
-			return retStr;
-		}
-	}
 
 	private SerialPort m_serial;
 	private InputStream m_serialInputStream;
@@ -171,16 +134,16 @@ public class ServoController {
 			m_serialOutputStream = m_serial.getOutputStream();
 			m_initialized = true;
 		} catch (PortInUseException e) {
-			System.out.println("Serial: Port already in use.");
+			DebugHelper.log("Serial: Port already in use.");
 			throw e;
 		} catch (NoSuchPortException e) {
-			System.out.println("Serial: No such port.");
+			DebugHelper.log("Serial: No such port.");
 			throw e;
 		} catch (IOException e) {
-			System.out.println("Serial: Could not get input or output stream.");
+			DebugHelper.log("Serial: Could not get input or output stream.");
 			throw e;
 		} catch (UnsupportedCommOperationException e) {
-			System.out.println("Serial: Could not set port parameters.");
+			DebugHelper.log("Serial: Could not set port parameters.");
 			throw e;
 		}
 	}
@@ -206,17 +169,13 @@ public class ServoController {
 		try {
 			return m_serialInputStream.read();
 		} catch (IOException e) {
+			DebugHelper.log(e);
 		}
 		return 0;
 	}
 
-
 	public int error() {
 		return m_error;
-	}
-
-	public String errorStr() {
-		return errorStr(m_error);
 	}
 
 	public SerialPort serial() {
@@ -224,7 +183,7 @@ public class ServoController {
 	}
 
 
-	public final static int getMotorSerie(int modelNr) {
+	public static int getMotorSerie(int modelNr) {
 		switch (modelNr) {
 			// dx
 			case DX_TYPE_DX_113:
@@ -544,13 +503,7 @@ public class ServoController {
 		}
 	}
 
-	/*
-		public synchronized boolean ping(int id,int timeout)
-			{
-
-			}
-	*/
-	// watch out, this resets the servo to the default factory settings
+	// resets the servo to the default factory settings!
 	public boolean reset(int id) {
 		synchronized (m_lock) {
 
@@ -637,7 +590,7 @@ public class ServoController {
 		if (end > DX_LAST_ID)
 			end = DX_LAST_ID;
 
-		ArrayList<Integer> servoList = new ArrayList<Integer>();
+		ArrayList<Integer> servoList = new ArrayList<>();
 		for (int i = start; i <= end; i++) {
 			if (ping(i))
 				servoList.add(i);
@@ -675,11 +628,7 @@ public class ServoController {
 			// checksum
 			write(calcChecksum(m_curChecksum));
 
-			if (id != DX_BROADCAST_ID)
-				// handle reply
-				return handleReturnStatus(id);
-			else
-				return true;
+			return id == DX_BROADCAST_ID || handleReturnStatus(id);
 		}
 	}
 
@@ -1262,10 +1211,6 @@ public class ServoController {
 	}
 
 	protected synchronized boolean writeData2Bytes(int id, int addr, int data, boolean regWrite) {
-//		if(_serialType == DX_SERIALTYPE_SYNC)
-//			// block next few bytes for receiving
-//			_serial.addReadBlockCount(9);
-
 		m_curChecksum = 0;
 
 		write(DX_BEGIN);
@@ -1309,10 +1254,6 @@ public class ServoController {
 	}
 
 	protected synchronized boolean writeDataByte(int id, int addr, int data, boolean regWrite) {
-//		if(m_serialType == DX_SERIALTYPE_SYNC)
-//			// block next few bytes for receiving
-//			_serial.addReadBlockCount(8);
-
 		m_curChecksum = 0;
 
 		write(DX_BEGIN);
@@ -1453,7 +1394,6 @@ public class ServoController {
 		int origTimeout = timeout;
 		int failCount = 100;
 
-		timeout = origTimeout;
 		while (failCount > 0) {
 			timeout = origTimeout;
 			if (!waitForData(m_serial, timeout, m_delay, 1))
@@ -1501,7 +1441,7 @@ public class ServoController {
 		try {
 			Thread.sleep(delay);
 		} catch (InterruptedException exception) {
-			System.out.println("InterruptedException: " + exception);
+			DebugHelper.log(exception);
 			return false;
 		}
 		return true;
