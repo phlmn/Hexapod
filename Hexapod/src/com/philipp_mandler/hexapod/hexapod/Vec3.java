@@ -136,4 +136,19 @@ public class Vec3 implements Serializable {
 		m_z = m_z * cosValue - m_y * sinValue;
 	}
 
+	public Vec3 crossP(Vec3 vec) {
+
+		Vec3 result = new Vec3();
+
+
+		result.setX( (m_y * vec.getZ()) - (m_z * vec.getY()) );
+		result.setY( (m_z * vec.getX()) - (m_x * vec.getZ()) );
+		result.setZ( (m_x * vec.getY()) - (m_y * vec.getX()) );
+
+		return result;
+	}
+
+	public Vec3 pow(double a) {
+		return new Vec3(Math.pow(m_x, a), Math.pow(m_y, a), Math.pow(m_z, a));
+	}
 }

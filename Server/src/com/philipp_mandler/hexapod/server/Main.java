@@ -1,12 +1,11 @@
 package com.philipp_mandler.hexapod.server;
 
+import com.philipp_mandler.hexapod.hexapod.net.ModuleStatusPackage;
+import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import com.philipp_mandler.hexapod.hexapod.net.ModuleStatusPackage;
-
-import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
 
 /* 
  *   
@@ -56,7 +55,6 @@ public class Main implements NetworkingEventListener {
 	}
 	
 	public void run() {
-
 
 		// initialize NetworkManager
 		try {
