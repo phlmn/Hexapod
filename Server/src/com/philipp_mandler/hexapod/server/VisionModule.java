@@ -1,9 +1,7 @@
 package com.philipp_mandler.hexapod.server;
 
 
-import com.philipp_mandler.hexapod.hexapod.Vec2;
 import com.philipp_mandler.hexapod.hexapod.net.NetPackage;
-import com.philipp_mandler.hexapod.hexapod.net.NotificationPackage;
 import com.philipp_mandler.hexapod.hexapod.orientation.BooleanMapManager;
 import org.openkinect.freenect.*;
 
@@ -71,18 +69,19 @@ public class VisionModule extends Module implements DepthHandler {
 
 	@Override
 	protected void onStop() {
+		Main.getNetworking().removeEventListener(this);
+
 		m_kinectWorker.end();
 		m_servoUpdater.shutdown();
 
 		if(m_kinect != null) {
 			m_kinect.setLed(LedStatus.BLINK_GREEN);
 			m_kinect.stopDepth();
-			m_kinect.close();
 			m_kinect.stopVideo();
+			m_kinect.close();
 			m_kinect = null;
 		}
 
-		Main.getNetworking().addEventListener(this);
 		Main.getNetworking().removeButtonGroup(m_buttonGroup);
 	}
 
