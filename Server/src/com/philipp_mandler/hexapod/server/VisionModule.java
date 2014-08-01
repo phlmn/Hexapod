@@ -69,6 +69,7 @@ public class VisionModule extends Module implements DepthHandler {
 
 	@Override
 	protected void onStop() {
+		Main.getNetworking().removeButtonGroup(m_buttonGroup);
 		Main.getNetworking().removeEventListener(this);
 
 		m_kinectWorker.end();
@@ -78,11 +79,9 @@ public class VisionModule extends Module implements DepthHandler {
 			m_kinect.setLed(LedStatus.BLINK_GREEN);
 			m_kinect.stopDepth();
 			m_kinect.stopVideo();
-			m_kinect.close();
-			m_kinect = null;
+			//m_kinect.close();
+			//m_kinect = null;
 		}
-
-		Main.getNetworking().removeButtonGroup(m_buttonGroup);
 	}
 
 	@Override

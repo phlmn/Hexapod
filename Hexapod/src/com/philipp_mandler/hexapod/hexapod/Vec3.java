@@ -109,22 +109,33 @@ public class Vec3 implements Serializable {
 
 	public void rotate(Vec3 angles) {
 
+		// TODO: test
+
+		double x;
+		double y;
+		double z;
+
 		// z-axis
 
 		double sinValue = Math.sin(angles.getZ());
 		double cosValue = Math.cos(angles.getZ());
 
-		m_x = m_x * cosValue - m_y * sinValue;
-		m_y = m_x * sinValue + m_y * cosValue;
+		x = m_x * cosValue - m_y * sinValue;
+		y = m_x * sinValue + m_y * cosValue;
 
+		m_x = x;
+		m_y = y;
 
 		// y-axis
 
 		sinValue = Math.sin(angles.getY());
 		cosValue = Math.cos(angles.getY());
 
-		m_z = m_z * cosValue - m_x * sinValue;
-		m_x = m_x * cosValue - m_z * sinValue ;
+		z = m_z * cosValue - m_x * sinValue;
+		x = m_x * cosValue - m_z * sinValue ;
+
+		m_z = z;
+		m_x = x;
 
 
 		// x-axis
@@ -132,8 +143,63 @@ public class Vec3 implements Serializable {
 		sinValue = Math.sin(angles.getX());
 		cosValue = Math.cos(angles.getX());
 
-		m_y = m_y * cosValue - m_z * sinValue;
-		m_z = m_z * cosValue - m_y * sinValue;
+		y = m_y * cosValue - m_z * sinValue;
+		z = m_z * cosValue - m_y * sinValue;
+
+		m_y = y;
+		m_z = z;
+	}
+
+	public void rotate(Vec3 angles, Vec3 origin) {
+
+		// TODO: Test
+
+		double x;
+		double y;
+		double z;
+
+		double moved_x = m_x - origin.getX();
+		double moved_y = m_y - origin.getY();
+		double moved_z = m_z - origin.getZ();
+
+		// z-axis
+
+		double sinValue = Math.sin(angles.getZ());
+		double cosValue = Math.cos(angles.getZ());
+
+		x = moved_x * cosValue - moved_y * sinValue;
+		y = moved_x * sinValue + moved_y * cosValue;
+
+		moved_x = x;
+		moved_y = y;
+
+		// y-axis
+
+		sinValue = Math.sin(angles.getY());
+		cosValue = Math.cos(angles.getY());
+
+		z = moved_z * cosValue - moved_x * sinValue;
+		x = moved_x * cosValue - moved_z * sinValue ;
+
+		moved_z = z;
+		moved_x = x;
+
+
+		// x-axis
+
+		sinValue = Math.sin(angles.getX());
+		cosValue = Math.cos(angles.getX());
+
+		y = moved_y * cosValue - moved_z * sinValue;
+		z = m_z * cosValue - moved_y * sinValue;
+
+		moved_y = y;
+		moved_z = z;
+
+		m_x = moved_x + origin.getX();
+		m_y = moved_y + origin.getY();
+		m_z = moved_z + origin.getZ();
+
 	}
 
 	public Vec3 crossP(Vec3 vec) {

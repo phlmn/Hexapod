@@ -21,6 +21,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 	private Vec3 m_rotationGoal = new Vec3();
 	private Vec3 m_groundRotation = new Vec3();
 	private boolean m_tilt = false;
+	private boolean m_leveling = false;
 	private ButtonGroup m_buttonGroup;
 
 	private boolean m_groundAdaption = false;
@@ -75,9 +76,11 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 		m_buttonGroup.addButton(new Button("gait-wave", "Wave Gait", getName() + " gait wave"));
 		m_buttonGroup.addButton(new Button("toggle-tilt", "Tilt", getName() + " toggle-tilt"));
 		m_buttonGroup.addButton(new Button("toggle-groundadaption", "Ground Adaption", getName() + " toggle-groundadaption"));
+		m_buttonGroup.addButton(new Button("toggle-leveling", "Leveling", getName() + " toggle-leveling"));
 		m_buttonGroup.addButton(new Button("height-up", "Body +", getName() + " height up"));
 		m_buttonGroup.addButton(new Button("height-down", "Body -", getName() + " height down"));
 		m_buttonGroup.addButton(new Button("toggle-slowmode", "Slow Mode", getName() + " toggle-slowmode"));
+
 
 		m_legUpdater = new LegUpdater();
 
@@ -174,7 +177,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 			TimeTrackerAction action;
 
-			if(m_groundAdaption) {
+			if(m_leveling) {
 				action = m_timeTracker.trackAction("level");
 
 				Vec3 raw = Main.getSensorManager().getLevel();
@@ -182,7 +185,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				Vec3 gravity = new Vec3(raw.getZ(), raw.getX(), 0);
 
 
-				m_groundRotation.add(new Vec3(-gravity.getX() * 0.001, gravity.getY() * 0.001, 0));
+				m_groundRotation.add(new Vec3(-gravity.getX() * elapsedTime.getSeconds() * 0.2, gravity.getY() * elapsedTime.getSeconds() * 0.2, 0));
 
 				action.stopTracking();
 			}
@@ -234,15 +237,13 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				action = m_timeTracker.trackAction("get leg loads");
 
 				double sumLoad = 0;
-				double legsOnGround = 0;
 
 				int loads[] = m_loadReader.getLoads();
 				double weightedLoads[] = new double[6];
 
 				for(int i = 0; i < 6; i++) {
 					// check if legs are touching ground
-					if(shellLegAdapt(i)) {
-						legsOnGround++;
+					if(shellLegAdapt(i) || idle) {
 						double load = loads[i];
 						if(m_legs[i].isRightSided()) load = -load;
 						Vec2 pos2d = new Vec2(m_legs[i].getRelativeGoalPosition().getX(), m_legs[i].getRelativeGoalPosition().getY());
@@ -253,12 +254,9 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				for(int i = 0; i < 6; i++) {
 					// check if legs are touching ground
-					if(shellLegAdapt(i)) {
-						double loadError = (sumLoad / legsOnGround) - weightedLoads[i];
-						m_loadOffsets[i] -= loadError * elapsedTime.getSeconds() * 60;
-					}
-					else {
-						m_loadOffsets[i] -= m_loadOffsets[i] * elapsedTime.getSeconds() * 10;
+					if(shellLegAdapt(i) || idle) {
+						double loadError = (sumLoad / 5) - weightedLoads[i];
+						m_loadOffsets[i] -= loadError * elapsedTime.getSeconds() * 80;
 					}
 				}
 
@@ -279,11 +277,11 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				}
 
 
-			/*	for(int i = 0; i < 6; i++) {
-					if(m_caseStepRipple[i] == 1 || m_caseStepRipple[i] == 2) {
+				for(int i = 0; i < 6; i++) {
+					if(!(shellLegAdapt(i) || idle)) {
 						m_loadOffsets[i] = 0;
 					}
-				}  */
+				}
 
 
 				Vec3 sum = new Vec3();
@@ -361,25 +359,32 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 						handleWaveGait(legID, pos, duration, elapsedTime, speed, speedR, stepHeight);
 					}
 
-					m_currentWalkPositions[legID] = new Vec3(pos);
-
+				}
+				else {
+					pos.setZ(pos.getZ() - (pos.getZ() * elapsedTime.getSeconds() * 0.0001));
+					//pos.setZ(0);
 				}
 
+				m_currentWalkPositions[legID] = new Vec3(pos);
+
+				m_preferredHeight = (m_preferredHeightGoal - m_preferredHeight) * elapsedTime.getSeconds() / 2 + m_preferredHeight;
 				if(idle) pos.setZ(0);
 
 				m_rotation.setX((m_rotationGoal.getX() - m_rotation.getX()) * elapsedTime.getSeconds() + m_rotation.getX());
 				m_rotation.setY((m_rotationGoal.getY() - m_rotation.getY()) * elapsedTime.getSeconds() + m_rotation.getY());
 				pos.rotate(m_rotation);
 
-				m_preferredHeight = (m_preferredHeightGoal - m_preferredHeight) * elapsedTime.getSeconds() * 10 + m_preferredHeight;
+				m_preferredHeight = (m_preferredHeightGoal - m_preferredHeight) * elapsedTime.getSeconds() / 2 + m_preferredHeight;
 
 
 				if(m_groundAdaption) {
-					//pos.rotate(m_groundRotation);
 					pos.add(new Vec3(0, 0, m_loadOffsets[legID]));
 				}
 
-				//if(m_groundAdaption) pos.add(new Vec3(0, 0, m_loadOffsets[legID]));
+				if(m_leveling) {
+					pos.rotate(m_groundRotation);
+				}
+
 				leg.setGoalPosition(pos.sum(new Vec3(0, 0, -m_preferredHeight)));
 
 			}
@@ -394,7 +399,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					double factor = 0.8;
 
 					if(m_slowmode)
-						factor = 0.4;
+						factor = 0.2;
 
 					if(m_speed.getLength() < Math.abs(m_rotSpeed)) {
 							m_speedFactor = Math.abs(m_rotSpeed) * factor + 0.2;
@@ -430,8 +435,8 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 			Vec3 rawRot = rotPack.getValue();
 
 			if(m_tilt) {
-				m_rotationGoal.setX(rawRot.getX() / 2);
-				m_rotationGoal.setY(-rawRot.getY() / 2);
+				m_rotationGoal.setX(Math.max(Math.min(rawRot.getX() / 3, 0.25), -0.25));
+				m_rotationGoal.setY(Math.max(Math.min(-rawRot.getY() / 3, 0.25), -0.25));
 			}
 			else {
 				m_rotationGoal.setX(0);
@@ -489,15 +494,25 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					else Main.getNetworking().broadcast(new NotificationPackage("Error: Ground Adaption enabled."));
 				}
 				else if(cmd[1].toLowerCase().equals("toggle-groundadaption")) {
+					m_tilt = false;
+					for(int i = 0; i < 6; i++) {
+						m_loadOffsets[i] =  0.0;
+					}
+
+					m_groundAdaption = !m_groundAdaption;
+					if(m_groundAdaption) Main.getNetworking().broadcast(new NotificationPackage("Adaption activated."));
+					else Main.getNetworking().broadcast(new NotificationPackage("Adaption deactivated."));
+
+				}
+				else if(cmd[1].toLowerCase().equals("toggle-leveling")) {
 					if(Main.getSensorManager().getKinect() != null) {
 						m_tilt = false;
-						for(int i = 0; i < 6; i++) {
-							m_loadOffsets[i] =  0.0;
-						}
 
-						m_groundAdaption = !m_groundAdaption;
-						if(m_groundAdaption) Main.getNetworking().broadcast(new NotificationPackage("Adaption activated."));
-						else Main.getNetworking().broadcast(new NotificationPackage("Adaption deactivated."));
+						m_groundRotation.set(0, 0, 0);
+
+						m_leveling = !m_leveling;
+						if(m_leveling) Main.getNetworking().broadcast(new NotificationPackage("Leveling activated."));
+						else Main.getNetworking().broadcast(new NotificationPackage("Leveling deactivated."));
 					}
 					else {
 						Main.getNetworking().broadcast(new NotificationPackage("Missing Kinect."));
@@ -530,7 +545,7 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 				else if(cmd[1].toLowerCase().equals("height")) {
 					if(cmd.length > 2) {
 						if(cmd[2].toLowerCase().equals("up")) {
-							if(m_preferredHeight <= 150) {
+							if(m_preferredHeight <= 170) {
 								m_preferredHeightGoal += 10;
 								Main.getNetworking().broadcast(new NotificationPackage("Lifting Body to " + (Math.round(m_preferredHeightGoal) / 10) + "cm"));
 							}
@@ -543,7 +558,9 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 								m_preferredHeightGoal -= 10;
 								Main.getNetworking().broadcast(new NotificationPackage("Lowering Body to " + (Math.round(m_preferredHeightGoal) / 10) + "cm"));
 							}
-							Main.getNetworking().broadcast(new NotificationPackage("Minimum reached (" + (Math.round(m_preferredHeightGoal) / 10) + "cm)"));
+							else {
+								Main.getNetworking().broadcast(new NotificationPackage("Minimum reached (" + (Math.round(m_preferredHeightGoal) / 10) + "cm)"));
+							}
 						}
 					}
 				}

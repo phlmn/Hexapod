@@ -64,7 +64,7 @@ public class Vec2 implements Serializable {
 		m_y /= divisor;
 	}
 	
-	public void rotate(Vec2 center, double angle) {
+	public void rotate(double angle, Vec2 center) {
 		double sinValue = Math.sin(angle);
 		double cosValue = Math.cos(angle);
 		
@@ -76,11 +76,17 @@ public class Vec2 implements Serializable {
 	}
 	
 	public void rotate(double angle) {
+		double x;
+		double y;
+
 		double sinValue = Math.sin(angle);
 		double cosValue = Math.cos(angle);
-		
-		m_x = m_x * cosValue - m_y * sinValue;
-		m_y = m_x * sinValue - m_y * cosValue;
+
+		x = m_x * cosValue - m_y * sinValue;
+		y = m_x * sinValue + m_y * cosValue;
+
+		m_x = x;
+		m_y = y;
 	}
 	
 	public void normalize() {
