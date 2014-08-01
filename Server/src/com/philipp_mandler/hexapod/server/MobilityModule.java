@@ -645,7 +645,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				pos.setZ(Math.sin((m_stepTime.getMilliseconds() / duration) * (Math.PI / 2)) * stepHeight);
 
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepRipple[legID] = 2;
 				break;
 
 			case 2: // forward lower
@@ -655,47 +654,31 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				pos.setZ((Math.cos(((m_stepTime.getMilliseconds() / duration) * Math.PI)) + 1) * (stepHeight / 2));
 
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepRipple[legID] = 3;
 				break;
 
-			case 3: // pull back slowly
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+
+				// pull back slowly
 
 				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
 				pos.setZ(0);
 				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepRipple[legID] = 4;
 				break;
 
-			case 4: // pull back slowly
+		}
 
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepRipple[legID] = 5;
-				break;
-
-			case 5: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepRipple[legID] = 6;
-				break;
-
-			case 6: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
+		if(m_stepTime.getMilliseconds() >= duration) {
+			if(m_caseStepRipple[legID] >= 6) {
+				m_caseStepRipple[legID] = 1;
+			}
+			else {
 				m_endPositions[legID] = new Vec2(pos.getX(), pos.getY());
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepRipple[legID] = 1;
-				break;
-
+				m_caseStepRipple[legID]++;
+			}
 		}
 	}
 
@@ -712,7 +695,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				pos.setZ(Math.sin((m_stepTime.getMilliseconds() / duration) * (Math.PI / 2)) * stepHeight);
 
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepTripod[legID] = 2;
 				break;
 
 			case 2: // forward lower
@@ -722,30 +704,31 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				pos.setZ((Math.cos(((m_stepTime.getMilliseconds() / duration) * Math.PI)) + 1) * (stepHeight / 2));
 
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepTripod[legID] = 3;
 				break;
 
-			case 3: // pull back slowly
+			case 3:
+			case 4:
+
+			// pull back slowly
 
 				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
 				pos.setZ(0);
 				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepTripod[legID] = 4;
-				break;
-
-			case 4: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				m_endPositions[legID] = new Vec2(pos.getX(), pos.getY());
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepTripod[legID] = 1;
 				break;
 
 		}
+
+		if(m_stepTime.getMilliseconds() >= duration) {
+			if(m_caseStepTripod[legID] >= 4) {
+				m_caseStepTripod[legID] = 1;
+			}
+			else {
+				m_endPositions[legID] = new Vec2(pos.getX(), pos.getY());
+				m_caseStepTripod[legID]++;
+			}
+		}
+
 	}
 
 
@@ -762,7 +745,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				pos.setZ(Math.sin((m_stepTime.getMilliseconds() / duration) * (Math.PI / 2)) * stepHeight);
 
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 2;
 				break;
 
 			case 2: // forward lower
@@ -772,102 +754,37 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				pos.setZ((Math.cos(((m_stepTime.getMilliseconds() / duration) * Math.PI)) + 1) * (stepHeight / 2));
 
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 3;
 				break;
 
-			case 3: // pull back slowly
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+			case 12:
+
+			// pull back slowly
 
 				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
 				pos.setZ(0);
 				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
 
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 4;
 				break;
 
-			case 4: // pull back slowly
+		}
 
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 5;
-				break;
-
-			case 5: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 6;
-				break;
-
-			case 6: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
+		if(m_stepTime.getMilliseconds() >= duration) {
+			if(m_caseStepWave[legID] >= 12) {
+				m_caseStepWave[legID] = 1;
+			}
+			else {
 				m_endPositions[legID] = new Vec2(pos.getX(), pos.getY());
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 7;
-				break;
-
-			case 7: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 8;
-				break;
-
-			case 8: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 9;
-				break;
-
-			case 9: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 10;
-				break;
-
-			case 10: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 11;
-				break;
-			case 11: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 12;
-				break;
-
-			case 12: // pull back slowly
-
-				pos.add(new Vec3(-speed.getX() * elapsedTime.getSeconds(), -speed.getY() * elapsedTime.getSeconds(), 0));
-				pos.setZ(0);
-				pos.rotate(new Vec3(0, 0, speedR * elapsedTime.getSeconds()));
-
-				m_endPositions[legID] = new Vec2(pos.getX(), pos.getY());
-
-				if(m_stepTime.getMilliseconds() >= duration) m_caseStepWave[legID] = 1;
-				break;
-
+				m_caseStepWave[legID]++;
+			}
 		}
 
 	}
