@@ -16,6 +16,6 @@ public class Data {
 	};
 
 	// height offset from second leg servo
-	static double servoPosOffsetZ = -50;
+	static double servoPosOffsetZ = -47;
 
 }

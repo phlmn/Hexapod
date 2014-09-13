@@ -547,7 +547,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 						if(cmd[2].toLowerCase().equals("up")) {
 							if(m_preferredHeight <= 170) {
 								m_preferredHeightGoal += 10;
-								Main.getNetworking().broadcast(new NotificationPackage("Lifting Body to " + (Math.round(m_preferredHeightGoal) / 10) + "cm"));
 							}
 							else {
 								Main.getNetworking().broadcast(new NotificationPackage("Maximum reached (" + (Math.round(m_preferredHeightGoal) / 10) + "cm)"));
@@ -556,7 +555,6 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 						else if(cmd[2].toLowerCase().equals("down")) {
 							if(m_preferredHeight >= 40) {
 								m_preferredHeightGoal -= 10;
-								Main.getNetworking().broadcast(new NotificationPackage("Lowering Body to " + (Math.round(m_preferredHeightGoal) / 10) + "cm"));
 							}
 							else {
 								Main.getNetworking().broadcast(new NotificationPackage("Minimum reached (" + (Math.round(m_preferredHeightGoal) / 10) + "cm)"));
