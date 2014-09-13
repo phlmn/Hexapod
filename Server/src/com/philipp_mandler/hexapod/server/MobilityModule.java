@@ -361,8 +361,8 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 
 				}
 				else {
-					pos.setZ(pos.getZ() - (pos.getZ() * elapsedTime.getSeconds() * 0.0001));
-					//pos.setZ(0);
+					//pos.setZ(pos.getZ() - (pos.getZ() * elapsedTime.getSeconds() * 0.0001));
+					pos.setZ(0);
 				}
 
 				m_currentWalkPositions[legID] = new Vec3(pos);
