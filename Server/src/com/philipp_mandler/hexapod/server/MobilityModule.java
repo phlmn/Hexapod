@@ -20,8 +20,10 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 	private Vec3 m_rotation = new Vec3();
 	private Vec3 m_rotationGoal = new Vec3();
 	private Vec3 m_groundRotation = new Vec3();
+	private Vec2 m_centerOffset = new Vec2();
 	private boolean m_tilt = false;
 	private boolean m_leveling = false;
+	private boolean m_errorDemo = false;
 	private ButtonGroup m_buttonGroup;
 
 	private boolean m_groundAdaption = false;
@@ -80,6 +82,12 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 		m_buttonGroup.addButton(new Button("height-up", "Body +", getName() + " height up"));
 		m_buttonGroup.addButton(new Button("height-down", "Body -", getName() + " height down"));
 		m_buttonGroup.addButton(new Button("toggle-slowmode", "Slow Mode", getName() + " toggle-slowmode"));
+		m_buttonGroup.addButton(new Button("toggle-loss", "Error Demo", getName() + " toggle-loss"));
+		m_buttonGroup.addButton(new Button("move-center-y+", "Move COW Y+", getName() + " move-center-y+"));
+		m_buttonGroup.addButton(new Button("move-center-y-", "Move COW Y-", getName() + " move-center-y-"));
+		m_buttonGroup.addButton(new Button("move-center-x+", "Move COW X+", getName() + " move-center-x+"));
+		m_buttonGroup.addButton(new Button("move-center-x-", "Move COW X-", getName() + " move-center-x-"));
+		m_buttonGroup.addButton(new Button("move-center-res", "Reset COW", getName() + " move-center-res"));
 
 
 		m_legUpdater = new LegUpdater();
@@ -385,7 +393,9 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					pos.rotate(m_groundRotation);
 				}
 
-				leg.setGoalPosition(pos.sum(new Vec3(0, 0, -m_preferredHeight)));
+				Vec3 tmp = pos.sum(new Vec3(m_centerOffset.getX(), m_centerOffset.getY(), -m_preferredHeight));
+				if(m_errorDemo && legID == 3) tmp.setZ(0);
+				leg.setGoalPosition(tmp);
 
 			}
 
@@ -566,6 +576,26 @@ public class MobilityModule extends Module implements NetworkingEventListener {
 					m_slowmode = !m_slowmode;
 					if(m_slowmode) Main.getNetworking().broadcast(new NotificationPackage("Slow Mode activated."));
 					else Main.getNetworking().broadcast(new NotificationPackage("Slow Mode deactivated."));
+				}
+				else if(cmd[1].toLowerCase().equals("toggle-loss")) {
+					m_errorDemo = !m_errorDemo;
+					if(m_errorDemo) Main.getNetworking().broadcast(new NotificationPackage("Error demo activated."));
+					else Main.getNetworking().broadcast(new NotificationPackage("Error demo deactivated."));
+				}
+				else if(cmd[1].toLowerCase().equals("move-center-y+")) {
+					m_centerOffset.add(new Vec2(0, 5));
+				}
+				else if(cmd[1].toLowerCase().equals("move-center-y-")) {
+					m_centerOffset.add(new Vec2(0, -5));
+				}
+				else if(cmd[1].toLowerCase().equals("move-center-x+")) {
+					m_centerOffset.add(new Vec2(5, 0));
+				}
+				else if(cmd[1].toLowerCase().equals("move-center-x-")) {
+					m_centerOffset.add(new Vec2(-5, 0));
+				}
+				else if(cmd[1].toLowerCase().equals("move-center-res")) {
+					m_centerOffset.set(0,0);
 				}
 			}
 		}
